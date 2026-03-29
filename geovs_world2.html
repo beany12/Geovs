@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>GeoVS — Higher or Lower Geography Game | 195 Countries</title>
+<title>GeoGenius — Higher or Lower Geography Game | 195 Countries</title>
 <meta name="description" content="Test your world knowledge! Compare 195 countries by population, GDP, life expectancy, CO2 and more. Free daily geography quiz — new challenge every day!">
 <meta name="keywords" content="geography game, higher lower game, country comparison, world quiz, population game, educational game, daily quiz, Geografie Spiel, jeu géographie">
 <meta name="robots" content="index, follow">
@@ -11,16 +11,16 @@
 <!-- Open Graph -->
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://geovs.netlify.app">
-<meta property="og:title" content="GeoVS — Can you guess which country is bigger? 🌍">
+<meta property="og:title" content="GeoGenius — Can you guess which country is bigger? 🌍">
 <meta property="og:description" content="Higher or Lower with 195 real countries. Compare population, GDP, life expectancy and 7 more stats. Free daily challenge!">
 <meta property="og:image" content="https://geovs.netlify.app/og-image.png">
 <!-- Twitter Card -->
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="GeoVS — Higher or Lower Geography Game">
+<meta name="twitter:title" content="GeoGenius — Higher or Lower Geography Game">
 <meta name="twitter:description" content="Higher or Lower with 195 real countries. Compare population, GDP, life expectancy and more. Free daily challenge!">
 <meta name="twitter:image" content="https://geovs.netlify.app/og-image.png">
 <!-- Structured data -->
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"GeoVS","description":"Higher or Lower geography game with 195 countries","url":"https://geovs.netlify.app","applicationCategory":"GameApplication","genre":"Educational","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"GeoGenius","description":"Higher or Lower geography game with 195 countries","url":"https://geovs.netlify.app","applicationCategory":"GameApplication","genre":"Educational","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}}</script>
 <!-- Twemoji for cross-platform flag rendering -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/twemoji.min.js" crossorigin="anonymous"></script>
 <!-- Google Fonts with preconnect for faster load (item 4) -->
@@ -44,7 +44,7 @@
     <div id="pp-emblem" style="display:flex;justify-content:center"></div>
     <div id="pp-name-wrap">
       <div id="pp-username" style="font-family:var(--font-m);font-size:.58rem;letter-spacing:.1em;color:var(--muted2)">PLAYER</div>
-      <button onclick="ppStartRename()" style="background:none;border:none;color:var(--muted2);font-size:.65rem;cursor:pointer;font-family:inherit;display:block;margin:0 auto">✏️ rename</button>
+      <button onclick="ppStartRename()" style="background:rgba(200,241,53,.1);border:1px solid rgba(200,241,53,.35);color:var(--lime);font-size:.68rem;font-weight:700;cursor:pointer;font-family:inherit;display:block;margin:2px auto 0;padding:3px 12px;border-radius:100px;letter-spacing:.04em">✏️ Edit Name</button>
     </div>
     <div id="pp-name-edit" style="display:none;flex-direction:column;gap:4px;width:100%">
       <input id="pp-rename-inp" maxlength="20" style="width:100%;padding:6px 10px;border-radius:8px;border:1px solid var(--lime);background:var(--ink);color:var(--text);font-family:inherit;font-size:.8rem;text-align:center;outline:none">
@@ -127,7 +127,7 @@
     </div>
     <div class="home-hero-content">
       <div class="eyebrow" id="t-eyebrow">World Knowledge Arena</div>
-      <h1 class="home-title">GEO<span class="lime">VS</span><br><span class="ghost">WORLD</span></h1>
+      <h1 class="home-title">GEO<span class="lime">GENIUS</span></h1>
       <p class="home-sub" id="t-home-sub">Test your knowledge of the world's nations across economics, geography, health, environment and more.</p>
     </div>
   </div>
@@ -662,7 +662,6 @@
     <div class="share-score" id="share-score-txt"></div>
     <div class="share-sub" id="share-sub-txt"></div>
     <div class="share-btns">
-      <button class="sh-btn copy" onclick="copyShare()">📋 Copy</button>
       <button class="sh-btn tweet" onclick="tweetShare()">𝕏 Tweet</button>
       <button class="sh-btn wa" onclick="waShare()">💬 WhatsApp</button>
       <button class="sh-btn tiktok" onclick="tiktokShare()">🎵 TikTok</button>

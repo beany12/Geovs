@@ -30,7 +30,7 @@ const LANGS = {
     eyebrow:'World Knowledge Arena',
     homeSub:'Test your knowledge of the world\'s nations across economics, geography, health and more.',
     m1name:'Higher or Lower',m1desc:'Compare two nations head-to-head. Which has the higher value? Race for the longest streak.',
-    m2name:'Sort Challenge',m2desc:'Four countries, one stat. Drag them into the correct order from lowest to highest.',
+    m2name:'Sort Challenge',m2desc:'Four countries, one stat. Drag them into the correct order from highest to lowest.',
     m3name:'Guess the Country',m3desc:'One clue at a time — guess the country. Up to 8 clues, but wrong guesses cost you.',
     m4name:'Capitals Quiz',m4desc:'Name the capital — or pick the right country. Choose region and question count.',
     m5name:'Flags Quiz',m5desc:'See the flag, name the country. Multiple choice or type your answer. Choose region and rounds.',
@@ -51,7 +51,7 @@ const LANGS = {
     bdrHintMsg:(name)=>`💡 Try: ${name}`,bdrNoHints:'No hints left!',bdrTimesUp:'⏱ Time\'s up!',
     capRegs:{all:'🌍 All',europe:'🌍 Europe',asia:'🌏 Asia',africa:'🌍 Africa',americas:'🌎 Americas',oceania:'🌊 Oceania'},gtcCluesLbl:'CLUES REVEALED',gtcGuessLbl:'YOUR GUESS',gtcBtn:'Guess →',gtcPlaceholder:'Type a country name...',
     higher:'▲ Higher',lower:'▼ Lower',
-    sortH:'Sort: <span style="color:var(--rose)">lowest</span> → <span style="color:var(--lime)">highest</span>',
+    sortH:'Sort: <span style="color:var(--lime)">highest</span> → <span style="color:var(--rose)">lowest</span>',
     sortHint:'Drag to reorder · then confirm',sortConfirm:'Confirm ✓',
     next:'Next →',results:'See Results 🏆',
     themeLabel:'Today\'s Theme',questionsLbl:'Questions',
@@ -98,7 +98,7 @@ const LANGS = {
     eyebrow:'Welt-Wissens-Arena',
     homeSub:'Teste dein Wissen über die Länder der Welt — Wirtschaft, Geografie, Gesundheit und mehr.',
     m1name:'Höher oder Niedriger',m1desc:'Vergleiche zwei Länder direkt. Welches hat den höheren Wert? Baue die längste Serie auf.',
-    m2name:'Sortier-Challenge',m2desc:'Vier Länder, eine Statistik. Ziehe sie in die richtige Reihenfolge von niedrig nach hoch.',
+    m2name:'Sortier-Challenge',m2desc:'Vier Länder, eine Statistik. Ziehe sie in die richtige Reihenfolge von hoch nach niedrig.',
     m3name:'Land erraten',m3desc:'Ein Hinweis nach dem anderen — errate das Land. Bis zu 8 Hinweise, aber falsche Antworten kosten dich.',
     m4name:'Hauptstadt-Quiz',m4desc:'Nenne die Hauptstadt — oder wähle das richtige Land. Wähle Region und Fragenanzahl.',
     m5name:'Flaggen-Quiz',m5desc:'Sieh die Flagge, nenne das Land. Multiple Choice oder selbst tippen. Wähle Region und Runden.',
@@ -119,7 +119,7 @@ const LANGS = {
     bdrHintMsg:(name)=>`💡 Versuch: ${name}`,bdrNoHints:'Keine Hinweise mehr!',bdrTimesUp:'⏱ Zeit abgelaufen!',
     capRegs:{all:'🌍 Alle',europe:'🌍 Europa',asia:'🌏 Asien',africa:'🌍 Afrika',americas:'🌎 Amerika',oceania:'🌊 Ozeanien'},gtcCluesLbl:'HINWEISE ENTHÜLLT',gtcGuessLbl:'DEIN TIPP',gtcBtn:'Raten →',gtcPlaceholder:'Ländernamen eingeben...',
     higher:'▲ Höher',lower:'▼ Niedriger',
-    sortH:'Sortiere: <span style="color:var(--rose)">niedrigste</span> → <span style="color:var(--lime)">höchste</span>',
+    sortH:'Sortiere: <span style="color:var(--lime)">höchste</span> → <span style="color:var(--rose)">niedrigste</span>',
     sortHint:'Ziehen zum Sortieren · dann bestätigen',sortConfirm:'Bestätigen ✓',
     next:'Weiter →',results:'Ergebnis sehen 🏆',
     themeLabel:'Heutiges Thema',questionsLbl:'Fragen',
@@ -163,7 +163,7 @@ const LANGS = {
     eyebrow:'Arène de Connaissance Mondiale',
     homeSub:'Testez vos connaissances sur les pays du monde — économie, géographie, santé et plus.',
     m1name:'Plus ou Moins',m1desc:'Comparez deux pays. Lequel a la valeur la plus élevée? Visez la plus longue série.',
-    m2name:'Défi Classement',m2desc:'Quatre pays, une stat. Glissez-les dans le bon ordre du plus bas au plus haut.',
+    m2name:'Défi Classement',m2desc:'Quatre pays, une stat. Glissez-les dans le bon ordre du plus haut au plus bas.',
     m3name:'Devinez le Pays',m3desc:'Un indice à la fois — devinez le pays. Jusqu\'à 8 indices, mais les mauvaises réponses vous coûtent.',
     m4name:'Quiz Capitales',m4desc:'Nommez la capitale — ou choisissez le bon pays. Choisissez la région et le nombre de questions.',
     m5name:'Quiz Drapeaux',m5desc:'Voyez le drapeau, nommez le pays. Choix multiples ou saisie libre. Choisissez région et tours.',
@@ -184,7 +184,7 @@ const LANGS = {
     bdrHintMsg:(name)=>`💡 Essayez: ${name}`,bdrNoHints:'Plus d\'indices!',bdrTimesUp:'⏱ Temps écoulé!',
     capRegs:{all:'🌍 Tous',europe:'🌍 Europe',asia:'🌏 Asie',africa:'🌍 Afrique',americas:'🌎 Amériques',oceania:'🌊 Océanie'},gtcCluesLbl:'INDICES RÉVÉLÉS',gtcGuessLbl:'VOTRE RÉPONSE',gtcBtn:'Deviner →',gtcPlaceholder:'Tapez un nom de pays...',
     higher:'▲ Plus',lower:'▼ Moins',
-    sortH:'Classer: <span style="color:var(--rose)">plus bas</span> → <span style="color:var(--lime)">plus haut</span>',
+    sortH:'Classer: <span style="color:var(--lime)">plus haut</span> → <span style="color:var(--rose)">plus bas</span>',
     sortHint:'Glisser pour trier · puis confirmer',sortConfirm:'Confirmer ✓',
     next:'Suivant →',results:'Voir les résultats 🏆',
     themeLabel:"Thème d'aujourd'hui",questionsLbl:'Questions',
@@ -228,7 +228,7 @@ const LANGS = {
     eyebrow:'Arena del Conocimiento Mundial',
     homeSub:'Pon a prueba tu conocimiento de las naciones del mundo — economía, geografía, salud y más.',
     m1name:'Mayor o Menor',m1desc:'Compara dos naciones. ¿Cuál tiene el valor más alto? Construye la racha más larga.',
-    m2name:'Desafío de Orden',m2desc:'Cuatro países, una estadística. Arrástralos en orden correcto de menor a mayor.',
+    m2name:'Desafío de Orden',m2desc:'Cuatro países, una estadística. Arrástralos en orden correcto de mayor a menor.',
     m3name:'Adivina el País',m3desc:'Una pista a la vez — adivina el país. Hasta 8 pistas, pero las respuestas incorrectas te cuestan.',
     m4name:'Quiz Capitales',m4desc:'Nombra la capital — o elige el país correcto. Elige región y número de preguntas.',
     m5name:'Quiz Banderas',m5desc:'Mira la bandera, nombra el país. Opción múltiple o escribe tu respuesta. Elige región y rondas.',
@@ -249,7 +249,7 @@ const LANGS = {
     bdrHintMsg:(name)=>`💡 Prueba: ${name}`,bdrNoHints:'¡Sin pistas!',bdrTimesUp:'⏱ ¡Se acabó el tiempo!',
     capRegs:{all:'🌍 Todo',europe:'🌍 Europa',asia:'🌏 Asia',africa:'🌍 África',americas:'🌎 Américas',oceania:'🌊 Oceanía'},gtcCluesLbl:'PISTAS REVELADAS',gtcGuessLbl:'TU RESPUESTA',gtcBtn:'Adivinar →',gtcPlaceholder:'Escribe un nombre de país...',
     higher:'▲ Mayor',lower:'▼ Menor',
-    sortH:'Ordenar: <span style="color:var(--rose)">menor</span> → <span style="color:var(--lime)">mayor</span>',
+    sortH:'Ordenar: <span style="color:var(--lime)">mayor</span> → <span style="color:var(--rose)">menor</span>',
     sortHint:'Arrastrar para ordenar · luego confirmar',sortConfirm:'Confirmar ✓',
     next:'Siguiente →',results:'Ver Resultados 🏆',
     themeLabel:'Tema de Hoy',questionsLbl:'Preguntas',
@@ -301,10 +301,10 @@ function setLang(code) {
   document.documentElement.lang = code;
   // Item 10: update browser tab title per language
   const TITLES = {
-    en: 'GeoVS — Higher or Lower Geography Game | 195 Countries',
-    de: 'GeoVS — Geografie-Spiel | 195 Länder vergleichen',
-    fr: 'GeoVS — Jeu de Géographie | 195 Pays',
-    es: 'GeoVS — Juego de Geografía | 195 Países'
+    en: 'GeoGenius — Higher or Lower Geography Game | 195 Countries',
+    de: 'GeoGenius — Geografie-Spiel | 195 Länder vergleichen',
+    fr: 'GeoGenius — Jeu de Géographie | 195 Pays',
+    es: 'GeoGenius — Juego de Geografía | 195 Países'
   };
   document.title = TITLES[code] || TITLES.en;
   // Update lang buttons
@@ -629,12 +629,26 @@ const CONT_IDS = ['all','Africa','Asia','Europe','N.America','S.America','Oceani
 
 function buildCatBar(elId, state, onChange){
   const el=document.getElementById(elId); if(!el) return;
+  if(!state.selectedCats) state.selectedCats=[0];
   el.innerHTML='';
   T.categories.forEach((lbl,i)=>{
     const b=document.createElement('button');
-    b.className='cat-chip'+(state.catIdx===i?' active':'');
+    const active=state.selectedCats.includes(i);
+    b.className='cat-chip'+(active?' active':'');
     b.textContent=lbl;
-    b.onclick=()=>{ state.catIdx=i; buildCatBar(elId,state,onChange); onChange(); };
+    b.onclick=()=>{
+      if(i===0){
+        state.selectedCats=[0];
+      } else {
+        const allIdx=state.selectedCats.indexOf(0);
+        if(allIdx>-1) state.selectedCats.splice(allIdx,1);
+        const ci=state.selectedCats.indexOf(i);
+        if(ci>-1) state.selectedCats.splice(ci,1); else state.selectedCats.push(i);
+        if(state.selectedCats.length===0) state.selectedCats=[0];
+      }
+      state.catIdx=state.selectedCats.includes(0)?0:state.selectedCats[0];
+      buildCatBar(elId,state,onChange); onChange();
+    };
     el.appendChild(b);
   });
 }
@@ -649,7 +663,13 @@ function buildContBar(elId, state, onChange){
     el.appendChild(b);
   });
 }
-function getMetricKeys(catIdx){ return CAT_KEYS[catIdx] || Object.keys(T.metrics); }
+function getMetricKeys(selectedCats){
+  const cats=Array.isArray(selectedCats)?selectedCats:[selectedCats||0];
+  if(cats.includes(0)||cats.length===0) return Object.keys(T.metrics);
+  const keys=[];
+  cats.forEach(ci=>{if(CAT_KEYS[ci]) keys.push(...CAT_KEYS[ci]);});
+  return keys.length>0?[...new Set(keys)]:Object.keys(T.metrics);
+}
 function getPool(catIdx, contIdx){
   const pool=filterCont(COUNTRIES, CONT_IDS[contIdx]||'all');
   return pool.length>=4 ? pool : COUNTRIES;
@@ -668,7 +688,7 @@ function hlSaveHighscore(s){
 }
 
 function launchHL(){
-  hlS={score:0,streak:0,bestStreak:0,round:0,correct:0,total_q:0,catIdx:0,contIdx:0,lastMode:'hl',prevB:null,prevMKey:null};
+  hlS={score:0,streak:0,bestStreak:0,round:0,correct:0,total_q:0,catIdx:0,selectedCats:[0],contIdx:0,lastMode:'hl',prevB:null,prevMKey:null};
   buildCatBar('hl-cats',hlS,()=>{hlS.score=0;hlS.streak=0;hlS.bestStreak=0;hlS.round=0;hlS.correct=0;hlS.total_q=0;hlS.prevB=null;hlS.prevMKey=null;hlRound();});
   buildContBar('hl-conts',hlS,()=>{hlS.score=0;hlS.streak=0;hlS.bestStreak=0;hlS.round=0;hlS.correct=0;hlS.total_q=0;hlS.prevB=null;hlS.prevMKey=null;hlRound();});
   hlHUD(); hlRound(); showScreen('hl');
@@ -689,15 +709,15 @@ function hlRound(){
   if(hlS.prevB){
     /* Carry-over: previous B becomes A */
     cA=hlS.prevB;
-    /* If specific category: keep same metric. If "All" (catIdx 0): pick new random metric */
-    const mKeys=getMetricKeys(hlS.catIdx);
-    mKey=(hlS.catIdx===0)?rand(mKeys):(hlS.prevMKey||rand(mKeys));
+    const mKeys=getMetricKeys(hlS.selectedCats||[0]);
+    const isSingle=hlS.selectedCats&&!hlS.selectedCats.includes(0)&&hlS.selectedCats.length===1&&mKeys.length===1;
+    mKey=isSingle&&hlS.prevMKey?hlS.prevMKey:rand(mKeys);
     m=T.metrics[mKey];
     const candidates=pool.filter(c=>c.n!==cA.n);
     cB=rand(candidates.length>0?candidates:pool);
   } else {
     /* First round: pick fresh */
-    const mKeys=getMetricKeys(hlS.catIdx);
+    const mKeys=getMetricKeys(hlS.selectedCats||[0]);
     mKey=rand(mKeys);
     m=T.metrics[mKey];
     const [a,b]=pick(pool,2);
@@ -745,7 +765,7 @@ function hlAnswer(guess){
     /* B becomes A for next round, keep metric */
     hlS.prevB=cB;
     hlS.prevMKey=mKey;
-    const nb=document.getElementById('hl-next'); nb.className='next-btn show'; nb.textContent=T.next;
+    setTimeout(()=>hlRound(),1400);
   } else {
     document.getElementById('hl-cB').className='hl-card wrong shake';
     fb.className='hl-feedback show bad';
@@ -918,7 +938,7 @@ function checkSort(){
   const cards=[...con.querySelectorAll('.sort-card')];
   const mKey=sortS.mKey; const m=T.metrics[mKey];
   const userOrder=cards.map(c=>sortS.order[parseInt(c.dataset.i)]);
-  const correct=[...sortS.countries].sort((a,b)=>a[mKey]-b[mKey]);
+  const correct=[...sortS.countries].sort((a,b)=>b[mKey]-a[mKey]);
   let exact=0;
   userOrder.forEach((c,i)=>{ if(c.n===correct[i].n) exact++; });
   const perfect=exact===4;
@@ -1134,7 +1154,7 @@ function openShareModal(score, correct, answers){
   const dateStr=new Date().toLocaleDateString(langLocale,{month:'short',day:'numeric',year:'numeric'});
   const emojis=(answers||[]).join('');
   const streak=loadStreak();
-  _shareText=['🌍 GeoVS Daily — '+dateStr,`Score: ${score} pts · ${correct}/8 correct`,emojis,streak.count>1?`🔥 ${streak.count} day streak!`:'','Play free: geovs.netlify.app'].filter(Boolean).join('\n');
+  _shareText=['🌍 GeoGenius Daily — '+dateStr,`Score: ${score} pts · ${correct}/8 correct`,emojis,streak.count>1?`🔥 ${streak.count} day streak!`:'','Play free: geovs.netlify.app'].filter(Boolean).join('\n');
   document.getElementById('share-grid').textContent=emojis||'🟩🟥🟩🟩🟥🟩🟩🟥';
   document.getElementById('share-score-txt').textContent=score+' pts';
   document.getElementById('share-sub-txt').textContent=`${correct}/8 correct · ${dateStr}${streak.count>1?' · 🔥 '+streak.count+' day streak':''}`;
@@ -1364,7 +1384,7 @@ function buildEasyQ(R) {
     const possessive = curLang==='de' ? "s" : curLang==='fr' ? " de" : curLang==='es' ? " de" : "'s";
     return {
       typeLabel: labelGuess,
-      question: questionWord+' '+flagImg(country.f,'1.2rem')+' <strong>'+countryName(country.n)+'</strong>'+possessive+' <strong>'+m.label.toLowerCase()+'</strong>?',
+      question: questionWord+' <strong>'+countryName(country.n)+'</strong> '+flagImg(country.f,'1.2rem')+possessive+' <strong>'+m.label.toLowerCase()+'</strong>?',
       options: allVals.map(v=>({text:m.fmt(v)})),
       correct: allVals.indexOf(realVal),
       explanation: countryName(country.n)+': '+m.fmt(realVal),
@@ -2429,7 +2449,7 @@ function capRound(){
   document.getElementById('cap-next').style.display='none';
   var skipBtn=document.getElementById('cap-skip'); if(skipBtn){ skipBtn.disabled=false; skipBtn.style.display=''; var skipLbl={en:'⏭ Skip',de:'⏭ Überspringen',fr:'⏭ Passer',es:'⏭ Saltar'}[curLang]||'⏭ Skip'; skipBtn.textContent=skipLbl; }
   var capQ={en:'What is the capital of',de:'Was ist die Hauptstadt von',fr:'Quelle est la capitale de',es:'¿Cuál es la capital de'}[curLang]||'What is the capital of';
-  document.getElementById('cap-q').innerHTML=capQ+' '+flagImg(q.f,'1.3rem')+' <strong>'+countryName(q.n)+'</strong>?';
+  document.getElementById('cap-q').innerHTML=capQ+' <strong>'+countryName(q.n)+'</strong> '+flagImg(q.f,'1.3rem')+'?';
   var mcEl=document.getElementById('cap-mc-opts');
   var typeEl=document.getElementById('cap-type-wrap');
   if(cS.mode==='mc'){
@@ -2473,8 +2493,8 @@ function capAnswer(ans,btn){
   var capWrongPfx={en:'✗ Answer: ',de:'✗ Antwort: ',fr:'✗ Réponse : ',es:'✗ Respuesta: '}[curLang]||'✗ Answer: ';
   document.getElementById('cap-feedback').textContent=capOk?capCorrectMsg:capWrongPfx+cS.answer;
   document.getElementById('cap-feedback').style.color=capOk?'var(--lime)':'var(--rose)';
-  showNextBtn('cap-next');
   var skipBtn=document.getElementById('cap-skip'); if(skipBtn) skipBtn.style.display='none';
+  setTimeout(function(){ capNext(); }, capOk?1200:2200);
 }
 
 function capAutoComplete(){
@@ -2515,8 +2535,8 @@ function capTypeSubmit(){
   var capWrongPfx={en:'✗ Answer: ',de:'✗ Antwort: ',fr:'✗ Réponse : ',es:'✗ Respuesta: '}[curLang]||'✗ Answer: ';
   document.getElementById('cap-feedback').textContent=ok?capCorrectMsg:capWrongPfx+cS.answer;
   document.getElementById('cap-feedback').style.color=ok?'var(--lime)':'var(--rose)';
-  showNextBtn('cap-next');
   var skipBtn=document.getElementById('cap-skip'); if(skipBtn) skipBtn.style.display='none';
+  setTimeout(function(){ capNext(); }, ok?1200:2200);
 }
 
 function capNext(){ capRound(); }
@@ -2621,7 +2641,7 @@ function flgRound(){
   var wrongs=shuffle(fS.allPool.filter(function(c){ return c.n!==q.n; })).slice(0,3);
   var opts=shuffle([q].concat(wrongs));
   if(fS.mode==='ftc'){
-    document.getElementById('flg-display').innerHTML=flagImg(q.f,'6rem');
+    document.getElementById('flg-display').innerHTML=flagImg(q.f,'9rem');
     document.getElementById('flg-display').style.display='block';
     document.getElementById('flg-q').textContent=T.flgQFTC||'Which country does this flag belong to?';
     if(isType){
@@ -2711,8 +2731,8 @@ function flgTypeSubmit(){
   var fbEl=document.getElementById('flg-feedback');
   fbEl.textContent=ok?correctMsg:wrongPfx+countryName(q.n);
   fbEl.style.color=ok?'var(--lime)':'var(--rose)';
-  showNextBtn('flg-next');
   var skipBtn=document.getElementById('flg-skip'); if(skipBtn) skipBtn.style.display='none';
+  setTimeout(function(){ flgNext(); }, ok?1200:2200);
 }
 
 function flgSkip(){
@@ -2727,7 +2747,7 @@ function flgAnswer(ok,btn,correctCountry){
     else if(b===btn&&!ok){ b.style.borderColor='var(--rose)'; b.style.opacity='.5'; }
   });
   if(ok){ fS.score++; try{awardXP(8);}catch(e){} try{achTrack('flgCorrect',1);achTrack('flgUnique',correctCountry);}catch(e){} }
-  showNextBtn('flg-next');
+  setTimeout(function(){ flgNext(); }, ok?1200:2200);
 }
 
 function flgNext(){ flgRound(); }
@@ -3208,6 +3228,7 @@ function gtcGuess() {
 
 function gtcReveal(won, pts) {
   gtcState.done = true;
+  document.getElementById('gtc-feedback').textContent = '';
   const c = gtcState.country;
   document.getElementById('gtc-inp').disabled = true;
   const res = document.getElementById('gtc-result');

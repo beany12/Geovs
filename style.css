@@ -113,9 +113,10 @@ canvas#bgc{position:fixed;inset:0;z-index:0;pointer-events:none}
 /* ── HIGHER/LOWER ── */
 #shl{padding-bottom:40px}
 .hl-body{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:28px 20px;gap:24px;width:100%}
-.hl-qlabel{font-family:var(--font-m);font-size:.68rem;letter-spacing:.2em;text-transform:uppercase;color:var(--muted2);text-align:center}
+.hl-qlabel{font-family:var(--font-m);font-size:.82rem;letter-spacing:.12em;text-transform:uppercase;color:var(--text);text-align:center;opacity:.85}
 .hl-arena{display:flex;align-items:stretch;gap:0;width:100%;max-width:780px;border-radius:var(--r-xl);overflow:hidden;border:1px solid var(--border)}
 .hl-card{flex:1;padding:30px 26px;background:var(--ink2);display:flex;flex-direction:column;gap:10px;transition:border-color .3s;position:relative;overflow:hidden}
+#hl-cB{padding-left:40px}
 .hl-card::after{content:'';position:absolute;inset:0;opacity:0;transition:opacity .4s;pointer-events:none}
 .hl-card.correct{border-color:rgba(200,241,53,.4)}.hl-card.correct::after{background:radial-gradient(ellipse at center,rgba(200,241,53,.1),transparent 70%);opacity:1}
 .hl-card.wrong{border-color:rgba(255,61,107,.4)}.hl-card.wrong::after{background:radial-gradient(ellipse at center,rgba(255,61,107,.1),transparent 70%);opacity:1}
@@ -313,6 +314,7 @@ canvas#bgc{position:fixed;inset:0;z-index:0;pointer-events:none}
   .hl-divider{width:100%;height:1px}
   .vs-orb{position:relative;margin:-24px auto}
   .hl-card{padding:20px 16px}
+  #hl-cB{padding-left:16px}
   .hl-name{font-size:1.2rem}
   .hl-btn{padding:13px 28px;font-size:.9rem}
 
