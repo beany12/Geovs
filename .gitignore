@@ -1,0 +1,28 @@
+# Secrets — never commit these
+.env
+.env.local
+.env*.local
+*.pem
+*.key
+
+# MacOS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+*.swp
+
+# Dependencies (if you ever add npm)
+node_modules/
+
+# Build output
+dist/
+build/
+.next/
+
+# Temporary files
+*.tmp
+*.log
+border_preview.html
