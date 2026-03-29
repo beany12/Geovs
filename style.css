@@ -271,9 +271,17 @@ canvas#bgc{position:fixed;inset:0;z-index:0;pointer-events:none}
 @keyframes popIn{from{transform:scale(.5) rotate(-3deg);opacity:0}to{transform:scale(1) rotate(0);opacity:1}}
 @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-5px)}80%{transform:translateX(5px)}}
 .shake{animation:shake .4s ease}
+@keyframes xpFloat{0%{opacity:1;transform:translateY(0) scale(1)}50%{opacity:1;transform:translateY(-14px) scale(1.08)}100%{opacity:0;transform:translateY(-28px) scale(.9)}}
+@keyframes xpBarGlow{0%{box-shadow:none}30%{box-shadow:0 0 10px rgba(200,241,53,.75),0 0 20px rgba(200,241,53,.35)}70%{box-shadow:0 0 6px rgba(200,241,53,.5)}100%{box-shadow:none}}
+.xp-gain-badge{position:fixed;font-size:.72rem;font-weight:800;color:#c8f135;text-shadow:0 0 8px rgba(200,241,53,.7);pointer-events:none;animation:xpFloat 1.6s ease-out forwards;z-index:9999;white-space:nowrap}
+.xp-bar-glow{animation:xpBarGlow 1.5s ease-out}
 
 /* ── MOBILE (≤640px) ── */
 @media(max-width:640px){
+  /* Profile badge — fixed so it stays visible when user scrolls */
+  #profile-badge{position:fixed;top:12px;right:12px;z-index:200;width:64px}
+  #profile-panel{top:82px;right:10px;width:calc(100vw - 20px);max-width:320px}
+
   /* Header */
   .game-header{padding:0 12px;height:54px}
   .gh-left{gap:10px}
@@ -363,6 +371,10 @@ canvas#bgc{position:fixed;inset:0;z-index:0;pointer-events:none}
   .mode-card:active{transform:scale(.98)!important;transition-duration:.08s}
   .hl-btn:active{transform:scale(.96)!important}
   .bdr-setup-chip:active{transform:scale(.96)}
+
+  /* XP animation — mobile */
+  .xp-gain-badge{font-size:.88rem;letter-spacing:.03em}
+  #pp-xp-bar{height:6px!important;border-radius:3px!important}
 }
 
 /* ── JOKERS ── */
@@ -588,4 +600,8 @@ canvas#bgc{position:fixed;inset:0;z-index:0;pointer-events:none}
 
   /* Jokers */
   .joker-bar{gap:8px}
+
+  /* XP animation — tablet */
+  .xp-gain-badge{font-size:.8rem}
+  #pp-xp-bar{height:5px!important;border-radius:2.5px!important}
 }

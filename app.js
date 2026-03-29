@@ -1102,6 +1102,7 @@ function chFinish(){
   saveDailyProgress({done:true,score:chS.score,correct:chS.correct,answers:chAnswers});
   updateStreak();
   try{achTrack('dailyDone',1);if(chS.correct===8&&!jokerFiftyUsed&&!jokerAudienceUsed)achTrack('dailyPerfectNoJoker',1);}catch(e){}
+  try{flushXP();}catch(e){}
   openShareModal(chS.score,chS.correct,chAnswers);
 }
 
@@ -1157,7 +1158,7 @@ function waShare(){ window.open('https://wa.me/?text='+encodeURIComponent(_share
 ══════════════════════════════════════════ */
 let _lastState=null;
 function showOver(state){
-  _lastState=state; try{incGames();achTrackLang();}catch(e){}
+  _lastState=state; try{flushXP();}catch(e){} try{incGames();achTrackLang();}catch(e){}
   const acc=state.total_q>0?Math.round(state.correct/state.total_q*100):0;
   document.getElementById('over-score').textContent=state.score;
   document.getElementById('os-correct').textContent=state.correct;
@@ -3232,15 +3233,51 @@ function gtcReveal(won, pts) {
 function gtcNext() { gtcState.done = false; gtcRound(); }
 
 
+let _pendingXP=0,_xpJustGained=0,_xpAnimFrom=0,_xpAnimTo=0;
 function awardXP(amt){
   if(!amt||amt<=0)return;
+  _pendingXP=(_pendingXP||0)+amt;
+}
+function flushXP(){
+  if(!_pendingXP||_pendingXP<=0)return;
   try{
-    const p=pGet(),oldLvl=getLvlData(p.xp).cur.lvl;
-    p.xp=(p.xp||0)+amt;pSave();profileRender();
-    showToast('+'+amt+' XP');
+    const p=pGet(),oldXP=p.xp||0,oldLvl=getLvlData(oldXP).cur.lvl;
+    _xpAnimFrom=getLvlData(oldXP).pct;
+    p.xp=oldXP+_pendingXP;
+    _xpJustGained=_pendingXP;
+    _pendingXP=0;
+    pSave();
+    _xpAnimTo=getLvlData(p.xp).pct;
+    profileRender();
+    showToast('+'+_xpJustGained+' XP');
     const newLvl=getLvlData(p.xp).cur.lvl;
     if(newLvl>oldLvl)setTimeout(()=>showLevelUp(getLvlData(p.xp).cur),700);
-  }catch(ex){console.warn('awardXP:',ex);}
+  }catch(ex){console.warn('flushXP:',ex);}
+}
+function animateXPBar(gained){
+  try{
+    const fill=document.getElementById('pp-xp-fill');
+    if(!fill)return;
+    fill.style.transition='none';
+    fill.style.width=_xpAnimFrom+'%';
+    const bar=document.getElementById('pp-xp-bar')||fill.parentElement;
+    if(bar&&gained>0){
+      const r=bar.getBoundingClientRect();
+      const badge=document.createElement('div');
+      badge.className='xp-gain-badge';
+      badge.textContent='+'+gained+' XP';
+      badge.style.left=(r.right-76)+'px';
+      badge.style.top=(r.top-6)+'px';
+      document.body.appendChild(badge);
+      setTimeout(()=>badge.remove(),1700);
+    }
+    requestAnimationFrame(()=>requestAnimationFrame(()=>{
+      fill.style.transition='width 1.2s cubic-bezier(.22,1,.36,1)';
+      fill.style.width=_xpAnimTo+'%';
+      fill.classList.add('xp-bar-glow');
+      setTimeout(()=>{fill.style.transition='';fill.classList.remove('xp-bar-glow');},1500);
+    }));
+  }catch(ex){console.warn('animateXPBar:',ex);}
 }
 function incGames(){try{const p=pGet();p.games=(p.games||0)+1;pSave();}catch(ex){}}
 
@@ -3414,6 +3451,11 @@ function toggleProfilePanel(){
     profileRender();
     const badge=document.getElementById('profile-badge');
     if(badge){const r=badge.getBoundingClientRect();panel.style.top=(r.bottom+6)+'px';panel.style.right=(window.innerWidth-r.right)+'px';}
+    if(_xpJustGained>0){
+      const gained=_xpJustGained;
+      _xpJustGained=0;
+      setTimeout(()=>animateXPBar(gained),180);
+    }
   }
 }
 document.addEventListener('click',e=>{
@@ -4314,8 +4356,7 @@ function bdrEnd(){
   if(bdr.timer)clearInterval(bdr.timer);
   document.removeEventListener('click',bdrCloseSuggest);
   const score=bdr.visited.length*10;
-  const xp=Math.min(200,bdr.visited.length*5);
-  try{const p=pGet();p.xp+=xp;pSave();profileRender();}catch(e){}
+  awardXP(Math.min(250,bdr.visited.length*4));
   try{
     achTrackMax('bdrBest',bdr.visited.length);
     if(bdr.hints===3&&bdr.visited.length>=10)achTrack('bdrNoHint10',1);
