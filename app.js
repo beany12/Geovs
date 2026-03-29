@@ -688,9 +688,9 @@ function hlSaveHighscore(s){
 }
 
 function launchHL(){
-  hlS={score:0,streak:0,bestStreak:0,round:0,correct:0,total_q:0,catIdx:0,selectedCats:[0],contIdx:0,lastMode:'hl',prevB:null,prevMKey:null};
-  buildCatBar('hl-cats',hlS,()=>{hlS.score=0;hlS.streak=0;hlS.bestStreak=0;hlS.round=0;hlS.correct=0;hlS.total_q=0;hlS.prevB=null;hlS.prevMKey=null;hlRound();});
-  buildContBar('hl-conts',hlS,()=>{hlS.score=0;hlS.streak=0;hlS.bestStreak=0;hlS.round=0;hlS.correct=0;hlS.total_q=0;hlS.prevB=null;hlS.prevMKey=null;hlRound();});
+  hlS={score:0,streak:0,bestStreak:0,round:0,correct:0,total_q:0,catIdx:0,selectedCats:[0],contIdx:0,lastMode:'hl',prevB:null,prevMKey:null,_newRecordShown:false};
+  buildCatBar('hl-cats',hlS,()=>{hlS.score=0;hlS.streak=0;hlS.bestStreak=0;hlS.round=0;hlS.correct=0;hlS.total_q=0;hlS.prevB=null;hlS.prevMKey=null;hlS._newRecordShown=false;hlRound();});
+  buildContBar('hl-conts',hlS,()=>{hlS.score=0;hlS.streak=0;hlS.bestStreak=0;hlS.round=0;hlS.correct=0;hlS.total_q=0;hlS.prevB=null;hlS.prevMKey=null;hlS._newRecordShown=false;hlRound();});
   hlHUD(); hlRound(); showScreen('hl');
 }
 
@@ -756,8 +756,27 @@ function hlAnswer(guess){
   if(ok){
     hlS.streak++; hlS.correct++; hlS.bestStreak=Math.max(hlS.bestStreak,hlS.streak);
     const pts=1; hlS.score+=pts;
-    try{awardXP(hlS.streak>=5?10:5);}catch(e){}
+    // Tiered XP: ×1 base, ×1.5 at 5, ×2 at 10, ×3 at 20
+    const xpBase=hlS.streak>=20?15:hlS.streak>=10?10:hlS.streak>=5?8:5;
+    try{awardXP(xpBase);}catch(e){}
     document.getElementById('hl-cB').className='hl-card correct';
+    // Milestone check
+    if([5,10,20].includes(hlS.streak)){
+      const mult=hlS.streak>=20?'×3 XP!':hlS.streak>=10?'×2 XP!':'×1.5 XP!';
+      showToast('🔥 Streak '+hlS.streak+'! '+mult);
+      const arena=document.getElementById('hl-arena');
+      if(arena){arena.classList.add('streak-milestone');setTimeout(()=>arena.classList.remove('streak-milestone'),1200);}
+    }
+    // Personal best — show once the moment the record is broken
+    const _prevBest=hlGetHighscore();
+    if(hlS.streak>_prevBest&&hlS.streak>0&&!hlS._newRecordShown){
+      hlS._newRecordShown=true;
+      setTimeout(()=>{
+        showToast('🏆 Neuer Rekord! '+hlS.streak);
+        try{startConfetti('#c8f135');}catch(e){}
+        setTimeout(()=>{try{stopConfetti();}catch(e){}},2200);
+      },500);
+    }
     fb.className='hl-feedback show ok';
     document.getElementById('hl-fb-main').textContent=(hlS.streak>=3?T.streak_msg(hlS.streak)+' ':T.correct_msg+' ')+T.pts(pts);
     document.getElementById('hl-fb-det').textContent=`${countryName(cB.n)}: ${m.fmt(vB)} vs ${countryName(cA.n)}: ${m.fmt(vA)}`;
@@ -800,6 +819,14 @@ function hlHUD(){
   const hs=hlGetHighscore();
   document.getElementById('hl-highscore').textContent=Math.max(hs,hlS.score);
   document.getElementById('hl-hs-pill').style.opacity=hlS.score>hs?'1':'0.6';
+  // Streak multiplier pill
+  const mp=document.getElementById('hl-mult-pill');
+  if(mp){
+    if(hlS.streak>=20){mp.style.display='';mp.textContent='×3 XP';mp.style.color='var(--rose)';}
+    else if(hlS.streak>=10){mp.style.display='';mp.textContent='×2 XP';mp.style.color='var(--amber)';}
+    else if(hlS.streak>=5){mp.style.display='';mp.textContent='×1.5 XP';mp.style.color='var(--lime)';}
+    else{mp.style.display='none';}
+  }
 }
 
 /* Keyboard shortcuts for HL mode */
@@ -933,6 +960,13 @@ function renderSortCards(countries,mKey){
 function updateSortRanks(){
   document.querySelectorAll('.sort-card').forEach((c,i)=>c.querySelector('.sort-rank').textContent=i+1);
 }
+function sortHUD(){
+  const p=document.getElementById('sort-perf-pill');
+  const s=document.getElementById('sort-perf-streak');
+  if(!p||!s) return;
+  if((sortS._perfStreak||0)>0){ p.style.display=''; s.textContent=sortS._perfStreak; }
+  else { p.style.display='none'; }
+}
 function checkSort(){
   const con=document.getElementById('sort-container');
   const cards=[...con.querySelectorAll('.sort-card')];
@@ -945,6 +979,7 @@ function checkSort(){
   const pts=perfect?20:exact>=2?10:0;
   sortS.score+=pts; sortS.total_q++; if(perfect) sortS.correct++; try{if(perfect)awardXP(10);else if(pts>0)awardXP(Math.round(pts/10));}catch(e){}
   try{achTrack('sortRounds',1);if(perfect){achTrack('sortPerfects',1);sortS._perfStreak=(sortS._perfStreak||0)+1;achTrackMax('sortPerfectStreak',sortS._perfStreak);}else{sortS._perfStreak=0;}}catch(e){}
+  sortHUD();
   cards.forEach((card,i)=>{
     const ci=parseInt(card.dataset.i); const country=sortS.order[ci];
     const sv=document.getElementById('sv'+ci);
@@ -952,6 +987,13 @@ function checkSort(){
     card.classList.remove('drag-over');
     const correctIdx=correct.findIndex(c=>c.n===country.n);
     card.classList.add(i===correctIdx?'correct-pos':'wrong-pos');
+    // Show position hint on wrong cards
+    if(i!==correctIdx){
+      const hint=document.createElement('span');
+      hint.className='sort-pos-hint';
+      hint.textContent='→ #'+(correctIdx+1);
+      card.appendChild(hint);
+    }
   });
   setTimeout(()=>{
     correct.forEach(c=>{
@@ -1257,6 +1299,49 @@ function showOver(state){
   document.getElementById('btn-replay').textContent=T.playAgain||T.next||'Play Again';
   var homeBtn=document.getElementById('btn-home'); if(homeBtn) homeBtn.textContent=T.homeLbl||'← Home';
   var shareBtn=document.getElementById('btn-share-over'); if(shareBtn) shareBtn.style.display=state.lastMode==='challenge'?'':'none';
+  // GTC avg clues efficiency
+  var gtcEff=document.getElementById('over-gtc-eff');
+  if(gtcEff){
+    if(state.lastMode==='gtc'&&state.gtcAvgClues){
+      gtcEff.style.display='';
+      var clueWord={en:'avg clues',de:'∅ Hinweise',fr:'indices moy.',es:'pistas prom.'}[curLang]||'avg clues';
+      document.getElementById('over-gtc-eff-val').textContent=state.gtcAvgClues;
+      document.getElementById('over-gtc-eff-lbl').textContent=clueWord;
+    } else { gtcEff.style.display='none'; }
+  }
+  // Border Run region % + record
+  var bdrExtra=document.getElementById('over-bdr-extra');
+  if(bdrExtra){
+    if(state.lastMode==='border'){
+      bdrExtra.style.display='';
+      var pctEl=document.getElementById('over-bdr-pct');
+      var recEl=document.getElementById('over-bdr-rec');
+      if(pctEl) pctEl.textContent=state.bdrPct+'%';
+      if(recEl){
+        if(state.bdrIsNewRec){
+          recEl.textContent={en:'🏆 New Region Record!',de:'🏆 Neuer Regionsrekord!',fr:'🏆 Nouveau record de région!',es:'🏆 ¡Nuevo récord regional!'}[curLang]||'🏆 New Record!';
+          recEl.style.color='var(--lime)';
+        } else {
+          var bestLbl={en:'Best',de:'Rekord',fr:'Record',es:'Récord'}[curLang]||'Best';
+          recEl.textContent=bestLbl+': '+state.bdrPrevRec;
+          recEl.style.color='var(--muted2)';
+        }
+      }
+    } else { bdrExtra.style.display='none'; }
+  }
+  // XP progress to next level
+  try{
+    var xpWrap=document.getElementById('over-xp-prog');
+    if(xpWrap){
+      var p2=pGet(),lvlD=getLvlData(p2.xp);
+      var toNext=lvlD.next.xp-p2.xp;
+      var toNextEl=document.getElementById('over-xp-to-next');
+      if(toNextEl) toNextEl.textContent=toNext+' XP → Level '+lvlD.next.lvl;
+      var fillEl=document.getElementById('over-xp-bar-fill');
+      if(fillEl){ fillEl.style.transition='none'; fillEl.style.width='0%';
+        setTimeout(()=>{ fillEl.style.transition='width 1s cubic-bezier(.22,1,.36,1)'; fillEl.style.width=lvlD.pct+'%'; },300); }
+    }
+  }catch(ex){}
   showScreen('over');
   const _pct=getPercentile(state.score,state.lastMode||'daily');
   const _pb=document.getElementById('pct-badge');
@@ -2430,11 +2515,26 @@ function capSlider(v){
   document.getElementById('cap-count').textContent=Math.min(parseInt(v),pool.length);
 }
 
+function capDifficulty(d){
+  cS.difficulty=d;
+  ['easy','medium','hard'].forEach(function(x){
+    var b=document.getElementById('cdiff-'+x); if(!b) return;
+    if(x===d){ b.style.borderColor='var(--blue)'; b.style.background='rgba(61,158,255,.1)'; b.style.color='var(--blue)'; }
+    else { b.style.borderColor='var(--border)'; b.style.background='var(--ink3)'; b.style.color='var(--text)'; }
+  });
+}
 function capStart(){
-  var pool=shuffle(qPool(cS.region).filter(function(c){ return CAPITALS[c.n]; }));
+  var allPool=qPool(cS.region).filter(function(c){ return CAPITALS[c.n]; });
+  // Difficulty filter: easy = pop > 20M, hard = pop < 5M, medium = all
+  var diff=cS.difficulty||'medium';
+  var filtPool=diff==='easy'?allPool.filter(function(c){return c.pop>20000000;}):
+                diff==='hard'?allPool.filter(function(c){return c.pop<5000000;}):allPool;
+  if(filtPool.length<4) filtPool=allPool; // fallback if filtered pool too small
+  var pool=shuffle(filtPool);
   var sl=document.getElementById('cap-slider');
   var count=Math.min(parseInt(sl?sl.value:20),pool.length);
-  cS.pool=pool.slice(0,count); cS.total=count; cS.round=0; cS.score=0;
+  cS.pool=pool.slice(0,count); cS.total=count; cS.round=0; cS.score=0; cS.streak=0;
+  cS.diffMult=diff==='hard'?1.5:1.0; // Hard gives ×1.5 XP
   try{achTrack('capRegions',cS.region);}catch(e){}
   document.getElementById('cap-next').style.display='none';
   showScreen('cap'); capRound();
@@ -2488,7 +2588,15 @@ function capAnswer(ans,btn){
     else if(b.textContent===ans&&ans!==cS.answer){ b.style.borderColor='var(--rose)'; b.style.opacity='.5'; }
   });
   var capOk=(ans===cS.answer);
-  if(capOk){ cS.score++; try{awardXP(8);}catch(e){} try{achTrack('capCorrect',1);}catch(e){} }
+  if(capOk){
+    cS.score++; cS.streak=(cS.streak||0)+1;
+    var bonus=cS.streak>=10?20:cS.streak>=5?10:cS.streak>=3?5:0;
+    var diffMult=cS.diffMult||1.0;
+    try{awardXP(Math.round((8+bonus)*diffMult));}catch(e){}
+    try{achTrack('capCorrect',1);}catch(e){}
+    if(bonus>0) showToast('🔥 Streak '+cS.streak+'! +'+bonus+' bonus XP');
+  } else { cS.streak=0; }
+  capComboHUD();
   var capCorrectMsg={en:'✓ Correct!',de:'✓ Richtig!',fr:'✓ Correct!',es:'✓ ¡Correcto!'}[curLang]||'✓ Correct!';
   var capWrongPfx={en:'✗ Answer: ',de:'✗ Antwort: ',fr:'✗ Réponse : ',es:'✗ Respuesta: '}[curLang]||'✗ Answer: ';
   document.getElementById('cap-feedback').textContent=capOk?capCorrectMsg:capWrongPfx+cS.answer;
@@ -2530,7 +2638,15 @@ function capTypeSubmit(){
   var typed=inp.value.trim();
   var ok=fuzzyMatch(typed,cS.answer);
   inp.style.borderColor=ok?'var(--lime)':'var(--rose)';
-  if(ok){ cS.score++; try{awardXP(8);}catch(e){} try{achTrack('capCorrect',1);}catch(e){} }
+  if(ok){
+    cS.score++; cS.streak=(cS.streak||0)+1;
+    var bonus=cS.streak>=10?20:cS.streak>=5?10:cS.streak>=3?5:0;
+    var diffMult=cS.diffMult||1.0;
+    try{awardXP(Math.round((8+bonus)*diffMult));}catch(e){}
+    try{achTrack('capCorrect',1);}catch(e){}
+    if(bonus>0) showToast('🔥 Streak '+cS.streak+'! +'+bonus+' bonus XP');
+  } else { cS.streak=0; }
+  capComboHUD();
   var capCorrectMsg={en:'✓ Correct!',de:'✓ Richtig!',fr:'✓ Correct!',es:'✓ ¡Correcto!'}[curLang]||'✓ Correct!';
   var capWrongPfx={en:'✗ Answer: ',de:'✗ Antwort: ',fr:'✗ Réponse : ',es:'✗ Respuesta: '}[curLang]||'✗ Answer: ';
   document.getElementById('cap-feedback').textContent=ok?capCorrectMsg:capWrongPfx+cS.answer;
@@ -2539,6 +2655,12 @@ function capTypeSubmit(){
   setTimeout(function(){ capNext(); }, ok?1200:2200);
 }
 
+function capComboHUD(){
+  var p=document.getElementById('cap-combo-pill');
+  if(!p) return;
+  if((cS.streak||0)>=3){ p.style.display=''; p.textContent='🔥 '+cS.streak+' streak'; }
+  else { p.style.display='none'; }
+}
 function capNext(){ capRound(); }
 
 function capSkip(){
@@ -2610,11 +2732,25 @@ function flgSlider(v){
   document.getElementById('flg-count').textContent=Math.min(parseInt(v),qPool(fS.region).length);
 }
 
+function flgDifficulty(d){
+  fS.difficulty=d;
+  ['easy','medium','hard'].forEach(function(x){
+    var b=document.getElementById('fdiff-'+x); if(!b) return;
+    if(x===d){ b.style.borderColor='var(--orange)'; b.style.background='rgba(255,107,53,.1)'; b.style.color='var(--orange)'; }
+    else { b.style.borderColor='var(--border)'; b.style.background='var(--ink3)'; b.style.color='var(--text)'; }
+  });
+}
 function flgStart(){
-  var pool=shuffle(qPool(fS.region));
+  var allPool=qPool(fS.region);
+  var diff=fS.difficulty||'medium';
+  var filtPool=diff==='easy'?allPool.filter(function(c){return c.pop>20000000;}):
+                diff==='hard'?allPool.filter(function(c){return c.pop<5000000;}):allPool;
+  if(filtPool.length<4) filtPool=allPool;
+  var pool=shuffle(filtPool);
   var sl=document.getElementById('flg-slider');
   var count=Math.min(parseInt(sl?sl.value:20),pool.length);
-  fS.pool=pool.slice(0,count); fS.allPool=[].concat(pool); fS.total=count; fS.round=0; fS.score=0;
+  fS.pool=pool.slice(0,count); fS.allPool=[].concat(pool); fS.total=count; fS.round=0; fS.score=0; fS.streak=0;
+  fS.diffMult=diff==='hard'?1.5:1.0;
   document.getElementById('flg-next').style.display='none';
   showScreen('flg'); flgRound();
 }
@@ -2725,7 +2861,15 @@ function flgTypeSubmit(){
   if(wc&&wc.names&&wc.names[curLang]) variants.push(wc.names[curLang]);
   var ok=variants.some(function(v){ return fuzzyMatch(typed,v); });
   inp.style.borderColor=ok?'var(--lime)':'var(--rose)';
-  if(ok){ fS.score++; try{awardXP(8);}catch(e){} try{achTrack('flgCorrect',1);achTrack('flgUnique',q.n);}catch(e){} }
+  if(ok){
+    fS.score++; fS.streak=(fS.streak||0)+1;
+    var fBonus=fS.streak>=10?20:fS.streak>=5?10:fS.streak>=3?5:0;
+    var fDiffMult=fS.diffMult||1.0;
+    try{awardXP(Math.round((8+fBonus)*fDiffMult));}catch(e){}
+    try{achTrack('flgCorrect',1);achTrack('flgUnique',q.n);}catch(e){}
+    if(fBonus>0) showToast('🔥 Streak '+fS.streak+'! +'+fBonus+' bonus XP');
+  } else { fS.streak=0; }
+  flgComboHUD();
   var correctMsg={en:'✓ Correct!',de:'✓ Richtig!',fr:'✓ Correct!',es:'✓ ¡Correcto!'}[curLang]||'✓ Correct!';
   var wrongPfx={en:'✗ Answer: ',de:'✗ Antwort: ',fr:'✗ Réponse : ',es:'✗ Respuesta: '}[curLang]||'✗ Answer: ';
   var fbEl=document.getElementById('flg-feedback');
@@ -2746,10 +2890,24 @@ function flgAnswer(ok,btn,correctCountry){
     if(bCountry===correctCountry){ b.style.borderColor='var(--lime)'; b.style.background='rgba(200,241,53,.1)'; }
     else if(b===btn&&!ok){ b.style.borderColor='var(--rose)'; b.style.opacity='.5'; }
   });
-  if(ok){ fS.score++; try{awardXP(8);}catch(e){} try{achTrack('flgCorrect',1);achTrack('flgUnique',correctCountry);}catch(e){} }
+  if(ok){
+    fS.score++; fS.streak=(fS.streak||0)+1;
+    var fBonus2=fS.streak>=10?20:fS.streak>=5?10:fS.streak>=3?5:0;
+    var fDiffMult2=fS.diffMult||1.0;
+    try{awardXP(Math.round((8+fBonus2)*fDiffMult2));}catch(e){}
+    try{achTrack('flgCorrect',1);achTrack('flgUnique',correctCountry);}catch(e){}
+    if(fBonus2>0) showToast('🔥 Streak '+fS.streak+'! +'+fBonus2+' bonus XP');
+  } else { fS.streak=0; }
+  flgComboHUD();
   setTimeout(function(){ flgNext(); }, ok?1200:2200);
 }
 
+function flgComboHUD(){
+  var p=document.getElementById('flg-combo-pill');
+  if(!p) return;
+  if((fS.streak||0)>=3){ p.style.display=''; p.textContent='🔥 '+fS.streak+' streak'; }
+  else { p.style.display='none'; }
+}
 function flgNext(){ flgRound(); }
 
 
@@ -2832,10 +2990,16 @@ function gtcUpdateUI() {
   if(inp) inp.placeholder = T.gtcPlaceholder || 'Type a country name...';
 }
 
+function gtcGetContinent(countryName){
+  for(const [region,names] of Object.entries(QCONTINENTS)){
+    if(names.indexOf(countryName)>=0) return region;
+  }
+  return null;
+}
 function launchGTC() {
   gtcState = {
     pool: shuffle([...GTC_DATA]).slice(0, 10),
-    round: 0, total: 10, score: 0, correct: 0, lastMode: 'gtc'
+    round: 0, total: 10, score: 0, correct: 0, lastMode: 'gtc', totalClues: 0
   };
   gtcUpdateUI();
   showScreen('gtc');
@@ -2844,7 +3008,8 @@ function launchGTC() {
 
 function gtcRound() {
   if (gtcState.round >= gtcState.total) {
-    showOver({score: gtcState.score, correct: gtcState.correct, total_q: gtcState.total, bestStreak: 0, total: gtcState.total, lastMode: 'gtc'});
+    showOver({score: gtcState.score, correct: gtcState.correct, total_q: gtcState.total, bestStreak: 0, total: gtcState.total, lastMode: 'gtc',
+      gtcAvgClues: gtcState.correct>0 ? (gtcState.totalClues/gtcState.correct).toFixed(1) : null});
     return;
   }
   const c = gtcState.pool[gtcState.round];
@@ -3215,7 +3380,17 @@ function gtcGuess() {
       const attWord = {en:rem===1?'attempt':'attempts',de:rem===1?'Versuch':'Versuche',fr:rem===1?'essai':'essais',es:rem===1?'intento':'intentos'}[curLang]||'attempts';
       const fbSuffix = {en:`${rem} ${attWord} left.`,de:`Noch ${rem} ${attWord}.`,fr:`${rem} ${attWord} restant${rem===1?'':'s'}.`,es:`${rem} ${attWord} restante${rem===1?'':'s'}.`}[curLang];
       const fbPrefix = {en:`❌ ${val}? No.`,de:`❌ ${val}? Nein.`,fr:`❌ ${val}? Non.`,es:`❌ ${val}? No.`}[curLang];
-      document.getElementById('gtc-feedback').textContent = `${fbPrefix} ${fbSuffix}`;
+      // Hot/Cold: check if guessed country is in same region as the answer
+      const guessedEntry=ALL_WORLD_COUNTRIES.find(c=>{
+        const dn=(c.names&&c.names[curLang])?c.names[curLang]:c.n;
+        return normalizeStr(dn)===normalizeStr(val)||normalizeStr(c.n)===normalizeStr(val);
+      });
+      const guessedCont=guessedEntry?gtcGetContinent(guessedEntry.n):null;
+      const targetCont=gtcGetContinent(gtcState.country.n);
+      const warmMsg=guessedCont&&targetCont&&guessedCont===targetCont
+        ?{en:' 🌡️ Warm — same region!',de:' 🌡️ Warm — gleiche Region!',fr:' 🌡️ Chaud — même région!',es:' 🌡️ ¡Cálido — misma región!'}[curLang]||' 🌡️ Warm!'
+        :'';
+      document.getElementById('gtc-feedback').textContent = `${fbPrefix}${warmMsg} ${fbSuffix}`;
       if (gtcState.attempts >= 8) gtcReveal(false, 0);
       else if (gtcState.fi < 8) gtcShowFact();
     } else {
@@ -3228,6 +3403,7 @@ function gtcGuess() {
 
 function gtcReveal(won, pts) {
   gtcState.done = true;
+  if(won) gtcState.totalClues = (gtcState.totalClues||0) + gtcState.fi;
   document.getElementById('gtc-feedback').textContent = '';
   const c = gtcState.country;
   document.getElementById('gtc-inp').disabled = true;
@@ -4378,6 +4554,12 @@ function bdrEnd(){
   document.removeEventListener('click',bdrCloseSuggest);
   const score=bdr.visited.length*10;
   awardXP(Math.min(250,bdr.visited.length*4));
+  // Region record tracking
+  const recKey='bdr_rec_'+(bdr.region||'all');
+  const prevRec=parseInt(localStorage.getItem(recKey)||'0');
+  const isNewRec=bdr.visited.length>prevRec;
+  if(isNewRec) localStorage.setItem(recKey,bdr.visited.length);
+  const pct=bdr.pool.length>0?Math.round(bdr.visited.length/bdr.pool.length*100):0;
   try{
     achTrackMax('bdrBest',bdr.visited.length);
     if(bdr.hints===3&&bdr.visited.length>=10)achTrack('bdrNoHint10',1);
@@ -4386,7 +4568,8 @@ function bdrEnd(){
     if(bdr.region==='asia'&&bdr.visited.length>=bdr.pool.length)achSave(Object.assign(achStore(),{bdrAsia:true}));
     if(bdr.region==='africa'&&bdr.visited.length>=bdr.pool.length)achSave(Object.assign(achStore(),{bdrAfrica:true}));
   }catch(e){}
-  showOver({score:score,correct:bdr.visited.length,total_q:bdr.pool.length,bestStreak:bdr.visited.length,lastMode:'border',total:bdr.pool.length});
+  showOver({score:score,correct:bdr.visited.length,total_q:bdr.pool.length,bestStreak:bdr.visited.length,lastMode:'border',total:bdr.pool.length,
+    bdrPct:pct,bdrIsNewRec:isNewRec,bdrPrevRec:prevRec,bdrRegion:bdr.region||'all'});
 }
 
 

@@ -277,6 +277,19 @@ canvas#bgc{position:fixed;inset:0;z-index:0;pointer-events:none}
 .xp-gain-badge{position:fixed;font-size:.72rem;font-weight:800;color:#c8f135;text-shadow:0 0 8px rgba(200,241,53,.7);pointer-events:none;animation:xpFloat 1.6s ease-out forwards;z-index:9999;white-space:nowrap}
 .xp-bar-glow{animation:xpBarGlow 1.5s ease-out}
 
+/* ── STREAK MILESTONE (HL arena pulse) ── */
+@keyframes streakPulse{0%{box-shadow:0 0 0 0 rgba(200,241,53,0)}40%{box-shadow:0 0 0 8px rgba(200,241,53,.25)}70%{box-shadow:0 0 0 16px rgba(200,241,53,.08)}100%{box-shadow:0 0 0 0 rgba(200,241,53,0)}}
+.hl-arena.streak-milestone{animation:streakPulse 1.2s ease-out}
+.hl-arena.streak-milestone .hl-card.correct{border-color:rgba(200,241,53,.6)}
+
+/* ── SORT POSITION HINT ── */
+.sort-pos-hint{position:absolute;bottom:5px;right:8px;font-family:var(--font-m);font-size:.5rem;color:var(--muted2);opacity:.75;pointer-events:none}
+.sort-card{position:relative}
+
+/* ── COMBO PILL COLOR ── */
+#cap-combo-pill,#flg-combo-pill{color:var(--lime)}
+#hl-mult-pill{background:rgba(200,241,53,.1);border-color:rgba(200,241,53,.25)}
+
 /* ── MOBILE (≤640px) ── */
 @media(max-width:640px){
   /* Profile badge — fixed so it stays visible when user scrolls */

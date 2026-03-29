@@ -225,6 +225,7 @@
     </div>
     <div class="gh-hud">
       <div class="hud-pill" id="hl-hs-pill" style="opacity:.6">🏆 <span class="hud-val" id="hl-highscore">0</span></div>
+      <div class="hud-pill" id="hl-mult-pill" style="display:none;font-weight:800"></div>
     </div>
   </div>
   <div class="cat-scroll" id="hl-cats"></div>
@@ -269,6 +270,7 @@
     </div>
     <div class="gh-hud">
       <div class="hud-pill">🎯 <span class="hud-val" id="sort-round">1/8</span></div>
+      <div class="hud-pill" id="sort-perf-pill" style="display:none">🔥 <span class="hud-val" id="sort-perf-streak">0</span> perfect</div>
     </div>
   </div>
   <div class="prog-track"><div class="prog-fill" id="sort-prog" style="width:0%"></div></div>
@@ -393,6 +395,14 @@
       <input type="range" min="5" max="195" value="20" id="cap-slider" oninput="capSlider(this.value)" style="width:100%;cursor:pointer;accent-color:var(--blue)">
       <div style="display:flex;justify-content:space-between;font-size:.65rem;color:var(--muted);margin-top:4px"><span>5</span><span id="cap-slider-max">195</span></div>
     </div>
+    <div style="background:var(--ink2);border:1px solid var(--border);border-radius:20px;padding:20px">
+      <div style="font-size:.6rem;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);margin-bottom:12px">DIFFICULTY</div>
+      <div style="display:flex;gap:10px">
+        <button id="cdiff-easy" onclick="capDifficulty('easy')" style="flex:1;padding:12px;border-radius:12px;border:2px solid var(--border);background:var(--ink3);cursor:pointer;font-weight:700;color:var(--text);font-size:.8rem;font-family:inherit">🟢 Easy</button>
+        <button id="cdiff-medium" onclick="capDifficulty('medium')" style="flex:1;padding:12px;border-radius:12px;border:2px solid var(--blue);background:rgba(61,158,255,.08);cursor:pointer;font-weight:700;color:var(--blue);font-size:.8rem;font-family:inherit">🟡 Medium</button>
+        <button id="cdiff-hard" onclick="capDifficulty('hard')" style="flex:1;padding:12px;border-radius:12px;border:2px solid var(--border);background:var(--ink3);cursor:pointer;font-weight:700;color:var(--text);font-size:.8rem;font-family:inherit">🔴 Hard ×1.5 XP</button>
+      </div>
+    </div>
     <button id="cap-lbl-start" onclick="capStart()" style="width:100%;padding:18px;border-radius:20px;background:var(--blue);color:#fff;font-weight:900;font-size:1rem;cursor:pointer;border:none;font-family:inherit">Start Quiz →</button>
   </div>
 </div>
@@ -405,6 +415,7 @@
     </div>
     <div class="gh-hud">
       <div class="hud-pill">📍 <span class="hud-val" id="cap-prog-lbl">1/20</span></div>
+      <div class="hud-pill" id="cap-combo-pill" style="display:none;font-weight:800"></div>
     </div>
   </div>
   <div class="prog-track"><div class="prog-fill" id="cap-prog" style="width:0%"></div></div>
@@ -458,6 +469,14 @@
       <input type="range" min="5" max="195" value="20" id="flg-slider" oninput="flgSlider(this.value)" style="width:100%;cursor:pointer;accent-color:var(--orange)">
       <div style="display:flex;justify-content:space-between;font-size:.65rem;color:var(--muted);margin-top:4px"><span>5</span><span id="flg-slider-max">195</span></div>
     </div>
+    <div style="background:var(--ink2);border:1px solid var(--border);border-radius:20px;padding:20px">
+      <div style="font-size:.6rem;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);margin-bottom:12px">DIFFICULTY</div>
+      <div style="display:flex;gap:10px">
+        <button id="fdiff-easy" onclick="flgDifficulty('easy')" style="flex:1;padding:12px;border-radius:12px;border:2px solid var(--border);background:var(--ink3);cursor:pointer;font-weight:700;color:var(--text);font-size:.8rem;font-family:inherit">🟢 Easy</button>
+        <button id="fdiff-medium" onclick="flgDifficulty('medium')" style="flex:1;padding:12px;border-radius:12px;border:2px solid var(--orange);background:rgba(255,107,53,.08);cursor:pointer;font-weight:700;color:var(--orange);font-size:.8rem;font-family:inherit">🟡 Medium</button>
+        <button id="fdiff-hard" onclick="flgDifficulty('hard')" style="flex:1;padding:12px;border-radius:12px;border:2px solid var(--border);background:var(--ink3);cursor:pointer;font-weight:700;color:var(--text);font-size:.8rem;font-family:inherit">🔴 Hard ×1.5 XP</button>
+      </div>
+    </div>
     <button id="flg-lbl-start" onclick="flgStart()" style="width:100%;padding:18px;border-radius:20px;background:var(--orange);color:#fff;font-weight:900;font-size:1rem;cursor:pointer;border:none;font-family:inherit">Start Quiz →</button>
   </div>
 </div>
@@ -470,6 +489,7 @@
     </div>
     <div class="gh-hud">
       <div class="hud-pill">🚩 <span class="hud-val" id="flg-prog-lbl">1/20</span></div>
+      <div class="hud-pill" id="flg-combo-pill" style="display:none;font-weight:800"></div>
     </div>
   </div>
   <div class="prog-track"><div class="prog-fill" id="flg-prog" style="width:0%"></div></div>
@@ -642,6 +662,29 @@
       <div id="over-msg"></div>
       <div id="pct-badge"></div>
       <div id="pct-bar"></div>
+    </div>
+    <div id="over-gtc-eff" style="display:none;width:100%;text-align:center;padding:8px 0">
+      <div style="display:inline-block;background:var(--ink3);border:1px solid var(--border);border-radius:12px;padding:10px 20px">
+        <div style="font-family:var(--font-d);font-size:1.6rem;color:var(--violet)" id="over-gtc-eff-val">—</div>
+        <div style="font-family:var(--font-m);font-size:.52rem;color:var(--muted);letter-spacing:.12em;margin-top:3px" id="over-gtc-eff-lbl">AVG CLUES</div>
+      </div>
+    </div>
+    <div id="over-bdr-extra" style="display:none;width:100%;text-align:center;padding:6px 0">
+      <div style="display:flex;justify-content:center;gap:16px">
+        <div style="background:var(--ink3);border:1px solid var(--border);border-radius:12px;padding:10px 20px">
+          <div style="font-family:var(--font-d);font-size:1.6rem;color:var(--teal)" id="over-bdr-pct">0%</div>
+          <div style="font-family:var(--font-m);font-size:.52rem;color:var(--muted);letter-spacing:.12em;margin-top:3px">REGION %</div>
+        </div>
+        <div style="background:var(--ink3);border:1px solid var(--border);border-radius:12px;padding:10px 20px;display:flex;align-items:center">
+          <div style="font-size:.82rem;font-weight:700" id="over-bdr-rec">—</div>
+        </div>
+      </div>
+    </div>
+    <div id="over-xp-prog" style="width:100%;padding:6px 0 2px">
+      <div style="height:5px;background:var(--ink3);border-radius:3px;overflow:hidden;margin-bottom:6px">
+        <div id="over-xp-bar-fill" style="height:100%;width:0%;background:linear-gradient(90deg,var(--lime),var(--teal));border-radius:3px;transition:width 1s"></div>
+      </div>
+      <div style="font-family:var(--font-m);font-size:.6rem;color:var(--muted2);text-align:center;letter-spacing:.06em" id="over-xp-to-next"></div>
     </div>
     <div class="over-actions" style="margin-top:16px">
       <button class="btn-primary" id="btn-share-over" onclick="openShareFromOver()" style="display:none">📤 Share</button>
