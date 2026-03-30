@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GeoVs — Login</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cabinet+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --ink: #0d0d14; --ink2: #161622; --ink3: #1e1e2e;
+      --border: rgba(255,255,255,.07); --border2: rgba(255,255,255,.14);
+      --text: #f0f0f8; --muted: #6b6b88; --muted2: #9090b0;
+      --lime: #c8f135; --rose: #ff3d6b; --amber: #ffb830; --blue: #3d9eff;
+      --font-d: 'Bebas Neue', sans-serif;
+      --font-b: 'Cabinet Grotesk', sans-serif;
+      --font-m: 'JetBrains Mono', monospace;
+    }
+
+    body {
+      background: var(--ink);
+      color: var(--text);
+      font-family: var(--font-b);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    /* ── Card ── */
+    .auth-card {
+      background: var(--ink2);
+      border: 1px solid var(--border2);
+      border-radius: 20px;
+      padding: 40px 36px;
+      width: 100%;
+      max-width: 420px;
+    }
+
+    .logo {
+      font-family: var(--font-d);
+      font-size: 2.2rem;
+      color: var(--lime);
+      letter-spacing: .05em;
+      margin-bottom: 6px;
+    }
+
+    .logo span { color: var(--text); opacity: .4; }
+
+    .card-subtitle {
+      font-size: .85rem;
+      color: var(--muted2);
+      margin-bottom: 32px;
+    }
+
+    /* ── Tabs ── */
+    .tab-row {
+      display: flex;
+      gap: 4px;
+      background: var(--ink3);
+      border-radius: 10px;
+      padding: 4px;
+      margin-bottom: 28px;
+    }
+
+    .tab-btn {
+      flex: 1;
+      background: none;
+      border: none;
+      color: var(--muted);
+      font-family: var(--font-b);
+      font-size: .85rem;
+      font-weight: 700;
+      padding: 8px;
+      border-radius: 7px;
+      cursor: pointer;
+      transition: all .2s;
+    }
+
+    .tab-btn.active {
+      background: var(--ink2);
+      color: var(--text);
+      box-shadow: 0 1px 4px rgba(0,0,0,.4);
+    }
+
+    /* ── Forms ── */
+    .auth-form { display: none; flex-direction: column; gap: 16px; }
+    .auth-form.visible { display: flex; }
+
+    .field label {
+      display: block;
+      font-size: .78rem;
+      font-weight: 700;
+      color: var(--muted2);
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+
+    .field input {
+      width: 100%;
+      background: var(--ink3);
+      border: 1px solid var(--border2);
+      border-radius: 10px;
+      padding: 12px 14px;
+      font-family: var(--font-b);
+      font-size: .95rem;
+      color: var(--text);
+      transition: border-color .2s;
+      outline: none;
+    }
+
+    .field input:focus { border-color: var(--lime); }
+    .field input.error { border-color: var(--rose); }
+    .field input.success { border-color: var(--lime); }
+
+    .field-hint {
+      font-size: .75rem;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    /* ── Password strength bar ── */
+    .pw-strength { margin-top: 6px; display: none; }
+    .pw-strength-bar {
+      height: 3px;
+      background: var(--ink3);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+    .pw-strength-fill {
+      height: 100%;
+      width: 0;
+      border-radius: 2px;
+      transition: width .3s, background .3s;
+    }
+    .pw-strength-label {
+      font-size: .7rem;
+      color: var(--muted);
+      margin-top: 3px;
+    }
+
+    /* ── Submit button ── */
+    .btn-primary {
+      background: var(--lime);
+      color: var(--ink);
+      border: none;
+      border-radius: 10px;
+      padding: 14px;
+      font-family: var(--font-b);
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: opacity .2s, transform .1s;
+      margin-top: 4px;
+    }
+
+    .btn-primary:hover { opacity: .9; }
+    .btn-primary:active { transform: scale(.98); }
+    .btn-primary:disabled { opacity: .4; cursor: not-allowed; transform: none; }
+
+    /* ── Feedback banner ── */
+    .feedback {
+      display: none;
+      border-radius: 10px;
+      padding: 12px 14px;
+      font-size: .85rem;
+      font-weight: 500;
+      line-height: 1.4;
+    }
+
+    .feedback.error   { display: block; background: rgba(255,61,107,.12); color: var(--rose); border: 1px solid rgba(255,61,107,.25); }
+    .feedback.success { display: block; background: rgba(200,241,53,.1);  color: var(--lime); border: 1px solid rgba(200,241,53,.2); }
+    .feedback.info    { display: block; background: rgba(61,158,255,.1);  color: var(--blue); border: 1px solid rgba(61,158,255,.2); }
+
+    /* ── Footer links ── */
+    .auth-footer {
+      text-align: center;
+      margin-top: 20px;
+      font-size: .82rem;
+      color: var(--muted);
+    }
+
+    .auth-footer a {
+      color: var(--lime);
+      text-decoration: none;
+      font-weight: 700;
+    }
+
+    .divider {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--muted);
+      font-size: .75rem;
+      margin: 4px 0;
+    }
+
+    .divider::before, .divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border2);
+    }
+
+    /* ── Spinner ── */
+    .spinner {
+      display: inline-block;
+      width: 16px; height: 16px;
+      border: 2px solid rgba(13,13,20,.4);
+      border-top-color: var(--ink);
+      border-radius: 50%;
+      animation: spin .6s linear infinite;
+      vertical-align: middle;
+      margin-right: 6px;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    @media (max-width: 480px) {
+      .auth-card { padding: 28px 20px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="auth-card">
+  <div class="logo">GeoVs<span>.</span></div>
+  <p class="card-subtitle" id="card-subtitle">Melde dich an um deine Fortschritte zu speichern</p>
+
+  <!-- Tab-Navigation -->
+  <div class="tab-row">
+    <button class="tab-btn active" onclick="switchTab('login')">Login</button>
+    <button class="tab-btn" onclick="switchTab('signup')">Registrieren</button>
+    <button class="tab-btn" onclick="switchTab('reset')">Passwort</button>
+  </div>
+
+  <!-- Feedback-Banner (geteilt für alle Formulare) -->
+  <div class="feedback" id="feedback"></div>
+
+  <!-- ── Login-Formular ── -->
+  <form class="auth-form visible" id="form-login" onsubmit="handleLogin(event)">
+    <div class="field">
+      <label for="login-email">E-Mail</label>
+      <input type="email" id="login-email" placeholder="deine@email.com" autocomplete="email" required>
+    </div>
+    <div class="field">
+      <label for="login-password">Passwort</label>
+      <input type="password" id="login-password" placeholder="••••••••" autocomplete="current-password" required>
+    </div>
+    <button type="submit" class="btn-primary" id="btn-login">Einloggen</button>
+    <div class="auth-footer">
+      <a href="#" onclick="switchTab('reset'); return false;">Passwort vergessen?</a>
+    </div>
+  </form>
+
+  <!-- ── Signup-Formular ── -->
+  <form class="auth-form" id="form-signup" onsubmit="handleSignup(event)">
+    <div class="field">
+      <label for="signup-name">Anzeigename (optional)</label>
+      <input type="text" id="signup-name" placeholder="z.B. GeoMaster" autocomplete="nickname" maxlength="30">
+    </div>
+    <div class="field">
+      <label for="signup-email">E-Mail</label>
+      <input type="email" id="signup-email" placeholder="deine@email.com" autocomplete="email" required>
+    </div>
+    <div class="field">
+      <label for="signup-password">Passwort</label>
+      <input type="password" id="signup-password" placeholder="Min. 8 Zeichen"
+             autocomplete="new-password" required oninput="checkPasswordStrength(this.value)">
+      <div class="pw-strength" id="pw-strength">
+        <div class="pw-strength-bar"><div class="pw-strength-fill" id="pw-fill"></div></div>
+        <div class="pw-strength-label" id="pw-label"></div>
+      </div>
+    </div>
+    <div class="field">
+      <label for="signup-confirm">Passwort bestätigen</label>
+      <input type="password" id="signup-confirm" placeholder="••••••••" autocomplete="new-password" required>
+    </div>
+    <button type="submit" class="btn-primary" id="btn-signup">Account erstellen</button>
+  </form>
+
+  <!-- ── Passwort-Reset-Formular ── -->
+  <form class="auth-form" id="form-reset" onsubmit="handleReset(event)">
+    <p style="font-size:.88rem; color:var(--muted2); line-height:1.5; margin-bottom:4px;">
+      Gib deine E-Mail ein — wir senden dir einen Link zum Zurücksetzen des Passworts.
+    </p>
+    <div class="field">
+      <label for="reset-email">E-Mail</label>
+      <input type="email" id="reset-email" placeholder="deine@email.com" autocomplete="email" required>
+    </div>
+    <button type="submit" class="btn-primary" id="btn-reset">Reset-Link senden</button>
+    <div class="auth-footer">
+      Zurück zum <a href="#" onclick="switchTab('login'); return false;">Login</a>
+    </div>
+  </form>
+</div>
+
+<!-- Firebase Client SDK (modular, CDN) -->
+<script type="module">
+  import { initializeApp }                    from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
+  import {
+    getAuth,
+    signInWithEmailAndPassword,
+    createUserWithEmailAndPassword,
+    sendEmailVerification,
+    sendPasswordResetEmail,
+    signOut,
+    updateProfile,
+  } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
+
+  // ── Firebase-Konfiguration ────────────────────────────────────────────
+  // Diese Werte findest du in: Firebase Console → Projekteinstellungen → Allgemein → Deine Apps
+  // Der apiKey ist KEIN geheimer Schlüssel — er identifiziert nur dein Projekt.
+  // Schütze dein Projekt über Firebase Security Rules + Domain-Einschränkungen.
+  const firebaseConfig = {
+    apiKey:            'AIzaSyCMUdIIekNViU29kfdzmc0EuU7niee02u8',
+    authDomain:        'geogenius-a5c5e.firebaseapp.com',
+    projectId:         'geogenius-a5c5e',
+    storageBucket:     'geogenius-a5c5e.firebasestorage.app',
+    messagingSenderId: '880941067540',
+    appId:             '1:880941067540:web:5b3ce79525dfafa4536601',
+  };
+  // ─────────────────────────────────────────────────────────────────────
+
+  const BACKEND = 'http://localhost:3000'; // ← nach Deploy: https://dein-backend.railway.app
+
+  const app  = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+
+  // ── Firebase-Fehlercodes → Deutsche Meldungen ──────────────────────
+  const ERROR_MESSAGES = {
+    'auth/user-not-found':        'Kein Account mit dieser E-Mail gefunden',
+    'auth/wrong-password':        'Falsches Passwort',
+    'auth/invalid-credential':    'E-Mail oder Passwort falsch',
+    'auth/email-already-in-use':  'Diese E-Mail ist bereits registriert',
+    'auth/weak-password':         'Passwort ist zu schwach (min. 6 Zeichen)',
+    'auth/invalid-email':         'Ungültige E-Mail-Adresse',
+    'auth/too-many-requests':     'Zu viele Versuche — Account vorübergehend gesperrt',
+    'auth/network-request-failed':'Netzwerkfehler — bitte Verbindung prüfen',
+    'auth/user-disabled':         'Dieser Account wurde deaktiviert',
+  };
+
+  function firebaseError(code) {
+    return ERROR_MESSAGES[code] || `Fehler: ${code}`;
+  }
+
+  // ── Login ──────────────────────────────────────────────────────────
+  window.handleLogin = async (e) => {
+    e.preventDefault();
+    const email    = document.getElementById('login-email').value.trim();
+    const password = document.getElementById('login-password').value;
+    const btn      = document.getElementById('btn-login');
+
+    setLoading(btn, true);
+    hideFeedback();
+
+    try {
+      // 1. Firebase-Login → direkt über Firebase Client SDK
+      const credential = await signInWithEmailAndPassword(auth, email, password);
+      const user = credential.user;
+      const idToken = await user.getIdToken();
+
+      // 2. Token speichern
+      sessionStorage.setItem('geo_token', idToken);
+
+      // 3. Weiterleitung
+      if (!user.emailVerified) {
+        showFeedback('info', '⚠️ E-Mail noch nicht bestätigt — bitte prüfe dein Postfach.');
+      } else {
+        showFeedback('success', `✓ Willkommen zurück, ${user.displayName || user.email}!`);
+        setTimeout(() => { window.location.href = 'index.html'; }, 1200);
+      }
+    } catch (err) {
+      console.error('[Login Error]', err.code, err.message, err);
+      const msg = (err.code && ERROR_MESSAGES[err.code]) || err.message || 'Login fehlgeschlagen';
+      showFeedback('error', msg);
+    } finally {
+      setLoading(btn, false);
+    }
+  };
+
+  // ── Signup ─────────────────────────────────────────────────────────
+  window.handleSignup = async (e) => {
+    e.preventDefault();
+    const name     = document.getElementById('signup-name').value.trim();
+    const email    = document.getElementById('signup-email').value.trim();
+    const password = document.getElementById('signup-password').value;
+    const confirm  = document.getElementById('signup-confirm').value;
+    const btn      = document.getElementById('btn-signup');
+
+    hideFeedback();
+
+    // Client-seitige Validierung
+    if (password !== confirm) {
+      return showFeedback('error', 'Passwörter stimmen nicht überein');
+    }
+    if (password.length < 8) {
+      return showFeedback('error', 'Passwort muss mindestens 8 Zeichen haben');
+    }
+
+    setLoading(btn, true);
+
+    try {
+      // 1. Firebase-Account erstellen
+      const credential = await createUserWithEmailAndPassword(auth, email, password);
+
+      // 2. Anzeigename setzen (falls angegeben)
+      if (name) {
+        await updateProfile(credential.user, { displayName: name });
+      }
+
+      // 3. Bestätigungs-E-Mail senden
+      await sendEmailVerification(credential.user);
+
+      showFeedback('success',
+        '✓ Account erstellt! Bitte bestätige deine E-Mail-Adresse — wir haben dir einen Link gesendet.'
+      );
+
+      // 4. Optional: auch im Backend registrieren (für eigene User-DB)
+      // const idToken = await credential.user.getIdToken();
+      // await fetch(`${BACKEND}/api/auth/signup`, { method:'POST', headers:{...}, body:... });
+
+      setTimeout(() => switchTab('login'), 3000);
+    } catch (err) {
+      showFeedback('error', firebaseError(err.code) || err.message);
+    } finally {
+      setLoading(btn, false);
+    }
+  };
+
+  // ── Passwort-Reset ─────────────────────────────────────────────────
+  window.handleReset = async (e) => {
+    e.preventDefault();
+    const email = document.getElementById('reset-email').value.trim();
+    const btn   = document.getElementById('btn-reset');
+
+    setLoading(btn, true);
+    hideFeedback();
+
+    try {
+      await sendPasswordResetEmail(auth, email);
+      showFeedback('success',
+        '✓ Reset-Link gesendet! Bitte prüfe dein Postfach (auch Spam-Ordner).'
+      );
+    } catch (err) {
+      // Immer Erfolg zeigen — verhindert User-Enumeration
+      showFeedback('success',
+        '✓ Falls ein Account existiert, wurde ein Reset-Link gesendet.'
+      );
+    } finally {
+      setLoading(btn, false);
+    }
+  };
+
+  // ── Passwort-Stärke ────────────────────────────────────────────────
+  window.checkPasswordStrength = (pw) => {
+    const bar    = document.getElementById('pw-strength');
+    const fill   = document.getElementById('pw-fill');
+    const label  = document.getElementById('pw-label');
+
+    if (!pw) { bar.style.display = 'none'; return; }
+    bar.style.display = 'block';
+
+    let score = 0;
+    if (pw.length >= 8)  score++;
+    if (pw.length >= 12) score++;
+    if (/[A-Z]/.test(pw)) score++;
+    if (/[0-9]/.test(pw)) score++;
+    if (/[^A-Za-z0-9]/.test(pw)) score++;
+
+    const levels = [
+      { pct: '20%', color: 'var(--rose)',  text: 'Sehr schwach' },
+      { pct: '40%', color: 'var(--rose)',  text: 'Schwach' },
+      { pct: '60%', color: 'var(--amber)', text: 'Mittel' },
+      { pct: '80%', color: 'var(--lime)',  text: 'Stark' },
+      { pct: '100%',color: 'var(--lime)',  text: 'Sehr stark' },
+    ];
+    const lvl = levels[Math.min(score, 4)];
+    fill.style.width      = lvl.pct;
+    fill.style.background = lvl.color;
+    label.textContent     = lvl.text;
+    label.style.color     = lvl.color;
+  };
+
+  // ── Hilfsfunktionen ────────────────────────────────────────────────
+  function showFeedback(type, msg) {
+    const el = document.getElementById('feedback');
+    el.className = `feedback ${type}`;
+    el.textContent = msg;
+    el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+
+  function hideFeedback() {
+    const el = document.getElementById('feedback');
+    el.className = 'feedback';
+    el.textContent = '';
+  }
+
+  function setLoading(btn, loading) {
+    btn.disabled = loading;
+    if (loading) {
+      btn._orig = btn.textContent;
+      btn.innerHTML = '<span class="spinner"></span>Bitte warten…';
+    } else {
+      btn.textContent = btn._orig || btn.textContent;
+    }
+  }
+
+  const SUBTITLES = {
+    login:  'Melde dich an um deine Fortschritte zu speichern',
+    signup: 'Erstelle deinen kostenlosen Account',
+    reset:  'Passwort zurücksetzen',
+  };
+
+  window.switchTab = (tab) => {
+    hideFeedback();
+    document.querySelectorAll('.tab-btn').forEach((b, i) => {
+      b.classList.toggle('active', ['login','signup','reset'][i] === tab);
+    });
+    document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('visible'));
+    document.getElementById(`form-${tab}`).classList.add('visible');
+    document.getElementById('card-subtitle').textContent = SUBTITLES[tab];
+  };
+</script>
+
+</body>
+</html>

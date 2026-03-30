@@ -42,7 +42,7 @@ const LANGS = {
     flgMode:'GAME MODE',flgRegion:'REGION',flgQuestions:'QUESTIONS',flgStart:'Start Quiz →',flgFTC:'Flag → Country',flgCTF:'Country → Flag',flgQFTC:'Which country does this flag belong to?',flgQCTF:'Which flag belongs to',
     flgRegs:{all:'🌍 All',europe:'🌍 Europe',asia:'🌏 Asia',africa:'🌍 Africa',americas:'🌎 Americas',oceania:'🌊 Oceania'},
     flgAnswerMode:'ANSWER MODE',flgMC:'🔤 Multiple Choice',flgType:'⌨️ Type Answer',flgSubmit:'Submit →',
-    bdrName:'Border Run',bdrDesc:'Start with one country and chain through neighbors. How far can you spread across the map?',bdrBadge:'🗺️ Border Run',
+    bdrName:'BorderRun 2P',bdrDesc:'Race a friend across the map — hop through land borders to reach the target first. Multiplayer!',bdrBadge:'🗺️ BorderRun',
     bdrSetupTitle:'Border Run',bdrSetupSub:'Chain through neighboring countries. How far can you go?',
     bdrRegion:'REGION',bdrTimer:'TIMER',bdrStart:'Start Border Run →',bdrUnlimited:'Unlimited',
     bdrPrompt:'NAME A NEIGHBOR OF',bdrPrompt2:'NAME A NEIGHBOR OF ANY COLORED COUNTRY',bdrFound:'COUNTRIES FOUND',bdrHintsLeft:'HINTS LEFT',bdrInRegion:'IN REGION',
@@ -110,7 +110,7 @@ const LANGS = {
     flgMode:'SPIELMODUS',flgRegion:'REGION',flgQuestions:'FRAGEN',flgStart:'Quiz starten →',flgFTC:'Flagge → Land',flgCTF:'Land → Flagge',flgQFTC:'Zu welchem Land gehört diese Flagge?',flgQCTF:'Welche Flagge gehört zu',
     flgRegs:{all:'🌍 Alle',europe:'🌍 Europa',asia:'🌏 Asien',africa:'🌍 Afrika',americas:'🌎 Amerika',oceania:'🌊 Ozeanien'},
     flgAnswerMode:'ANTWORTMODUS',flgMC:'🔤 Multiple Choice',flgType:'⌨️ Eingabe',flgSubmit:'Absenden →',
-    bdrName:'Grenzlauf',bdrDesc:'Starte mit einem Land und arbeite dich durch Nachbarländer. Wie weit schaffst du es?',bdrBadge:'🗺️ Grenzlauf',
+    bdrName:'BorderRun 2P',bdrDesc:'Renne mit einem Freund über die Karte — hüpfe durch Landgrenzen zum Ziel. Mehrspieler!',bdrBadge:'🗺️ BorderRun',
     bdrSetupTitle:'Grenzlauf',bdrSetupSub:'Kette dich durch Nachbarländer. Wie weit kommst du?',
     bdrRegion:'REGION',bdrTimer:'TIMER',bdrStart:'Grenzlauf starten →',bdrUnlimited:'Unbegrenzt',
     bdrPrompt:'NENNE EIN NACHBARLAND VON',bdrPrompt2:'NENNE EIN NACHBARLAND EINES FARBIGEN LANDES',bdrFound:'LÄNDER GEFUNDEN',bdrHintsLeft:'HINWEISE ÜBRIG',bdrInRegion:'IN REGION',
@@ -175,7 +175,7 @@ const LANGS = {
     flgMode:'MODE DE JEU',flgRegion:'RÉGION',flgQuestions:'QUESTIONS',flgStart:'Commencer →',flgFTC:'Drapeau → Pays',flgCTF:'Pays → Drapeau',flgQFTC:'À quel pays appartient ce drapeau?',flgQCTF:'Quel drapeau appartient à',
     flgRegs:{all:'🌍 Tous',europe:'🌍 Europe',asia:'🌏 Asie',africa:'🌍 Afrique',americas:'🌎 Amériques',oceania:'🌊 Océanie'},
     flgAnswerMode:'MODE DE RÉPONSE',flgMC:'🔤 Choix multiple',flgType:'⌨️ Saisie libre',flgSubmit:'Soumettre →',
-    bdrName:'Course aux Frontières',bdrDesc:'Commencez avec un pays et enchaînez les voisins. Jusqu\'où pouvez-vous aller?',bdrBadge:'🗺️ Course aux Frontières',
+    bdrName:'BorderRun 2J',bdrDesc:'Courez avec un ami sur la carte — traversez les frontières terrestres pour atteindre la cible. Multijoueur!',bdrBadge:'🗺️ BorderRun',
     bdrSetupTitle:'Course aux Frontières',bdrSetupSub:'Enchaînez les pays voisins. Jusqu\'où irez-vous?',
     bdrRegion:'RÉGION',bdrTimer:'MINUTERIE',bdrStart:'Commencer →',bdrUnlimited:'Illimité',
     bdrPrompt:'NOMMEZ UN VOISIN DE',bdrPrompt2:'NOMMEZ UN VOISIN D\'UN PAYS COLORÉ',bdrFound:'PAYS TROUVÉS',bdrHintsLeft:'INDICES RESTANTS',bdrInRegion:'DANS LA RÉGION',
@@ -240,7 +240,7 @@ const LANGS = {
     flgMode:'MODO DE JUEGO',flgRegion:'REGIÓN',flgQuestions:'PREGUNTAS',flgStart:'Iniciar →',flgFTC:'Bandera → País',flgCTF:'País → Bandera',flgQFTC:'¿A qué país pertenece esta bandera?',flgQCTF:'¿Qué bandera pertenece a',
     flgRegs:{all:'🌍 Todo',europe:'🌍 Europa',asia:'🌏 Asia',africa:'🌍 África',americas:'🌎 Américas',oceania:'🌊 Oceanía'},
     flgAnswerMode:'MODO DE RESPUESTA',flgMC:'🔤 Opción múltiple',flgType:'⌨️ Escribir',flgSubmit:'Enviar →',
-    bdrName:'Carrera de Fronteras',bdrDesc:'Empieza con un país y encadena vecinos. ¿Hasta dónde puedes llegar?',bdrBadge:'🗺️ Carrera de Fronteras',
+    bdrName:'BorderRun 2J',bdrDesc:'¡Compite con un amigo por el mapa — salta por fronteras terrestres hasta el objetivo. Multijugador!',bdrBadge:'🗺️ BorderRun',
     bdrSetupTitle:'Carrera de Fronteras',bdrSetupSub:'Encadena países vecinos. ¿Hasta dónde llegarás?',
     bdrRegion:'REGIÓN',bdrTimer:'TEMPORIZADOR',bdrStart:'Iniciar →',bdrUnlimited:'Sin límite',
     bdrPrompt:'NOMBRA UN VECINO DE',bdrPrompt2:'NOMBRA UN VECINO DE CUALQUIER PAÍS COLOREADO',bdrFound:'PAÍSES ENCONTRADOS',bdrHintsLeft:'PISTAS RESTANTES',bdrInRegion:'EN LA REGIÓN',
@@ -3681,9 +3681,19 @@ function ppCancelRename(){
 function showLevelUp(ld){
   try{
     const ge=id=>document.getElementById(id);
-    if(ge('lu-emblem'))ge('lu-emblem').innerHTML=drawEmblem(ld.lvl,2.0);
+    const td=TIERS[ld.tier]||TIERS.wanderer;
+    if(ge('lu-emblem'))ge('lu-emblem').innerHTML=drawEmblem(ld.lvl,2.2);
+    if(ge('lu-emblem-ring')){
+      ge('lu-emblem-ring').style.cssText=`border-color:${ld.color};box-shadow:0 0 30px ${td.glow},0 0 60px ${td.glow}40`;
+    }
+    if(ge('lu-tier-badge')){
+      ge('lu-tier-badge').textContent=td.label;
+      ge('lu-tier-badge').style.cssText=`background:${ld.color}22;color:${ld.color};border-color:${ld.color}55`;
+    }
     if(ge('lu-name')){ge('lu-name').textContent=ld.name;ge('lu-name').style.color=ld.color;}
-    if(ge('lu-sub'))ge('lu-sub').textContent='You reached Level '+ld.lvl+'!';
+    if(ge('lu-sub'))ge('lu-sub').textContent='Level '+ld.lvl+' unlocked';
+    if(ge('lu-btn')){ge('lu-btn').style.background=ld.color;ge('lu-btn').style.color=(ld.tier==='worldscholar'||ld.tier==='oracle')?'#fff':'#000';}
+    if(ge('lu-bg-glow'))ge('lu-bg-glow').style.background=`radial-gradient(ellipse at center,${td.glow} 0%,transparent 70%)`;
     const o=ge('levelup-overlay');if(o)o.classList.add('show');
     startConfetti(ld.color);
   }catch(ex){console.warn('showLevelUp:',ex);}
@@ -3706,13 +3716,23 @@ function openRanksPanel(){
   if(!panel||!list)return;
   const p=pGet(),cl=getLvlData(p.xp).cur.lvl;
   list.innerHTML='';
-  for(let i=1;i<=10;i++){
-    const ld=LEVELS[i-1],isC=i===cl,isU=cl>=i;
-    const row=document.createElement('div');
-    row.style.cssText=`display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:10px;border:1px solid ${isC?ld.color:'rgba(255,255,255,.07)'};opacity:${isU?'1':'.4'}`;
-    row.innerHTML=`<div style="flex-shrink:0">${drawEmblem(i,.8)}</div><div style="flex:1"><div style="font-family:var(--font-m);font-size:.75rem;font-weight:700;color:${ld.color}">Level ${i} · ${ld.name}</div><div style="font-size:.65rem;color:var(--muted2);margin-top:1px">${i===1?'Starting rank':ld.xp.toLocaleString()+' XP required'}</div></div>${isC?'<div style="font-family:var(--font-m);font-size:.52rem;color:var(--lime);background:rgba(200,241,53,.1);border:1px solid rgba(200,241,53,.3);padding:2px 7px;border-radius:100px">NOW</div>':(!isU?'<div style="color:var(--muted2)">🔒</div>':'')}`;
-    list.appendChild(row);
-  }
+  LEVELS.forEach(ld=>{
+    const i=ld.lvl,isC=i===cl,isU=cl>=i;
+    const td=TIERS[ld.tier]||TIERS.wanderer;
+    const card=document.createElement('div');
+    card.className='rp-card'+(isC?' rp-current':'')+(isU?'':' rp-locked');
+    if(isC)card.style.cssText=`border-color:${ld.color};box-shadow:0 0 20px ${td.glow}`;
+    card.innerHTML=`
+      <div class="rp-emblem-wrap" style="${isC?'filter:drop-shadow(0 0 12px '+td.glow+')':''}">${drawEmblem(i,1.1)}</div>
+      <div class="rp-card-body">
+        <div class="rp-card-tier" style="color:${td.color}">${td.label}</div>
+        <div class="rp-card-name" style="color:${ld.color}">${ld.name}</div>
+        <div class="rp-card-xp">${i===1?'Starting level':(ld.xp.toLocaleString()+' XP to unlock')}</div>
+        ${isC?`<div class="rp-now-badge" style="color:${ld.color};border-color:${ld.color}40;background:${ld.color}15">▶ YOUR LEVEL</div>`:''}
+      </div>
+      <div class="rp-card-status" style="color:${isU?ld.color:'var(--muted2)'}">${!isU?'🔒':isC?'':'✓'}</div>`;
+    list.appendChild(card);
+  });
   panel.classList.add('open');
   document.getElementById('profile-panel').classList.remove('open');
 }

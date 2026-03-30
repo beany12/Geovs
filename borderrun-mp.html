@@ -1,0 +1,1100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>BorderRun 2P — GeoGenius</title>
+<link rel="stylesheet" href="style.css">
+<!-- Socket.io client (served by backend automatically) -->
+<script src="/socket.io/socket.io.js"></script>
+<!-- BorderRun world map data -->
+<script src="borderrun-world.js"></script>
+<style>
+  /* ── Page reset ── */
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--ink);color:var(--text);font-family:inherit;min-height:100dvh;display:flex;flex-direction:column;align-items:center}
+
+  /* ── Screens ── */
+  .screen{display:none;flex-direction:column;align-items:center;width:100%;max-width:460px;padding:20px 16px;min-height:100dvh}
+  .screen.active{display:flex}
+
+  /* ── Header ── */
+  .br-header{width:100%;display:flex;align-items:center;justify-content:space-between;margin-bottom:24px}
+  .br-logo{font-family:var(--font-d);font-size:1.5rem;color:var(--lime)}
+  .br-logo span{color:var(--muted2);font-size:.75rem;display:block;font-family:var(--font-m);letter-spacing:.1em}
+  .back-link{color:var(--muted2);font-size:.8rem;text-decoration:none;padding:6px 10px;border-radius:8px;border:1px solid var(--border);cursor:pointer;background:none}
+
+  /* ── Lang bar ── */
+  .br-lang{display:flex;gap:6px;margin-bottom:20px}
+  .br-lang button{padding:5px 10px;border-radius:8px;border:1px solid var(--border);background:var(--ink2);color:var(--muted2);font-size:.72rem;cursor:pointer;display:flex;align-items:center;gap:4px}
+  .br-lang button.active{border-color:var(--lime);color:var(--lime)}
+
+  /* ── Cards ── */
+  .br-card{background:var(--ink2);border:1px solid var(--border);border-radius:16px;padding:20px;width:100%;margin-bottom:12px}
+  .br-card-title{font-family:var(--font-d);font-size:1.1rem;color:var(--text);margin-bottom:12px}
+
+  /* ── Buttons ── */
+  .btn-lime{width:100%;padding:14px;border-radius:12px;background:var(--lime);color:#000;font-weight:700;font-size:1rem;border:none;cursor:pointer;font-family:inherit;transition:opacity .15s}
+  .btn-lime:hover{opacity:.88}
+  .btn-outline{width:100%;padding:12px;border-radius:12px;background:transparent;color:var(--lime);font-weight:700;font-size:.9rem;border:2px solid var(--lime);cursor:pointer;font-family:inherit;margin-top:8px}
+  .btn-muted{width:100%;padding:10px;border-radius:10px;background:var(--ink3);color:var(--muted2);font-size:.85rem;border:1px solid var(--border);cursor:pointer;font-family:inherit;margin-top:8px}
+
+  /* ── Code input ── */
+  .br-input{width:100%;padding:12px 14px;border-radius:10px;border:1px solid var(--border);background:var(--ink3);color:var(--text);font-family:var(--font-m);font-size:1.1rem;letter-spacing:.15em;text-transform:uppercase;outline:none;text-align:center;margin-bottom:10px}
+  .br-input:focus{border-color:var(--lime)}
+
+  /* ── Code display ── */
+  .br-code{font-family:var(--font-m);font-size:2rem;letter-spacing:.25em;color:var(--lime);text-align:center;padding:16px;background:var(--ink3);border-radius:12px;border:1px solid rgba(200,241,53,.3);margin-bottom:12px}
+  .br-code-label{font-size:.65rem;letter-spacing:.15em;color:var(--muted2);text-align:center;margin-bottom:6px;text-transform:uppercase}
+
+  /* ── Waiting pulse ── */
+  .waiting-dot{width:8px;height:8px;border-radius:50%;background:var(--amber);display:inline-block;animation:pulse 1.2s ease-in-out infinite}
+  @keyframes pulse{0%,100%{opacity:.3;transform:scale(.8)}50%{opacity:1;transform:scale(1.2)}}
+
+  /* ── Route display (start → target) ── */
+  .br-route{display:flex;align-items:center;justify-content:center;gap:8px;padding:14px;background:var(--ink3);border-radius:12px;margin-bottom:14px;width:100%}
+  .br-route-country{display:flex;flex-direction:column;align-items:center;gap:4px;min-width:80px}
+  .br-route-flag{width:44px;height:32px;border-radius:4px;object-fit:cover}
+  .br-route-name{font-size:.68rem;color:var(--muted2);text-align:center;font-weight:600}
+  .br-route-arrow{font-size:1.4rem;color:var(--muted);flex:1;text-align:center}
+
+  /* ── Player positions ── */
+  .br-players{display:grid;grid-template-columns:1fr 1fr;gap:8px;width:100%;margin-bottom:14px}
+  .br-player{background:var(--ink3);border-radius:12px;padding:12px;border:1px solid var(--border)}
+  .br-player.me{border-color:rgba(200,241,53,.4)}
+  .br-player.opp{border-color:rgba(255,184,48,.2)}
+  .br-player-label{font-size:.6rem;letter-spacing:.12em;color:var(--muted);margin-bottom:6px;text-transform:uppercase}
+  .br-player-flag{width:32px;height:22px;border-radius:3px;object-fit:cover;margin-bottom:4px}
+  .br-player-name{font-size:.78rem;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .br-player-moves{font-size:.65rem;color:var(--muted2);margin-top:2px}
+  .br-player-path{font-size:.58rem;color:var(--muted);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+  /* ── World map ── */
+  .br-map-wrap{width:100%;position:relative;border-radius:12px;overflow:hidden;border:1px solid var(--border);margin-bottom:10px;cursor:grab;touch-action:none;background:#0b1d35}
+  .br-map-wrap:active{cursor:grabbing}
+  .br-map-wrap svg{display:block;width:100%;height:auto;aspect-ratio:2/1}
+  .br-map-zoom{position:absolute;bottom:6px;right:6px;display:flex;gap:4px}
+  .br-map-zoom button{width:26px;height:26px;border-radius:6px;background:rgba(0,0,0,.5);color:#fff;border:1px solid rgba(255,255,255,.2);font-size:1rem;cursor:pointer;line-height:1;display:flex;align-items:center;justify-content:center}
+  /* ── Country input + suggestions ── */
+  .br-suggest{position:relative;width:100%;margin-bottom:8px}
+  .br-country-input{width:100%;padding:12px 14px;border-radius:10px;border:1px solid var(--border);background:var(--ink3);color:var(--text);font-family:inherit;font-size:.95rem;outline:none}
+  .br-country-input:focus{border-color:var(--lime)}
+  .br-suggest-list{position:absolute;top:100%;left:0;right:0;z-index:50;background:var(--ink2);border:1px solid var(--border);border-radius:10px;overflow:hidden;display:none;margin-top:3px}
+  .br-suggest-list.show{display:block}
+  .br-suggest-item{padding:9px 14px;cursor:pointer;font-size:.88rem;display:flex;align-items:center;gap:8px}
+  .br-suggest-item:hover{background:var(--ink3)}
+  .br-suggest-not-nb{opacity:.45}
+  /* ── Countdown overlay ── */
+  .br-countdown{position:fixed;inset:0;z-index:999;display:flex;align-items:center;justify-content:center;pointer-events:all;background:rgba(0,0,0,.55);backdrop-filter:blur(2px)}
+  .br-countdown.hidden{display:none}
+  .br-countdown-num{font-size:clamp(5rem,20vw,9rem);font-weight:900;color:#fff;text-shadow:0 0 40px rgba(200,241,53,.8),0 4px 24px rgba(0,0,0,.6);animation:br-pop .7s ease-out forwards;line-height:1}
+  @keyframes br-pop{0%{transform:scale(2.2);opacity:0}30%{opacity:1;transform:scale(1)}85%{opacity:1;transform:scale(.9)}100%{opacity:0;transform:scale(.75)}}
+  .br-countdown-go{font-size:clamp(3rem,14vw,6rem);font-weight:900;color:var(--lime);text-shadow:0 0 50px rgba(200,241,53,1);animation:br-go .8s ease-out forwards}
+  @keyframes br-go{0%{transform:scale(.5);opacity:0}20%{opacity:1;transform:scale(1.15)}50%{transform:scale(1)}90%{opacity:1}100%{opacity:0;transform:scale(1.3)}}
+  /* ── Feedback ── */
+  .br-fb{height:20px;font-size:.82rem;text-align:center;margin-bottom:6px;transition:opacity .3s}
+  .br-fb.ok{color:var(--lime)}
+  .br-fb.bad{color:#ef4444}
+
+  /* ── Victory screen ── */
+  .br-victory-icon{font-size:4rem;margin-bottom:8px}
+  .br-victory-title{font-family:var(--font-d);font-size:1.8rem;margin-bottom:6px}
+  .br-victory-sub{font-size:.88rem;color:var(--muted2);margin-bottom:20px;text-align:center}
+  .br-path-display{background:var(--ink3);border-radius:10px;padding:12px;width:100%;margin-bottom:8px;font-size:.78rem;line-height:1.7;color:var(--muted2)}
+  .br-path-display b{color:var(--text)}
+
+  /* ── Toast ── */
+  .br-toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--ink2);border:1px solid var(--border);border-radius:10px;padding:10px 18px;font-size:.85rem;color:var(--text);z-index:999;opacity:0;transition:opacity .2s;pointer-events:none;white-space:nowrap}
+  .br-toast.show{opacity:1}
+
+  /* ── Misc ── */
+  .br-divider{width:100%;border:none;border-top:1px solid var(--border);margin:12px 0}
+  .text-center{text-align:center}
+  .gap-top{margin-top:12px}
+  .color-lime{color:var(--lime)}
+  .color-amber{color:var(--amber)}
+
+  /* ── Difficulty selector ── */
+  .br-diff-btns{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+  .br-diff-btn{padding:10px 6px;border-radius:10px;border:1px solid var(--border);background:var(--ink3);cursor:pointer;text-align:center;transition:border-color .15s,background .15s;font-family:inherit}
+  .br-diff-btn.active{border-color:var(--lime);background:rgba(200,241,53,.08)}
+  .br-diff-btn.active .br-diff-name{color:var(--lime)}
+  .br-diff-name{font-weight:700;font-size:.85rem;color:var(--text);margin-bottom:2px}
+  .br-diff-desc{font-size:.65rem;color:var(--muted2)}
+</style>
+</head>
+<body>
+
+<!-- ══════════════ SCREEN: LOBBY ══════════════ -->
+<div id="screen-lobby" class="screen active">
+  <div class="br-header">
+    <div class="br-logo">
+      🗺️ BorderRun
+      <span id="t-subtitle">2-Player Race</span>
+    </div>
+    <a class="back-link" href="index.html">← Home</a>
+  </div>
+
+  <div class="br-lang">
+    <button data-lang="en" onclick="setLang('en')" class="active"><img src="https://flagcdn.com/w40/gb.png" style="height:12px;border-radius:2px"> EN</button>
+    <button data-lang="de" onclick="setLang('de')"><img src="https://flagcdn.com/w40/de.png" style="height:12px;border-radius:2px"> DE</button>
+    <button data-lang="fr" onclick="setLang('fr')"><img src="https://flagcdn.com/w40/fr.png" style="height:12px;border-radius:2px"> FR</button>
+    <button data-lang="es" onclick="setLang('es')"><img src="https://flagcdn.com/w40/es.png" style="height:12px;border-radius:2px"> ES</button>
+  </div>
+
+  <div class="br-card" style="text-align:center;border-color:rgba(200,241,53,.25);margin-bottom:20px">
+    <div style="font-size:2.2rem;margin-bottom:8px">🏁</div>
+    <div style="font-family:var(--font-d);font-size:1.4rem;color:var(--lime);margin-bottom:6px" id="t-game-title">Race Across Borders</div>
+    <div style="font-size:.82rem;color:var(--muted2);line-height:1.5" id="t-game-desc">
+      Both players start at the same country and race to the target — moving only through land borders. First to arrive wins!
+    </div>
+  </div>
+
+  <div class="br-card" id="diff-card">
+    <div class="br-card-title" id="t-diff-lbl">Difficulty</div>
+    <div class="br-diff-btns">
+      <button class="br-diff-btn" data-diff="easy" onclick="setDifficulty('easy')">
+        <div class="br-diff-name" id="t-diff-easy">Easy</div>
+        <div class="br-diff-desc" id="t-diff-easy-desc">European · 4-6 hops</div>
+      </button>
+      <button class="br-diff-btn active" data-diff="medium" onclick="setDifficulty('medium')">
+        <div class="br-diff-name" id="t-diff-medium">Medium</div>
+        <div class="br-diff-desc" id="t-diff-medium-desc">Global · 5-8 hops</div>
+      </button>
+      <button class="br-diff-btn" data-diff="hard" onclick="setDifficulty('hard')">
+        <div class="br-diff-name" id="t-diff-hard">Hard</div>
+        <div class="br-diff-desc" id="t-diff-hard-desc">Global · 7-11 hops</div>
+      </button>
+    </div>
+    <div style="font-size:.7rem;color:var(--muted2);margin-top:8px;text-align:center" id="t-diff-note">Only the room creator's choice applies</div>
+  </div>
+
+  <div class="br-card">
+    <div class="br-card-title" id="t-create-title">Create a Match</div>
+    <button class="btn-lime" onclick="createMatch()" id="t-create-btn">Create Match →</button>
+  </div>
+
+  <div class="br-card">
+    <div class="br-card-title" id="t-join-title">Join a Match</div>
+    <input class="br-input" id="join-code-input" maxlength="6" placeholder="XXXXXX" oninput="this.value=this.value.toUpperCase()">
+    <button class="btn-outline" onclick="joinMatch()" id="t-join-btn">Join →</button>
+  </div>
+</div>
+
+<!-- ══════════════ SCREEN: WAITING ══════════════ -->
+<div id="screen-waiting" class="screen">
+  <div class="br-header">
+    <div class="br-logo">🗺️ BorderRun <span id="t-subtitle-w">2-Player Race</span></div>
+    <button class="back-link" onclick="goLobby()" id="t-cancel">Cancel</button>
+  </div>
+
+  <div class="br-card text-center" style="border-color:rgba(200,241,53,.25);padding:28px 20px">
+    <div style="font-size:2rem;margin-bottom:12px">⏳</div>
+    <div style="font-size:.85rem;color:var(--muted2);margin-bottom:16px" id="t-waiting-for">Waiting for opponent...</div>
+
+    <div class="br-code-label" id="t-your-code">Your room code</div>
+    <div class="br-code" id="display-code">------</div>
+    <div id="w-diff-badge" style="font-size:.72rem;color:var(--amber);text-align:center;margin-bottom:8px"></div>
+
+    <button class="btn-lime" onclick="copyInviteLink()" id="t-copy-link">📋 Copy Invite Link</button>
+    <button class="btn-muted" onclick="copyCode()" id="t-copy-code">Copy Code</button>
+  </div>
+
+  <div class="br-card" style="margin-top:8px">
+    <div style="font-size:.78rem;color:var(--muted2);line-height:1.6" id="t-how-to-share">
+      Share the link or code with your opponent. The game starts automatically when they join.
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ SCREEN: GAME ══════════════ -->
+<div id="screen-game" class="screen">
+  <div class="br-header" style="margin-bottom:10px">
+    <div class="br-logo" style="font-size:1.1rem">🗺️ BorderRun</div>
+    <div style="text-align:right">
+      <div style="font-size:.72rem;color:var(--muted2)">
+        <span id="g-my-moves">0</span> <span id="t-moves-lbl">moves</span>
+      </div>
+      <div id="g-score" style="font-size:.7rem;color:var(--muted2)"></div>
+    </div>
+  </div>
+
+  <!-- Route: start → target -->
+  <div class="br-route">
+    <div class="br-route-country">
+      <img id="g-start-flag" class="br-route-flag" src="" alt="">
+      <div class="br-route-name" id="g-start-name"></div>
+    </div>
+    <div class="br-route-arrow">→</div>
+    <div class="br-route-country" style="flex:1;text-align:center">
+      <div style="font-size:.58rem;color:var(--muted);letter-spacing:.1em;text-transform:uppercase" id="t-target-lbl">TARGET</div>
+    </div>
+    <div class="br-route-arrow">→</div>
+    <div class="br-route-country">
+      <img id="g-target-flag" class="br-route-flag" src="" alt="" style="border:2px solid var(--lime)">
+      <div class="br-route-name" id="g-target-name" style="color:var(--lime)"></div>
+    </div>
+  </div>
+
+  <!-- Player positions -->
+  <div class="br-players">
+    <div class="br-player me">
+      <div class="br-player-label" id="t-you-lbl">YOU</div>
+      <img id="g-my-flag" class="br-player-flag" src="" alt="">
+      <div class="br-player-name" id="g-my-pos"></div>
+      <div class="br-player-moves"><span id="g-my-move-count">0</span> <span id="t-moves-lbl2">moves</span></div>
+      <div class="br-player-path" id="g-my-path"></div>
+    </div>
+    <div class="br-player opp">
+      <div class="br-player-label" id="t-opp-lbl">OPPONENT</div>
+      <div class="br-player-name" id="g-opp-pos" style="color:var(--amber)">???</div>
+      <div class="br-player-moves"><span id="g-opp-move-count">0</span> <span id="t-moves-lbl3">moves</span></div>
+    </div>
+  </div>
+
+  <!-- World map -->
+  <div class="br-map-wrap" id="g-map-wrap">
+    <svg id="g-map-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 500"></svg>
+    <div class="br-map-zoom">
+      <button onclick="brZoom(1.4)">+</button>
+      <button onclick="brResetView()">⌂</button>
+      <button onclick="brZoom(0.7)">−</button>
+    </div>
+  </div>
+
+  <!-- Type country name -->
+  <div class="br-suggest">
+    <input id="g-country-input" class="br-country-input" autocomplete="off" autocorrect="off" spellcheck="false" placeholder="Type a neighboring country...">
+    <div id="g-suggestions" class="br-suggest-list"></div>
+  </div>
+  <div id="g-fb" class="br-fb"></div>
+</div>
+
+<!-- ══════════════ SCREEN: VICTORY ══════════════ -->
+<div id="screen-victory" class="screen">
+  <div class="br-header">
+    <div class="br-logo">🗺️ BorderRun</div>
+    <button class="back-link" onclick="goLobby()" id="t-home-btn">Home</button>
+  </div>
+
+  <div style="text-align:center;width:100%;margin-bottom:16px">
+    <div class="br-victory-icon" id="v-icon">🏆</div>
+    <div class="br-victory-title" id="v-title">You Win!</div>
+    <div class="br-victory-sub" id="v-sub">You reached the target first.</div>
+    <div id="v-score" style="font-family:var(--font-d);font-size:1.4rem;color:var(--lime);text-align:center;margin-bottom:4px"></div>
+  </div>
+
+  <div class="br-map-wrap" id="v-map-wrap" style="margin-bottom:14px">
+    <svg id="v-map-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 500"></svg>
+  </div>
+
+  <div class="br-card" style="width:100%">
+    <div class="br-card-title" id="t-results-lbl">Results</div>
+    <div class="br-path-display" id="v-my-path"></div>
+    <div class="br-path-display" id="v-opp-path" style="margin-top:8px"></div>
+  </div>
+
+  <button class="btn-lime gap-top" onclick="requestRematch()" id="t-rematch-btn">Rematch →</button>
+  <button class="btn-muted" onclick="goLobby()" id="t-home-btn2">← Home</button>
+</div>
+
+<!-- Toast -->
+<div class="br-toast" id="toast"></div>
+
+<script>
+// ── Debug: show JS errors visibly ─────────────────────────────────────────────
+window.onerror = function(msg, src, line) {
+  document.body.insertAdjacentHTML('beforeend',
+    '<div style="position:fixed;top:0;left:0;right:0;background:#e74c3c;color:#fff;padding:10px;z-index:99999;font-size:12px;word-break:break-all">JS ERROR: '+msg+' (line '+line+')</div>');
+};
+document.addEventListener('DOMContentLoaded', function() {
+  if (typeof io === 'undefined') {
+    document.body.insertAdjacentHTML('beforeend',
+      '<div style="position:fixed;top:0;left:0;right:0;background:#e74c3c;color:#fff;padding:10px;z-index:99999">Socket.io script failed to load!</div>');
+  }
+});
+
+// ── Config ────────────────────────────────────────────────────────────────────
+const SOCKET_URL = window.location.origin;
+let currentState = null;
+let _brCountdownActive = false;
+
+// ── Translations ──────────────────────────────────────────────────────────────
+const LANGS = {
+  en: {
+    subtitle:'2-Player Race', gameTitle:'Race Across Borders',
+    gameDesc:'Both players start at the same country and race to the target — moving only through land borders. First to arrive wins!',
+    createTitle:'Create a Match', createBtn:'Create Match →',
+    joinTitle:'Join a Match', joinBtn:'Join →',
+    waitingFor:'Waiting for opponent...', yourCode:'Your room code',
+    copyLink:'📋 Copy Invite Link', copyCode:'Copy Code',
+    howToShare:'Share the link or code with your opponent. The game starts automatically when they join.',
+    cancel:'Cancel', targetLbl:'TARGET', youLbl:'YOU', oppLbl:'OPPONENT',
+    movesLbl:'moves', moveTo:'MOVE TO:', resultsLbl:'Results',
+    youWin:'You Win! 🏆', youLose:'You Lost', draw:'Game Over',
+    winSub:'You reached the target first.', loseSub:'Your opponent got there first.',
+    homBtn:'Home', rematchBtn:'Rematch →',
+    myPathLbl:'Your path', oppPathLbl:"Opponent's path",
+    linkCopied:'Link copied!', codeCopied:'Code copied!',
+    notConnected:'Connecting...', joined:'Opponent joined — starting!',
+    oppLeft:'Opponent disconnected.', errorFull:'Room is full.',
+    errorNotFound:'Room not found. Check the code.',
+    errorGeneric:'Something went wrong.',
+    connecting:'Connecting to server...',
+    diffLbl:'Difficulty',
+    diffEasy:'Easy', diffEasyDesc:'Europe · 4-6 hops',
+    diffMedium:'Medium', diffMediumDesc:'Europe/Asia/Americas · 5-8 hops',
+    diffHard:'Hard', diffHardDesc:'Worldwide incl. Africa · 7-11 hops',
+    diffNote:"Only the room creator's choice applies",
+    score:'Score',
+  },
+  de: {
+    subtitle:'2-Spieler-Rennen', gameTitle:'Grenzen-Rennen',
+    gameDesc:'Beide Spieler starten im selben Land und rasen zum Ziel — nur über Landgrenzen. Wer zuerst ankommt, gewinnt!',
+    createTitle:'Spiel erstellen', createBtn:'Spiel erstellen →',
+    joinTitle:'Spiel beitreten', joinBtn:'Beitreten →',
+    waitingFor:'Warte auf Gegner...', yourCode:'Dein Raumcode',
+    copyLink:'📋 Einladungslink kopieren', copyCode:'Code kopieren',
+    howToShare:'Teile den Link oder Code mit deinem Gegner. Das Spiel startet automatisch.',
+    cancel:'Abbrechen', targetLbl:'ZIEL', youLbl:'DU', oppLbl:'GEGNER',
+    movesLbl:'Züge', moveTo:'ZIEHE ZU:', resultsLbl:'Ergebnisse',
+    youWin:'Du gewinnst! 🏆', youLose:'Du hast verloren', draw:'Spiel beendet',
+    winSub:'Du hast das Ziel zuerst erreicht.', loseSub:'Dein Gegner war schneller.',
+    homBtn:'Startseite', rematchBtn:'Nochmal →',
+    myPathLbl:'Dein Weg', oppPathLbl:'Weg des Gegners',
+    linkCopied:'Link kopiert!', codeCopied:'Code kopiert!',
+    notConnected:'Verbinde...', joined:'Gegner beigetreten — Spiel startet!',
+    oppLeft:'Gegner hat das Spiel verlassen.', errorFull:'Raum ist voll.',
+    errorNotFound:'Raum nicht gefunden. Code prüfen.',
+    errorGeneric:'Etwas ist schiefgelaufen.',
+    connecting:'Verbinde mit Server...',
+    diffLbl:'Schwierigkeitsgrad',
+    diffEasy:'Leicht', diffEasyDesc:'Europa · 4-6 Länder',
+    diffMedium:'Mittel', diffMediumDesc:'Europa/Asien/Amerika · 5-8 Länder',
+    diffHard:'Schwer', diffHardDesc:'Weltweit inkl. Afrika · 7-11 Länder',
+    diffNote:'Nur die Wahl des Raum-Erstellers gilt',
+    score:'Punkte',
+  },
+  fr: {
+    subtitle:'Course à 2 joueurs', gameTitle:'Course aux Frontières',
+    gameDesc:'Les deux joueurs démarrent dans le même pays et courent vers la cible — en traversant uniquement des frontières terrestres. Le premier arrivé gagne!',
+    createTitle:'Créer une partie', createBtn:'Créer →',
+    joinTitle:'Rejoindre une partie', joinBtn:'Rejoindre →',
+    waitingFor:"En attente de l'adversaire...", yourCode:'Code de la salle',
+    copyLink:"📋 Copier le lien d'invitation", copyCode:'Copier le code',
+    howToShare:"Partagez le lien ou le code avec votre adversaire. La partie démarre automatiquement.",
+    cancel:'Annuler', targetLbl:'CIBLE', youLbl:'VOUS', oppLbl:'ADVERSAIRE',
+    movesLbl:'coups', moveTo:'SE DÉPLACER VERS:', resultsLbl:'Résultats',
+    youWin:'Vous gagnez! 🏆', youLose:'Vous avez perdu', draw:'Partie terminée',
+    winSub:'Vous avez atteint la cible en premier.', loseSub:'Votre adversaire est arrivé le premier.',
+    homBtn:'Accueil', rematchBtn:'Revanche →',
+    myPathLbl:'Votre chemin', oppPathLbl:"Chemin de l'adversaire",
+    linkCopied:'Lien copié!', codeCopied:'Code copié!',
+    notConnected:'Connexion...', joined:'Adversaire rejoint — début!',
+    oppLeft:"L'adversaire s'est déconnecté.", errorFull:'La salle est pleine.',
+    errorNotFound:'Salle introuvable. Vérifiez le code.',
+    errorGeneric:"Une erreur s'est produite.",
+    connecting:'Connexion au serveur...',
+    diffLbl:'Difficulté',
+    diffEasy:'Facile', diffEasyDesc:'Europe · 4-6 pays',
+    diffMedium:'Moyen', diffMediumDesc:'Europe/Asie/Amériques · 5-8 pays',
+    diffHard:'Difficile', diffHardDesc:'Mondial incl. Afrique · 7-11 pays',
+    diffNote:"Seul le choix du créateur s'applique",
+    score:'Score',
+  },
+  es: {
+    subtitle:'Carrera 2 jugadores', gameTitle:'Carrera de Fronteras',
+    gameDesc:'Ambos jugadores comienzan en el mismo país y corren hacia el objetivo — moviéndose solo por fronteras terrestres. ¡El primero en llegar gana!',
+    createTitle:'Crear partida', createBtn:'Crear →',
+    joinTitle:'Unirse a partida', joinBtn:'Unirse →',
+    waitingFor:'Esperando al oponente...', yourCode:'Tu código de sala',
+    copyLink:'📋 Copiar enlace de invitación', copyCode:'Copiar código',
+    howToShare:'Comparte el enlace o código con tu oponente. El juego empieza automáticamente.',
+    cancel:'Cancelar', targetLbl:'OBJETIVO', youLbl:'TÚ', oppLbl:'OPONENTE',
+    movesLbl:'movimientos', moveTo:'MOVER A:', resultsLbl:'Resultados',
+    youWin:'¡Ganaste! 🏆', youLose:'Perdiste', draw:'Juego terminado',
+    winSub:'Llegaste al objetivo primero.', loseSub:'Tu oponente llegó primero.',
+    homBtn:'Inicio', rematchBtn:'Revancha →',
+    myPathLbl:'Tu camino', oppPathLbl:'Camino del oponente',
+    linkCopied:'¡Enlace copiado!', codeCopied:'¡Código copiado!',
+    notConnected:'Conectando...', joined:'¡Oponente unido — empieza!',
+    oppLeft:'El oponente se desconectó.', errorFull:'La sala está llena.',
+    errorNotFound:'Sala no encontrada. Revisa el código.',
+    errorGeneric:'Algo salió mal.',
+    connecting:'Conectando al servidor...',
+    diffLbl:'Dificultad',
+    diffEasy:'Fácil', diffEasyDesc:'Europa · 4-6 países',
+    diffMedium:'Medio', diffMediumDesc:'Europa/Asia/Américas · 5-8 países',
+    diffHard:'Difícil', diffHardDesc:'Mundial incl. África · 7-11 países',
+    diffNote:'Solo aplica la elección del creador',
+    score:'Puntuación',
+  },
+};
+
+let curLang = localStorage.getItem('geovs_lang') || 'en';
+let T = LANGS[curLang];
+let myRoomCode = null;
+let selectedDifficulty = 'medium';
+let myColorMap = {};
+let oppColorMap = {};
+let sessionScore = { me: 0, opp: 0 };
+
+function setDifficulty(d) {
+  selectedDifficulty = d;
+  document.querySelectorAll('.br-diff-btn').forEach(b => b.classList.toggle('active', b.dataset.diff === d));
+}
+
+function randomMapColor() {
+  // Bright non-blue HSL color: hues 0-200 (skip 200-260 = blue range) or 280-360
+  const hueRanges = [[0, 60], [80, 175], [280, 360]];
+  const range = hueRanges[Math.floor(Math.random() * hueRanges.length)];
+  const hue = range[0] + Math.random() * (range[1] - range[0]);
+  const sat = 70 + Math.random() * 25;
+  const lit = 50 + Math.random() * 15;
+  return `hsl(${Math.round(hue)},${Math.round(sat)}%,${Math.round(lit)}%)`;
+}
+
+function updateScoreDisplay() {
+  const scoreStr = `${sessionScore.me} – ${sessionScore.opp}`;
+  const gs = document.getElementById('g-score');
+  if (gs) gs.textContent = (T.score || 'Score') + ': ' + scoreStr;
+  const vs = document.getElementById('v-score');
+  if (vs) vs.textContent = (T.score || 'Score') + ': ' + scoreStr;
+}
+
+function setLang(code) {
+  curLang = code;
+  T = LANGS[code];
+  localStorage.setItem('geovs_lang', code);
+  document.querySelectorAll('.br-lang button').forEach(b => {
+    b.classList.toggle('active', b.dataset.lang === code);
+  });
+  applyTranslations();
+}
+
+function applyTranslations() {
+  const ids = {
+    't-subtitle': 'subtitle', 't-subtitle-w': 'subtitle',
+    't-game-title': 'gameTitle', 't-game-desc': 'gameDesc',
+    't-create-title': 'createTitle', 't-create-btn': 'createBtn',
+    't-join-title': 'joinTitle', 't-join-btn': 'joinBtn',
+    't-waiting-for': 'waitingFor', 't-your-code': 'yourCode',
+    't-copy-link': 'copyLink', 't-copy-code': 'copyCode',
+    't-how-to-share': 'howToShare', 't-cancel': 'cancel',
+    't-target-lbl': 'targetLbl', 't-you-lbl': 'youLbl', 't-opp-lbl': 'oppLbl',
+    't-moves-lbl': 'movesLbl', 't-moves-lbl2': 'movesLbl', 't-moves-lbl3': 'movesLbl',
+    't-move-to': 'moveTo', 't-results-lbl': 'resultsLbl',
+    't-home-btn': 'homBtn', 't-home-btn2': 'homBtn', 't-rematch-btn': 'rematchBtn',
+    't-diff-lbl': 'diffLbl',
+    't-diff-easy': 'diffEasy', 't-diff-easy-desc': 'diffEasyDesc',
+    't-diff-medium': 'diffMedium', 't-diff-medium-desc': 'diffMediumDesc',
+    't-diff-hard': 'diffHard', 't-diff-hard-desc': 'diffHardDesc',
+    't-diff-note': 'diffNote',
+  };
+  for (const [id, key] of Object.entries(ids)) {
+    const el = document.getElementById(id);
+    if (el && T[key]) el.textContent = T[key];
+  }
+}
+
+// ── Socket.io ──────────────────────────────────────────────────────────────────
+let socket = null;
+
+function connectSocket() {
+  if (socket && socket.connected) return;
+  socket = io(SOCKET_URL, { transports: ['websocket','polling'] });
+
+  socket.on('connect', () => {
+    // If URL has a code, auto-join
+    const urlCode = new URLSearchParams(window.location.search).get('code');
+    if (urlCode) {
+      document.getElementById('join-code-input').value = urlCode.toUpperCase();
+    }
+  });
+
+  socket.on('connect_error', () => showToast(T.connecting));
+
+  socket.on('br:created', ({ code, difficulty }) => {
+    myRoomCode = code;
+    document.getElementById('display-code').textContent = code;
+    const badge = document.getElementById('w-diff-badge');
+    if (badge) {
+      const diffLabels = { easy: T.diffEasy || 'Easy', medium: T.diffMedium || 'Medium', hard: T.diffHard || 'Hard' };
+      badge.textContent = diffLabels[difficulty] || difficulty;
+    }
+    showScreen('waiting');
+  });
+
+  socket.on('br:start', (state) => {
+    if (state.myMoves === 0) {
+      myColorMap = {};
+      oppColorMap = {};
+    }
+    renderGame(state);
+    showScreen('game');
+    brInitPanZoom();
+    const inp = document.getElementById('g-country-input');
+    if (inp) {
+      inp.oninput = () => brAutoComplete();
+      inp.onkeydown = (e) => {
+        if (e.key === 'Enter') brSubmitInput();
+        if (e.key === 'Escape') document.getElementById('g-suggestions').classList.remove('show');
+      };
+    }
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('.br-suggest')) document.getElementById('g-suggestions').classList.remove('show');
+    });
+    // Countdown only on fresh game start (both players at 0 moves)
+    if (state.myMoves === 0) {
+      brStartCountdown();
+    } else {
+      showToast('');
+    }
+  });
+
+  socket.on('br:state', (state) => {
+    renderGame(state);
+  });
+
+  socket.on('br:victory', (state) => {
+    renderVictory(state);
+    showScreen('victory');
+  });
+
+  socket.on('br:opponent_left', () => showToast(T.oppLeft));
+
+  socket.on('br:error', (err) => {
+    const msgs = {
+      ROOM_NOT_FOUND: T.errorNotFound,
+      ROOM_FULL:      T.errorFull,
+      NOT_A_NEIGHBOR: null,
+    };
+    if (err === 'NOT_A_NEIGHBOR') { brShowFb('Not a neighbor!', 'bad'); return; }
+    const msg = msgs[err] !== undefined ? msgs[err] : T.errorGeneric;
+    if (msg) showToast(msg);
+  });
+}
+
+// ── Game actions ───────────────────────────────────────────────────────────────
+function createMatch() {
+  const btn = document.getElementById('t-create-btn');
+  btn.textContent = '⏳ Connecting...';
+  btn.disabled = true;
+
+  connectSocket();
+
+  const timeout = setTimeout(() => {
+    btn.textContent = T.createBtn;
+    btn.disabled = false;
+    showToast('❌ Cannot reach server on port 4000');
+  }, 5000);
+
+  const send = () => {
+    clearTimeout(timeout);
+    socket.emit('br:create', { difficulty: selectedDifficulty });
+  };
+  socket.connected ? send() : socket.once('connect', send);
+}
+
+function joinMatch() {
+  const code = document.getElementById('join-code-input').value.trim().toUpperCase();
+  if (code.length < 4) { showToast('Enter a 6-character code'); return; }
+
+  const btn = document.getElementById('t-join-btn');
+  btn.textContent = '⏳ Joining...';
+  btn.disabled = true;
+
+  connectSocket();
+  myRoomCode = code;
+
+  const timeout = setTimeout(() => {
+    btn.textContent = T.joinBtn;
+    btn.disabled = false;
+    showToast('❌ Cannot reach server on port 4000');
+  }, 5000);
+
+  const send = () => {
+    clearTimeout(timeout);
+    socket.emit('br:join', { code });
+  };
+  socket.connected ? send() : socket.once('connect', send);
+}
+
+function moveTo(iso) {
+  if (!socket) return;
+  socket.emit('br:move', iso);
+}
+
+function requestRematch() {
+  if (!socket) return;
+  socket.emit('br:rematch');
+}
+
+function goLobby() {
+  if (socket) { socket.disconnect(); socket = null; }
+  myRoomCode = null;
+  sessionScore = { me: 0, opp: 0 };
+  // Clear URL params
+  window.history.replaceState({}, '', window.location.pathname);
+  showScreen('lobby');
+}
+
+// ── Render ─────────────────────────────────────────────────────────────────────
+function flag(iso2, w, h) {
+  if (!iso2) return `<div style="width:${w}px;height:${h}px;background:var(--ink3);border-radius:3px"></div>`;
+  return `<img src="https://flagcdn.com/w80/${iso2}.png" style="width:${w}px;height:${h}px;border-radius:3px;object-fit:cover" alt="" loading="lazy">`;
+}
+
+function flagSrc(iso2) {
+  return iso2 ? `https://flagcdn.com/w80/${iso2}.png` : '';
+}
+
+function isoToName(iso) {
+  return (typeof BR_ISO_NAMES !== 'undefined' && BR_ISO_NAMES[iso]) || iso;
+}
+
+function renderGame(state) {
+  currentState = state;
+
+  // Route header
+  setImgSrc('g-start-flag', flagSrc(state.startFlag));
+  setText('g-start-name', state.startName);
+  setImgSrc('g-target-flag', flagSrc(state.targetFlag));
+  setText('g-target-name', state.targetName);
+
+  // My position
+  setText('g-my-moves', state.myMoves);
+  setImgSrc('g-my-flag', flagSrc(state.myFlag));
+  setText('g-my-pos', state.myPosName);
+  setText('g-my-move-count', state.myMoves);
+  setText('g-my-path', state.myPath.slice(-4).map(isoToName).join(' → '));
+
+  // Opponent — show move count only, not position
+  setText('g-opp-move-count', state.opponentMoves || 0);
+
+  // Render map
+  renderBRMap(state);
+
+  // Auto-zoom
+  if (state.myMoves === 0) {
+    // Show start + target for 3 s, then zoom to start country
+    brZoomToTwoCountries(state.startName, state.targetName, 700);
+    clearTimeout(window._brIntroTimer);
+    window._brIntroTimer = setTimeout(() => {
+      brZoomToCountry(state.startName, 800);
+    }, 3000);
+  } else {
+    clearTimeout(window._brIntroTimer);
+    brZoomToCountry(state.myPosName, 500);
+  }
+
+  // Score
+  updateScoreDisplay();
+
+  // Focus input (only if not blocked by countdown)
+  const inp = document.getElementById('g-country-input');
+  if (inp) { inp.value = ''; if (!_brCountdownActive) inp.focus(); }
+}
+
+// ── Map rendering ──────────────────────────────────────────────────────────────
+const OPP_PALETTE = ['#f97316','#fb923c','#fbbf24','#ef4444','#f59e0b'];
+let oppPaletteIdx = 0;
+
+function renderBRMap(state, showOpponent = false) {
+  const svg = document.getElementById('g-map-svg');
+  if (!svg || typeof BR_MAP_PATHS === 'undefined') return;
+  _renderMapToSvg(svg, state, showOpponent);
+}
+
+function _renderMapToSvg(svg, state, showOpponent) {
+  const startName  = state.startName;
+  const targetName = state.targetName;
+  const myPos      = state.myPosName;
+
+  // Build sets of my visited countries (names)
+  const myVisited = new Set((state.myPath || []).map(iso => isoToName(iso)));
+  const oppVisited = showOpponent ? new Set((state.opponentPath || []).map(iso => isoToName(iso))) : new Set();
+
+  let html = `<defs>
+<linearGradient id="brOG" gradientUnits="userSpaceOnUse" x1="500" y1="0" x2="500" y2="500">
+  <stop offset="0%" stop-color="#0b1d35"/>
+  <stop offset="50%" stop-color="#1a6fa3"/>
+  <stop offset="100%" stop-color="#0a1b30"/>
+</linearGradient>
+</defs>
+<rect width="1000" height="500" fill="url(#brOG)"/>`;
+
+  for (const [name, path] of Object.entries(BR_MAP_PATHS)) {
+    let fill, stroke = '#163a52', strokeW = '0.5', opacity = '1';
+
+    if (name === targetName) {
+      fill = '#c8f135'; stroke = '#8fb020'; strokeW = '1';
+    } else if (name === myPos) {
+      // Current position: use myColorMap color with bright stroke
+      if (!myColorMap[name]) myColorMap[name] = randomMapColor();
+      fill = myColorMap[name]; stroke = '#fff'; strokeW = '1.2';
+    } else if (myVisited.has(name)) {
+      // Previously visited (in my path, not current)
+      if (!myColorMap[name]) myColorMap[name] = randomMapColor();
+      fill = myColorMap[name]; stroke = '#163a52'; strokeW = '0.5';
+    } else if (showOpponent && oppVisited.has(name) && name !== startName) {
+      // Opponent path (victory screen only)
+      if (!oppColorMap[name]) {
+        oppColorMap[name] = OPP_PALETTE[oppPaletteIdx % OPP_PALETTE.length];
+        oppPaletteIdx++;
+      }
+      fill = oppColorMap[name]; stroke = '#163a52'; strokeW = '0.5';
+    } else if (name === startName && !myVisited.has(name)) {
+      // Start country (before player has moved away)
+      fill = '#4b5563'; stroke = '#374151'; strokeW = '0.5';
+    } else {
+      fill = '#1e4a66'; stroke = '#163a52'; opacity = '0.7';
+    }
+    html += `<path d="${path}" fill="${fill}" stroke="${stroke}" stroke-width="${strokeW}" stroke-linejoin="round" opacity="${opacity}"><title>${name}</title></path>`;
+  }
+
+  // Labels for highlighted countries
+  const labelSet = new Set([startName, targetName, myPos].filter(Boolean));
+  for (const name of labelSet) {
+    const path = BR_MAP_PATHS[name];
+    if (!path) continue;
+    const subs = path.split(/Z/i);
+    let bestA = -1, bestCx = 0, bestCy = 0, bestW = 0, bestH = 0;
+    for (const sub of subs) {
+      const ns = sub.match(/[\d.]+/g);
+      if (!ns || ns.length < 4) continue;
+      let x0=9999,x1=0,y0=9999,y1=0;
+      for (let i=0; i<ns.length; i+=2) {
+        const x=parseFloat(ns[i]), y=parseFloat(ns[i+1]||0);
+        if(x<x0)x0=x; if(x>x1)x1=x; if(y<y0)y0=y; if(y>y1)y1=y;
+      }
+      const a=(x1-x0)*(y1-y0);
+      if(a>bestA){bestA=a;bestCx=(x0+x1)/2;bestCy=(y0+y1)/2;bestW=x1-x0;bestH=y1-y0;}
+    }
+    if (bestA < 0) continue;
+    const fs = Math.max(2.5, Math.min(6, Math.min(bestW, bestH) * 0.2));
+    let color = name === targetName ? '#0a1500' : '#fff';
+    html += `<text x="${bestCx}" y="${bestCy+fs*0.38}" font-family="Arial,sans-serif" font-size="${fs}" font-weight="700" fill="${color}" text-anchor="middle">${name}</text>`;
+  }
+
+  svg.innerHTML = html;
+}
+
+function renderVictoryMap(state) {
+  const svg = document.getElementById('v-map-svg');
+  if (!svg || typeof BR_MAP_PATHS === 'undefined') return;
+
+  // Reset opp palette index for consistent assignment
+  oppPaletteIdx = 0;
+
+  _renderMapToSvg(svg, state, true);
+
+  // Compute bounding box of all visited countries (both paths) + start + target
+  const allNames = new Set([
+    state.startName,
+    state.targetName,
+    ...(state.myPath || []).map(isoToName),
+    ...(state.opponentPath || []).map(isoToName),
+  ]);
+
+  let minX = 9999, maxX = 0, minY = 9999, maxY = 0;
+  let found = false;
+  for (const name of allNames) {
+    const bb = brGetBBox(name);
+    if (!bb) continue;
+    found = true;
+    if (bb.x < minX) minX = bb.x;
+    if (bb.x + bb.w > maxX) maxX = bb.x + bb.w;
+    if (bb.y < minY) minY = bb.y;
+    if (bb.y + bb.h > maxY) maxY = bb.y + bb.h;
+  }
+
+  if (!found) return;
+
+  const pad = 30;
+  let vw = (maxX - minX) + pad * 2;
+  let vh = vw / 2;
+  const cx = (minX + maxX) / 2;
+  const cy = (minY + maxY) / 2;
+  if (vw > 1000) { vw = 1000; vh = 500; }
+  svg.setAttribute('viewBox', `${cx - vw/2} ${cy - vh/2} ${vw} ${vh}`);
+}
+
+// ── Pan & zoom ─────────────────────────────────────────────────────────────────
+let brView = {x:0,y:0,w:1000,h:500,dragging:false,startX:0,startY:0,startVx:0,startVy:0,pinchDist:0};
+
+function brInitPanZoom() {
+  const wrap = document.getElementById('g-map-wrap');
+  const svg  = document.getElementById('g-map-svg');
+  if (!wrap || !svg) return;
+  brView = {x:0,y:0,w:1000,h:500,dragging:false,startX:0,startY:0,startVx:0,startVy:0,pinchDist:0};
+  brApplyView();
+  wrap.onwheel = (e) => { e.preventDefault(); brZoomAt(e.deltaY<0?1.25:0.8,e.offsetX,e.offsetY); };
+  wrap.onmousedown = (e) => { if(e.button!==0)return; brView.dragging=true;brView.startX=e.clientX;brView.startY=e.clientY;brView.startVx=brView.x;brView.startVy=brView.y; };
+  window.addEventListener('mousemove', brMouseMove);
+  window.addEventListener('mouseup', () => { brView.dragging=false; });
+  wrap.ontouchstart = (e) => {
+    if(e.touches.length===1){brView.dragging=true;brView.startX=e.touches[0].clientX;brView.startY=e.touches[0].clientY;brView.startVx=brView.x;brView.startVy=brView.y;}
+    else if(e.touches.length===2){brView.dragging=false;brView.pinchDist=Math.hypot(e.touches[1].clientX-e.touches[0].clientX,e.touches[1].clientY-e.touches[0].clientY);}
+  };
+  wrap.ontouchmove = (e) => {
+    e.preventDefault();
+    if(e.touches.length===1&&brView.dragging){const dx=e.touches[0].clientX-brView.startX;const dy=e.touches[0].clientY-brView.startY;const rect=wrap.getBoundingClientRect();brView.x=brView.startVx-dx*(brView.w/rect.width);brView.y=brView.startVy-dy*(brView.h/rect.height);brApplyView();}
+    else if(e.touches.length===2){const d=Math.hypot(e.touches[1].clientX-e.touches[0].clientX,e.touches[1].clientY-e.touches[0].clientY);if(brView.pinchDist>0){const f=brView.pinchDist/d;const cx=(e.touches[0].clientX+e.touches[1].clientX)/2;const cy=(e.touches[0].clientY+e.touches[1].clientY)/2;const rect=wrap.getBoundingClientRect();brZoomAt(f,cx-rect.left,cy-rect.top);}brView.pinchDist=d;}
+  };
+  wrap.ontouchend = () => { brView.dragging=false; brView.pinchDist=0; };
+}
+
+function brMouseMove(e) {
+  if(!brView.dragging)return;
+  const wrap=document.getElementById('g-map-wrap');if(!wrap)return;
+  const rect=wrap.getBoundingClientRect();
+  brView.x=brView.startVx-(e.clientX-brView.startX)*(brView.w/rect.width);
+  brView.y=brView.startVy-(e.clientY-brView.startY)*(brView.h/rect.height);
+  brApplyView();
+}
+
+function brZoomAt(factor,px,py) {
+  const wrap=document.getElementById('g-map-wrap');if(!wrap)return;
+  const rect=wrap.getBoundingClientRect();
+  const svgX=brView.x+(px/rect.width)*brView.w;
+  const svgY=brView.y+(py/rect.height)*brView.h;
+  const nw=Math.max(80,Math.min(1000,brView.w*factor));
+  brView.x=svgX-(px/rect.width)*nw;
+  brView.y=svgY-(py/rect.height)*(nw/2);
+  brView.w=nw; brView.h=nw/2;
+  brApplyView();
+}
+
+function brZoom(factor) {
+  const wrap=document.getElementById('g-map-wrap');if(!wrap)return;
+  const rect=wrap.getBoundingClientRect();
+  brZoomAt(1/factor,rect.width/2,rect.height/2);
+}
+
+function brResetView() { brView.x=0;brView.y=0;brView.w=1000;brView.h=500;brApplyView(); }
+
+function brApplyView() {
+  const svg=document.getElementById('g-map-svg');if(!svg)return;
+  svg.setAttribute('viewBox',`${brView.x} ${brView.y} ${brView.w} ${brView.h}`);
+}
+
+function brGetBBox(name) {
+  if(typeof BR_MAP_PATHS==='undefined')return null;
+  const path=BR_MAP_PATHS[name];if(!path)return null;
+  const nums=path.match(/[\d.]+/g);if(!nums||nums.length<4)return null;
+  let minX=9999,maxX=0,minY=9999,maxY=0;
+  for(let i=0;i<nums.length;i+=2){const x=parseFloat(nums[i]),y=parseFloat(nums[i+1]||0);if(x<minX)minX=x;if(x>maxX)maxX=x;if(y<minY)minY=y;if(y>maxY)maxY=y;}
+  return {x:minX,y:minY,w:maxX-minX,h:maxY-minY,cx:(minX+maxX)/2,cy:(minY+maxY)/2};
+}
+
+function brAnimateView(tx,ty,tw,th,dur) {
+  const sx=brView.x,sy=brView.y,sw=brView.w,sh=brView.h;
+  const t0=performance.now();
+  function ease(t){return t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2;}
+  function step(now){const t=Math.min(1,(now-t0)/dur);const e=ease(t);brView.x=sx+(tx-sx)*e;brView.y=sy+(ty-sy)*e;brView.w=sw+(tw-sw)*e;brView.h=sh+(th-sh)*e;brApplyView();if(t<1)requestAnimationFrame(step);}
+  requestAnimationFrame(step);
+}
+
+function brZoomToCountry(name,dur) {
+  const bb=brGetBBox(name);if(!bb)return;
+  // Clamp: min 120, max 320 — large countries (Russia, China) won't zoom fully out
+  const vw=Math.min(Math.max(bb.w*3,120),320),vh=vw/2;
+  brAnimateView(bb.cx-vw/2,bb.cy-vh/2,vw,vh,dur||600);
+}
+
+function brZoomToTwoCountries(a,b,dur) {
+  const ba=brGetBBox(a),bb=brGetBBox(b);
+  if(!ba&&!bb){brResetView();return;}
+  if(!ba){brZoomToCountry(b,dur);return;}
+  if(!bb){brZoomToCountry(a,dur);return;}
+  const minX=Math.min(ba.x,bb.x),maxX=Math.max(ba.x+ba.w,bb.x+bb.w);
+  const minY=Math.min(ba.y,bb.y),maxY=Math.max(ba.y+ba.h,bb.y+bb.h);
+  // Clamp intro view: min 160, max 600
+  const vw=Math.min(Math.max((maxX-minX)*2.2,160),600),vh=vw/2;
+  const cx=(minX+maxX)/2,cy=(minY+maxY)/2;
+  brAnimateView(cx-vw/2,cy-vh/2,vw,vh,dur||600);
+}
+
+// ── Autocomplete (searches ALL world countries, flags non-neighbors) ───────────
+function brAutoComplete() {
+  if (!currentState || typeof BR_ISO_NAMES === 'undefined') return;
+  const inp  = document.getElementById('g-country-input');
+  const list = document.getElementById('g-suggestions');
+  const val  = inp.value.toLowerCase().trim();
+  if (val.length < 1) { list.classList.remove('show'); return; }
+
+  // Build neighbor lookup for fast check
+  const nbMap = {};
+  (currentState.myNeighbors || []).forEach(n => { nbMap[n.iso] = n; });
+
+  // Search all countries with 75% match
+  const matches = Object.entries(BR_ISO_NAMES).filter(([iso, name]) => {
+    const n = name.toLowerCase();
+    if (n.startsWith(val)) return val.length >= 3;
+    return val.length / n.length >= 0.75 && n.includes(val);
+  }).slice(0, 8);
+
+  if (!matches.length) { list.classList.remove('show'); return; }
+  list.innerHTML = '';
+  matches.forEach(([iso, name]) => {
+    const nb = nbMap[iso];
+    const isNeighbor = !!nb;
+    const isTarget = iso === currentState.target;
+    const item = document.createElement('div');
+    item.className = 'br-suggest-item' + (isNeighbor ? '' : ' br-suggest-not-nb');
+    const iso2 = (nb && nb.flag) || (typeof BR_ISO3_TO_2 !== 'undefined' && BR_ISO3_TO_2[iso]) || '';
+    const flagHtml = iso2 ? flag(iso2, 24, 16) : '<span style="width:24px;height:16px;display:inline-block;background:var(--ink3);border-radius:2px"></span>';
+    item.innerHTML = flagHtml + ' ' + name + (isTarget ? ' 🎯' : '');
+    item.onclick = () => {
+      inp.value = '';
+      list.classList.remove('show');
+      if (!isNeighbor) { brShowFb('✗ Not a neighbor!', 'bad'); return; }
+      moveTo(iso);
+    };
+    list.appendChild(item);
+  });
+  list.classList.add('show');
+}
+
+function brSubmitInput() {
+  if (!currentState || typeof BR_ISO_NAMES === 'undefined') return;
+  const inp  = document.getElementById('g-country-input');
+  const list = document.getElementById('g-suggestions');
+  const val  = inp.value.trim().toLowerCase();
+  list.classList.remove('show');
+  if (!val) return;
+  // Exact match in all world countries
+  const entry = Object.entries(BR_ISO_NAMES).find(([, name]) => name.toLowerCase() === val);
+  if (!entry) { brShowFb('Country not found', 'bad'); inp.value = ''; return; }
+  const [iso] = entry;
+  const isNeighbor = (currentState.myNeighbors || []).some(n => n.iso === iso);
+  if (!isNeighbor) { brShowFb('✗ Not a neighbor!', 'bad'); inp.value = ''; return; }
+  inp.value = '';
+  moveTo(iso);
+}
+
+function brShowFb(msg, type) {
+  const fb = document.getElementById('g-fb');
+  if (!fb) return;
+  fb.textContent = msg; fb.className = 'br-fb ' + type;
+  setTimeout(() => { fb.textContent = ''; fb.className = 'br-fb'; }, 2000);
+}
+
+function renderVictory(state) {
+  const win = state.isWinner;
+  setText('v-icon', win ? '🏆' : '😔');
+  setText('v-title', win ? T.youWin : T.youLose);
+  setText('v-sub',  win ? T.winSub  : T.loseSub);
+
+  // Update session score
+  if (win) { sessionScore.me++; } else { sessionScore.opp++; }
+  updateScoreDisplay();
+
+  const myPathStr  = state.myPath.map(isoToName).join(' → ');
+  const oppPathStr = (state.opponentPath || []).map(isoToName).join(' → ');
+  document.getElementById('v-my-path').innerHTML  = `<b>${T.myPathLbl} (${state.myMoves} ${T.movesLbl}):</b><br>${myPathStr}`;
+  document.getElementById('v-opp-path').innerHTML = `<b>${T.oppPathLbl} (${state.opponentMoves} ${T.movesLbl}):</b><br>${oppPathStr}`;
+
+  // Render victory map with both paths
+  renderVictoryMap(state);
+}
+
+// ── Invite helpers ─────────────────────────────────────────────────────────────
+function copyInviteLink() {
+  const url = `${window.location.origin}${window.location.pathname}?code=${myRoomCode}`;
+  navigator.clipboard.writeText(url).then(() => showToast(T.linkCopied));
+}
+
+function copyCode() {
+  if (!myRoomCode) return;
+  navigator.clipboard.writeText(myRoomCode).then(() => showToast(T.codeCopied));
+}
+
+// ── Utils ──────────────────────────────────────────────────────────────────────
+function showScreen(name) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + name).classList.add('active');
+}
+
+// ── Countdown (Mario Kart style) ───────────────────────────────────────────────
+function brStartCountdown() {
+  if (_brCountdownActive) return;
+  _brCountdownActive = true;
+  const overlay = document.getElementById('br-countdown');
+  const numEl   = document.getElementById('br-countdown-num');
+  const inp      = document.getElementById('g-country-input');
+  if (inp) inp.disabled = true; // block input during countdown
+
+  overlay.classList.remove('hidden');
+  let count = 3;
+
+  function showStep() {
+    if (count > 0) {
+      numEl.className = 'br-countdown-num';
+      numEl.textContent = count;
+      // Restart animation
+      void numEl.offsetWidth;
+      numEl.className = 'br-countdown-num';
+      count--;
+      setTimeout(showStep, 900);
+    } else {
+      // GO!
+      numEl.className = 'br-countdown-go';
+      numEl.textContent = 'GO!';
+      void numEl.offsetWidth;
+      numEl.className = 'br-countdown-go';
+      setTimeout(() => {
+        overlay.classList.add('hidden');
+        _brCountdownActive = false;
+        if (inp) { inp.disabled = false; inp.focus(); }
+      }, 800);
+    }
+  }
+  showStep();
+}
+
+function setText(id, val) {
+  const el = document.getElementById(id);
+  if (el) el.textContent = val ?? '';
+}
+
+function setImgSrc(id, src) {
+  const el = document.getElementById(id);
+  if (el) el.src = src || '';
+}
+
+let _toastTimer;
+function showToast(msg) {
+  if (!msg) return;
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(_toastTimer);
+  _toastTimer = setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+// ── Init ───────────────────────────────────────────────────────────────────────
+setLang(curLang);
+
+// Auto-join if URL has ?code=
+const urlCode = new URLSearchParams(window.location.search).get('code');
+if (urlCode) {
+  document.getElementById('join-code-input').value = urlCode.toUpperCase();
+  // Small delay to let socket connect
+  setTimeout(() => {
+    connectSocket();
+    socket.once('connect', () => {
+      myRoomCode = urlCode.toUpperCase();
+      socket.emit('br:join', { code: myRoomCode });
+    });
+  }, 100);
+}
+</script>
+
+<!-- Countdown overlay (shared, lives outside screen divs) -->
+<div id="br-countdown" class="br-countdown hidden">
+  <div id="br-countdown-num" class="br-countdown-num">3</div>
+</div>
+</body>
+</html>
