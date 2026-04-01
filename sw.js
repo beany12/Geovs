@@ -1,4 +1,4 @@
-const CACHE = 'geovs-v1';
+const CACHE = 'geovs-v5';
 const ASSETS = [
   '/',
   '/index.html',
@@ -25,9 +25,15 @@ self.addEventListener('activate', e => {
 self.addEventListener('fetch', e => {
   // Only cache same-origin GET requests
   if (e.request.method !== 'GET' || !e.request.url.startsWith(self.location.origin)) return;
+
+  // Never cache API, auth, or health endpoints
+  const url = new URL(e.request.url);
+  if (url.pathname.startsWith('/api/') || url.pathname.startsWith('/health') ||
+      url.pathname.startsWith('/auth') || url.pathname.includes('token')) return;
+
   e.respondWith(
     caches.match(e.request).then(cached => cached || fetch(e.request).then(res => {
-      if (res && res.status === 200) {
+      if (res && res.status === 200 && res.type === 'basic') {
         const clone = res.clone();
         caches.open(CACHE).then(c => c.put(e.request, clone));
       }

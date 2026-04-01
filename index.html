@@ -159,13 +159,14 @@
 
   <!-- Daily banner -->
   <div class="daily-banner" onclick="launchChallenge()">
-    <div class="db-icon">🗓</div>
+    <div class="db-icon">🌍</div>
     <div class="db-text">
-      <div class="db-title" id="db-title">Today's Daily Challenge is ready!</div>
-      <div class="db-sub" id="db-sub">8 questions · Shareable results · New every day</div>
+      <div class="db-title" id="db-title">Today's Country is ready!</div>
+      <div class="db-sub" id="db-sub">1 mystery country · 8 clues · Guess it!</div>
+      <div class="db-how" id="db-how" style="font-size:.68rem;color:var(--muted);margin-top:3px;line-height:1.4">Clues reveal one by one — fewer clues = more XP. Can you guess it in 1?</div>
     </div>
     <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
-      <div style="background:linear-gradient(135deg,#c8174a,#e8254f);color:#fff;font-family:var(--font-b);font-size:.7rem;font-weight:900;padding:5px 11px;border-radius:8px;letter-spacing:.06em;white-space:nowrap;transform:rotate(-2deg);box-shadow:0 2px 8px rgba(200,23,74,.4)" id="ch-home-xp-tag">⚡ EXTRA XP</div>
+      <div style="background:linear-gradient(135deg,#c8174a,#e8254f);color:#fff;font-family:var(--font-b);font-size:.7rem;font-weight:900;padding:5px 11px;border-radius:8px;letter-spacing:.06em;white-space:nowrap;transform:rotate(-2deg);box-shadow:0 2px 8px rgba(200,23,74,.4)" id="ch-home-xp-tag">⚡ UP TO 130 XP</div>
       <button class="db-cta" id="t-play-cta">Play →</button>
     </div>
   </div>
@@ -181,7 +182,7 @@
     <!-- Left: Single Player 2×2 -->
     <div class="modes-col solo-col">
       <div class="mode-section-header">
-        <span class="section-tag solo">👤 Single Player</span>
+        <span class="section-tag solo" id="t-section-solo">👤 Single Player</span>
         <div class="section-line"></div>
       </div>
       <div class="mode-grid solo-grid">
@@ -215,7 +216,7 @@
     <!-- Right: Multiplayer stacked -->
     <div class="modes-col multi-col">
       <div class="mode-section-header">
-        <span class="section-tag multi">👥 Multiplayer</span>
+        <span class="section-tag multi" id="t-section-multi">👥 Multiplayer</span>
         <div class="section-line"></div>
       </div>
       <div class="mode-grid multi-grid">
@@ -225,10 +226,10 @@
           <div class="mode-desc" id="t-m6-desc">Race a friend — hop through neighboring countries to reach the target first.</div>
           <div class="mode-arrow">↗</div>
         </div>
-        <div class="mode-card srt" onclick="launchSort()">
-          <span class="mode-icon">🔢</span>
-          <div class="mode-name" id="t-m2-name">Sort Challenge</div>
-          <div class="mode-desc" id="t-m2-desc">Four countries, one stat. Drag them from lowest to highest.</div>
+        <div class="mode-card srt" onclick="window.location.href='geotactoe.html'">
+          <span class="mode-icon">⭕</span>
+          <div class="mode-name" id="t-m2-name">GeoTacToe</div>
+          <div class="mode-desc" id="t-m2-desc">2-player tic-tac-toe — name countries that match both criteria to claim cells.</div>
           <div class="mode-arrow">↗</div>
         </div>
       </div>
@@ -291,42 +292,6 @@
   </div>
 </div>
 
-<!-- ══════════════════════════════════════
-     SORT
-══════════════════════════════════════ -->
-<div class="screen" id="ssort">
-  <div class="game-header">
-    <div class="gh-left">
-      <button class="back-btn" onclick="goHome()" aria-label="Go back">←</button>
-      <div class="mode-badge badge-sort" id="t-badge-sort">Sort Challenge</div>
-    </div>
-    <div class="gh-hud">
-      <div class="hud-pill">🎯 <span class="hud-val" id="sort-round">1/8</span></div>
-      <div class="hud-pill" id="sort-perf-pill" style="display:none">🔥 <span class="hud-val" id="sort-perf-streak">0</span> perfect</div>
-    </div>
-  </div>
-  <div class="prog-track"><div class="prog-fill" id="sort-prog" style="width:0%"></div></div>
-  <div class="cat-scroll" id="sort-cats"></div>
-  <div class="cat-scroll" id="sort-conts"></div>
-  <div style="display:flex;align-items:center;gap:10px;padding:10px 24px;border-bottom:1px solid var(--border);background:rgba(13,13,20,.6)">
-    <span style="font-family:var(--font-m);font-size:.62rem;letter-spacing:.15em;text-transform:uppercase;color:var(--muted2)" id="sort-rounds-lbl">ROUNDS</span>
-    <input type="range" id="sort-slider" min="4" max="20" value="8" step="1" style="flex:1;accent-color:var(--teal)" oninput="sortSliderChange(this.value)">
-    <span style="font-family:var(--font-m);font-size:.85rem;font-weight:700;color:var(--teal);min-width:24px;text-align:center" id="sort-count">8</span>
-  </div>
-  <div class="sort-body">
-    <div class="sort-prompt">
-      <p id="sort-metric-lbl">Population</p>
-      <h2 id="t-sort-h">Sort: <span style="color:var(--rose)">lowest</span> → <span style="color:var(--lime)">highest</span></h2>
-    </div>
-    <div class="sort-hint" id="t-sort-hint">Drag to reorder · then confirm</div>
-    <div class="sort-cards" id="sort-container"></div>
-    <div class="sort-fb" id="sort-fb"></div>
-    <div style="display:flex;gap:12px;align-items:center">
-      <button class="btn-primary teal" id="sort-submit" onclick="checkSort()" id="t-sort-confirm">Confirm ✓</button>
-      <button class="next-btn" id="sort-next"></button>
-    </div>
-  </div>
-</div>
 
 <!-- ══════════════════════════════════════
      DAILY CHALLENGE
@@ -339,20 +304,17 @@
     </div>
     <div class="gh-hud">
       <div class="hud-pill">⚡ <span class="hud-val" id="ch-xp">0</span> XP</div>
-      <div class="hud-pill">✓ <span class="hud-val" id="ch-correct">0/8</span></div>
     </div>
   </div>
-  <div class="prog-track"><div class="prog-fill" id="ch-prog" style="width:0%"></div></div>
   <div class="daily-body">
     <div id="ch-xp-banner" style="position:absolute;top:0;left:0;background:linear-gradient(135deg,#c8174a,#e8254f);padding:6px 22px 6px 12px;clip-path:polygon(0 0,100% 0,85% 100%,0 100%);display:flex;flex-direction:column;gap:1px;z-index:10;box-shadow:2px 2px 8px rgba(200,23,74,.5)">
       <div style="font-family:var(--font-b);font-size:.82rem;color:#fff;font-weight:900;letter-spacing:.06em;white-space:nowrap" id="ch-xp-banner-title">EXTRA XP</div>
     </div>
-    <div style="display:none" id="ch-xp-banner-sub"></div>
     <div class="ch-header-card">
       <div class="ch-info">
         <div class="ch-date-lbl" id="ch-date">Today's Challenge</div>
-        <div class="ch-title-txt" id="t-ch-title">Daily Geography Quiz</div>
-        <div class="ch-sub-txt" id="t-ch-sub">8 questions · New challenge every day</div>
+        <div class="ch-title-txt" id="t-ch-title">Guess the Country of the Day</div>
+        <div class="ch-sub-txt" id="t-ch-sub">8 clues · 1 country · New every day</div>
       </div>
       <div class="ch-ring-wrap">
         <svg class="ch-ring-svg" width="72" height="72" viewBox="0 0 72 72">
@@ -362,34 +324,33 @@
         <div class="ch-ring-num"><span id="ch-ring-n">0</span><span class="ch-ring-lbl">/ 8</span></div>
       </div>
     </div>
-    <!-- Joker Bar -->
-    <div class="joker-bar" id="joker-bar">
-      <span class="joker-label">Jokers:</span>
-      <button class="joker-btn fifty-btn" id="joker-fifty" onclick="useJokerFifty()">
-        <span style="font-weight:900">50</span><span style="opacity:.5;font-size:.7rem">/</span><span style="font-weight:900">50</span>
-        <span class="joker-count" id="fifty-count">1×</span>
-      </button>
-      <button class="joker-btn audience-btn" id="joker-audience" onclick="useJokerAudience()">
-        👥 Audience <span class="joker-count" id="audience-count">1×</span>
-      </button>
-    </div>
 
-    <!-- Audience Poll -->
-    <div class="audience-poll" id="audience-poll" style="display:none">
-      <div class="audience-title">📊 Audience Poll</div>
-      <div class="audience-bars" id="audience-bars"></div>
-    </div>
+    <!-- Clues area -->
+    <div id="ch-clues" style="display:flex;flex-direction:column;gap:8px;width:100%;max-width:600px"></div>
 
-    <div class="q-card">
-      <div class="q-header">
-        <span class="q-num" id="ch-q-num">Q 1</span>
-        <span class="q-type" id="ch-q-type">Higher / Lower</span>
+    <!-- Guess input -->
+    <div id="ch-guess-wrap" style="background:var(--ink2);border:1px solid rgba(168,85,247,.25);border-radius:20px;padding:16px 18px;width:100%;max-width:600px">
+      <div style="font-family:var(--font-m);font-size:.58rem;letter-spacing:.18em;color:var(--muted);margin-bottom:9px" id="ch-guess-lbl">YOUR GUESS</div>
+      <div style="display:flex;gap:9px;position:relative">
+        <input id="ch-inp" autocomplete="off" placeholder=""
+          style="flex:1;padding:12px 14px;border-radius:10px;border:1.5px solid var(--border);background:var(--ink);color:var(--text);font-size:.9rem;font-family:inherit;outline:none"
+          onkeydown="if(event.key==='Enter')chGuess()" oninput="chAutoComplete()">
+        <button id="ch-guess-btn" onclick="chGuess()" style="padding:12px 20px;border-radius:10px;background:var(--violet);color:#fff;font-weight:800;cursor:pointer;border:none;font-family:inherit;font-size:.85rem;white-space:nowrap">Guess →</button>
+        <div id="ch-suggestions" class="bdr-suggest-list" style="top:52px;border-radius:12px"></div>
       </div>
-      <div class="q-text" id="ch-q-text">Loading...</div>
-      <div class="q-opts" id="ch-q-opts"></div>
-      <div class="q-explain" id="ch-q-exp"></div>
+      <div id="ch-feedback" style="margin-top:7px;font-size:.8rem;min-height:18px;color:var(--rose)"></div>
     </div>
-    <button class="next-btn" id="ch-next">Next Question →</button>
+
+    <!-- Result (shown after solve or fail) -->
+    <div id="ch-result" style="display:none;background:var(--ink2);border:1px solid var(--border);border-radius:20px;padding:20px;text-align:center;width:100%;max-width:600px">
+      <div id="ch-rf" style="font-size:3.5rem;margin-bottom:6px"></div>
+      <div id="ch-rn" style="font-size:1.4rem;font-weight:900;margin-bottom:4px"></div>
+      <div id="ch-rs" style="font-size:.85rem;color:var(--muted2);margin-bottom:8px"></div>
+      <div id="ch-rp" style="font-family:var(--font-d);font-size:2rem;color:var(--violet)"></div>
+    </div>
+
+    <!-- Share button (after done) -->
+    <button class="next-btn" id="ch-share-btn" style="display:none" onclick="chShowShare()">Share Result 🏆</button>
   </div>
 </div>
 
@@ -402,40 +363,55 @@
       <div class="mode-badge badge-cap" id="cap-setup-badge">🏛️ Capitals</div>
     </div>
   </div>
-  <div style="width:100%;max-width:680px;margin:0 auto;padding:20px 16px;display:flex;flex-direction:column;gap:14px">
-    <div style="background:var(--ink2);border:1px solid var(--border);border-radius:20px;padding:20px">
-      <div id="cap-lbl-mode" style="font-size:.6rem;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);margin-bottom:12px">GAME MODE</div>
-      <div style="display:flex;gap:10px">
-        <button id="cbtn-mc" onclick="capMode('mc')" style="flex:1;padding:14px;border-radius:12px;border:2px solid var(--blue);background:rgba(61,158,255,.08);cursor:pointer;font-weight:700;color:var(--blue);font-size:.85rem;font-family:inherit">🔤 Multiple Choice</button>
-        <button id="cbtn-type" onclick="capMode('type')" style="flex:1;padding:14px;border-radius:12px;border:2px solid var(--border);background:var(--ink3);cursor:pointer;font-weight:700;color:var(--text);font-size:.85rem;font-family:inherit">⌨️ Type Answer</button>
+  <div class="setup-body">
+    <div class="setup-hero">
+      <div class="setup-hero-icon">🏛️</div>
+      <div class="setup-hero-title" style="color:var(--blue)">Capitals Quiz</div>
+      <div class="setup-hero-sub">Name the capital city — or pick the right country</div>
+    </div>
+    <div class="setup-card">
+      <div class="setup-card-head"><span class="setup-card-icon">🎮</span><span class="setup-card-label" id="cap-lbl-mode">GAME MODE</span></div>
+      <div class="setup-mode-grid">
+        <button id="cbtn-mc" class="setup-mode-btn active-blue" onclick="capMode('mc')">
+          <div class="setup-mode-icon">🔤</div><div class="setup-mode-name">Multiple Choice</div><div class="setup-mode-desc">Pick from 4 options</div>
+        </button>
+        <button id="cbtn-type" class="setup-mode-btn" onclick="capMode('type')">
+          <div class="setup-mode-icon">⌨️</div><div class="setup-mode-name">Type Answer</div><div class="setup-mode-desc">Type the city name</div>
+        </button>
       </div>
     </div>
-    <div style="background:var(--ink2);border:1px solid var(--border);border-radius:20px;padding:20px">
-      <div id="cap-lbl-region" style="font-size:.6rem;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);margin-bottom:12px">REGION</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
-        <button id="creg-all"      onclick="capRegion('all',this)"      style="padding:10px;border-radius:10px;border:2px solid var(--blue);background:rgba(61,158,255,.1);cursor:pointer;font-weight:700;color:var(--blue);font-size:.78rem;font-family:inherit" data-capreg="all">🌍 All</button>
-        <button id="creg-europe"   onclick="capRegion('europe',this)"   style="padding:10px;border-radius:10px;border:2px solid var(--border);background:var(--ink3);cursor:pointer;font-weight:700;color:var(--text);font-size:.78rem;font-family:inherit" data-capreg="europe">🌍 Europe</button>
-        <button id="creg-asia"     onclick="capRegion('asia',this)"     style="padding:10px;border-radius:10px;border:2px solid var(--border);background:var(--ink3);cursor:pointer;font-weight:700;color:var(--text);font-size:.78rem;font-family:inherit" data-capreg="asia">🌏 Asia</button>
-        <button id="creg-africa"   onclick="capRegion('africa',this)"   style="padding:10px;border-radius:10px;border:2px solid var(--border);background:var(--ink3);cursor:pointer;font-weight:700;color:var(--text);font-size:.78rem;font-family:inherit" data-capreg="africa">🌍 Africa</button>
-        <button id="creg-americas" onclick="capRegion('americas',this)" style="padding:10px;border-radius:10px;border:2px solid var(--border);background:var(--ink3);cursor:pointer;font-weight:700;color:var(--text);font-size:.78rem;font-family:inherit" data-capreg="americas">🌎 Americas</button>
-        <button id="creg-oceania"  onclick="capRegion('oceania',this)"  style="padding:10px;border-radius:10px;border:2px solid var(--border);background:var(--ink3);cursor:pointer;font-weight:700;color:var(--text);font-size:.78rem;font-family:inherit" data-capreg="oceania">🌊 Oceania</button>
+    <div class="setup-card">
+      <div class="setup-card-head"><span class="setup-card-icon">🌍</span><span class="setup-card-label" id="cap-lbl-region">REGION</span></div>
+      <div class="setup-region-grid">
+        <button id="creg-all" class="setup-region-btn active-blue" onclick="capRegion('all',this)" data-capreg="all">🌍 All</button>
+        <button id="creg-europe" class="setup-region-btn" onclick="capRegion('europe',this)" data-capreg="europe">🌍 Europe</button>
+        <button id="creg-asia" class="setup-region-btn" onclick="capRegion('asia',this)" data-capreg="asia">🌏 Asia</button>
+        <button id="creg-africa" class="setup-region-btn" onclick="capRegion('africa',this)" data-capreg="africa">🌍 Africa</button>
+        <button id="creg-americas" class="setup-region-btn" onclick="capRegion('americas',this)" data-capreg="americas">🌎 Americas</button>
+        <button id="creg-oceania" class="setup-region-btn" onclick="capRegion('oceania',this)" data-capreg="oceania">🌊 Oceania</button>
       </div>
     </div>
-    <div style="background:var(--ink2);border:1px solid var(--border);border-radius:20px;padding:20px">
-      <div id="cap-lbl-questions" style="font-size:.6rem;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);margin-bottom:8px">QUESTIONS</div>
-      <div id="cap-count" style="font-size:3rem;font-weight:900;color:var(--blue);text-align:center;line-height:1;margin-bottom:10px">20</div>
-      <input type="range" min="5" max="195" value="20" id="cap-slider" oninput="capSlider(this.value)" style="width:100%;cursor:pointer;accent-color:var(--blue)">
+    <div class="setup-card">
+      <div class="setup-card-head"><span class="setup-card-icon">📊</span><span class="setup-card-label" id="cap-lbl-questions">QUESTIONS</span></div>
+      <div class="setup-count blue" id="cap-count">20</div>
+      <input type="range" min="5" max="195" value="20" id="cap-slider" class="setup-slider" oninput="capSlider(this.value)" style="accent-color:var(--blue)">
       <div style="display:flex;justify-content:space-between;font-size:.65rem;color:var(--muted);margin-top:4px"><span>5</span><span id="cap-slider-max">195</span></div>
     </div>
-    <div style="background:var(--ink2);border:1px solid var(--border);border-radius:20px;padding:20px">
-      <div style="font-size:.6rem;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);margin-bottom:12px">DIFFICULTY</div>
-      <div style="display:flex;gap:10px">
-        <button id="cdiff-easy" onclick="capDifficulty('easy')" style="flex:1;padding:12px;border-radius:12px;border:2px solid var(--border);background:var(--ink3);cursor:pointer;font-weight:700;color:var(--text);font-size:.8rem;font-family:inherit">🟢 Easy</button>
-        <button id="cdiff-medium" onclick="capDifficulty('medium')" style="flex:1;padding:12px;border-radius:12px;border:2px solid var(--blue);background:rgba(61,158,255,.08);cursor:pointer;font-weight:700;color:var(--blue);font-size:.8rem;font-family:inherit">🟡 Medium</button>
-        <button id="cdiff-hard" onclick="capDifficulty('hard')" style="flex:1;padding:12px;border-radius:12px;border:2px solid var(--border);background:var(--ink3);cursor:pointer;font-weight:700;color:var(--text);font-size:.8rem;font-family:inherit">🔴 Hard ×1.5 XP</button>
+    <div class="setup-card">
+      <div class="setup-card-head"><span class="setup-card-icon">🔥</span><span class="setup-card-label">DIFFICULTY</span></div>
+      <div class="setup-diff-grid">
+        <button id="cdiff-easy" class="setup-diff-btn" onclick="capDifficulty('easy')">
+          <div class="diff-icon">🟢</div><div class="diff-name">Easy</div>
+        </button>
+        <button id="cdiff-medium" class="setup-diff-btn active-blue" onclick="capDifficulty('medium')">
+          <div class="diff-icon">🟡</div><div class="diff-name">Medium</div>
+        </button>
+        <button id="cdiff-hard" class="setup-diff-btn" onclick="capDifficulty('hard')">
+          <div class="diff-icon">🔴</div><div class="diff-name">Hard</div><div class="diff-bonus">×1.5 XP</div>
+        </button>
       </div>
     </div>
-    <button id="cap-lbl-start" onclick="capStart()" style="width:100%;padding:18px;border-radius:20px;background:var(--blue);color:#fff;font-weight:900;font-size:1rem;cursor:pointer;border:none;font-family:inherit">Start Quiz →</button>
+    <button id="cap-lbl-start" class="setup-start blue" onclick="capStart()">Start Quiz →</button>
   </div>
 </div>
 <!-- CAPITALS GAME -->
@@ -475,41 +451,55 @@
       <div class="mode-badge badge-flg" id="flg-setup-badge">🚩 Flags</div>
     </div>
   </div>
-  <div style="width:100%;max-width:680px;margin:0 auto;padding:20px 16px;display:flex;flex-direction:column;gap:14px">
-
-    <div style="background:var(--ink2);border:1px solid var(--border);border-radius:20px;padding:20px">
-      <div id="flg-lbl-answer" style="font-size:.6rem;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);margin-bottom:12px">ANSWER MODE</div>
-      <div style="display:flex;gap:10px">
-        <button id="fbtn-mc" onclick="flgAnswerMode('mc')" style="flex:1;padding:14px;border-radius:12px;border:2px solid var(--orange);background:rgba(255,107,53,.08);cursor:pointer;font-weight:700;color:var(--orange);font-size:.85rem;font-family:inherit">🔤 Multiple Choice</button>
-        <button id="fbtn-type" onclick="flgAnswerMode('type')" style="flex:1;padding:14px;border-radius:12px;border:2px solid var(--border);background:var(--ink3);cursor:pointer;font-weight:700;color:var(--text);font-size:.85rem;font-family:inherit">⌨️ Type Answer</button>
+  <div class="setup-body">
+    <div class="setup-hero">
+      <div class="setup-hero-icon">🚩</div>
+      <div class="setup-hero-title" style="color:var(--orange)">Flags Quiz</div>
+      <div class="setup-hero-sub">See the flag, name the country — or the other way around</div>
+    </div>
+    <div class="setup-card">
+      <div class="setup-card-head"><span class="setup-card-icon">🎮</span><span class="setup-card-label" id="flg-lbl-answer">ANSWER MODE</span></div>
+      <div class="setup-mode-grid">
+        <button id="fbtn-mc" class="setup-mode-btn active-orange" onclick="flgAnswerMode('mc')">
+          <div class="setup-mode-icon">🔤</div><div class="setup-mode-name">Multiple Choice</div><div class="setup-mode-desc">Pick from 4 options</div>
+        </button>
+        <button id="fbtn-type" class="setup-mode-btn" onclick="flgAnswerMode('type')">
+          <div class="setup-mode-icon">⌨️</div><div class="setup-mode-name">Type Answer</div><div class="setup-mode-desc">Type the country name</div>
+        </button>
       </div>
     </div>
-    <div style="background:var(--ink2);border:1px solid var(--border);border-radius:20px;padding:20px">
-      <div id="flg-lbl-region" style="font-size:.6rem;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);margin-bottom:12px">REGION</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
-        <button id="freg-all"      onclick="flgRegion('all',this)"      style="padding:10px;border-radius:10px;border:2px solid var(--orange);background:rgba(255,107,53,.1);cursor:pointer;font-weight:700;color:var(--orange);font-size:.78rem;font-family:inherit" data-flgreg="all">🌍 All</button>
-        <button id="freg-europe"   onclick="flgRegion('europe',this)"   style="padding:10px;border-radius:10px;border:2px solid var(--border);background:var(--ink3);cursor:pointer;font-weight:700;color:var(--text);font-size:.78rem;font-family:inherit" data-flgreg="europe">🌍 Europe</button>
-        <button id="freg-asia"     onclick="flgRegion('asia',this)"     style="padding:10px;border-radius:10px;border:2px solid var(--border);background:var(--ink3);cursor:pointer;font-weight:700;color:var(--text);font-size:.78rem;font-family:inherit" data-flgreg="asia">🌏 Asia</button>
-        <button id="freg-africa"   onclick="flgRegion('africa',this)"   style="padding:10px;border-radius:10px;border:2px solid var(--border);background:var(--ink3);cursor:pointer;font-weight:700;color:var(--text);font-size:.78rem;font-family:inherit" data-flgreg="africa">🌍 Africa</button>
-        <button id="freg-americas" onclick="flgRegion('americas',this)" style="padding:10px;border-radius:10px;border:2px solid var(--border);background:var(--ink3);cursor:pointer;font-weight:700;color:var(--text);font-size:.78rem;font-family:inherit" data-flgreg="americas">🌎 Americas</button>
-        <button id="freg-oceania"  onclick="flgRegion('oceania',this)"  style="padding:10px;border-radius:10px;border:2px solid var(--border);background:var(--ink3);cursor:pointer;font-weight:700;color:var(--text);font-size:.78rem;font-family:inherit" data-flgreg="oceania">🌊 Oceania</button>
+    <div class="setup-card">
+      <div class="setup-card-head"><span class="setup-card-icon">🌍</span><span class="setup-card-label" id="flg-lbl-region">REGION</span></div>
+      <div class="setup-region-grid">
+        <button id="freg-all" class="setup-region-btn active-orange" onclick="flgRegion('all',this)" data-flgreg="all">🌍 All</button>
+        <button id="freg-europe" class="setup-region-btn" onclick="flgRegion('europe',this)" data-flgreg="europe">🌍 Europe</button>
+        <button id="freg-asia" class="setup-region-btn" onclick="flgRegion('asia',this)" data-flgreg="asia">🌏 Asia</button>
+        <button id="freg-africa" class="setup-region-btn" onclick="flgRegion('africa',this)" data-flgreg="africa">🌍 Africa</button>
+        <button id="freg-americas" class="setup-region-btn" onclick="flgRegion('americas',this)" data-flgreg="americas">🌎 Americas</button>
+        <button id="freg-oceania" class="setup-region-btn" onclick="flgRegion('oceania',this)" data-flgreg="oceania">🌊 Oceania</button>
       </div>
     </div>
-    <div style="background:var(--ink2);border:1px solid var(--border);border-radius:20px;padding:20px">
-      <div id="flg-lbl-questions" style="font-size:.6rem;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);margin-bottom:8px">QUESTIONS</div>
-      <div id="flg-count" style="font-size:3rem;font-weight:900;color:var(--orange);text-align:center;line-height:1;margin-bottom:10px">20</div>
-      <input type="range" min="5" max="195" value="20" id="flg-slider" oninput="flgSlider(this.value)" style="width:100%;cursor:pointer;accent-color:var(--orange)">
+    <div class="setup-card">
+      <div class="setup-card-head"><span class="setup-card-icon">📊</span><span class="setup-card-label" id="flg-lbl-questions">QUESTIONS</span></div>
+      <div class="setup-count orange" id="flg-count">20</div>
+      <input type="range" min="5" max="195" value="20" id="flg-slider" class="setup-slider" oninput="flgSlider(this.value)" style="accent-color:var(--orange)">
       <div style="display:flex;justify-content:space-between;font-size:.65rem;color:var(--muted);margin-top:4px"><span>5</span><span id="flg-slider-max">195</span></div>
     </div>
-    <div style="background:var(--ink2);border:1px solid var(--border);border-radius:20px;padding:20px">
-      <div style="font-size:.6rem;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);margin-bottom:12px">DIFFICULTY</div>
-      <div style="display:flex;gap:10px">
-        <button id="fdiff-easy" onclick="flgDifficulty('easy')" style="flex:1;padding:12px;border-radius:12px;border:2px solid var(--border);background:var(--ink3);cursor:pointer;font-weight:700;color:var(--text);font-size:.8rem;font-family:inherit">🟢 Easy</button>
-        <button id="fdiff-medium" onclick="flgDifficulty('medium')" style="flex:1;padding:12px;border-radius:12px;border:2px solid var(--orange);background:rgba(255,107,53,.08);cursor:pointer;font-weight:700;color:var(--orange);font-size:.8rem;font-family:inherit">🟡 Medium</button>
-        <button id="fdiff-hard" onclick="flgDifficulty('hard')" style="flex:1;padding:12px;border-radius:12px;border:2px solid var(--border);background:var(--ink3);cursor:pointer;font-weight:700;color:var(--text);font-size:.8rem;font-family:inherit">🔴 Hard ×1.5 XP</button>
+    <div class="setup-card">
+      <div class="setup-card-head"><span class="setup-card-icon">🔥</span><span class="setup-card-label">DIFFICULTY</span></div>
+      <div class="setup-diff-grid">
+        <button id="fdiff-easy" class="setup-diff-btn" onclick="flgDifficulty('easy')">
+          <div class="diff-icon">🟢</div><div class="diff-name">Easy</div>
+        </button>
+        <button id="fdiff-medium" class="setup-diff-btn active-orange" onclick="flgDifficulty('medium')">
+          <div class="diff-icon">🟡</div><div class="diff-name">Medium</div>
+        </button>
+        <button id="fdiff-hard" class="setup-diff-btn" onclick="flgDifficulty('hard')">
+          <div class="diff-icon">🔴</div><div class="diff-name">Hard</div><div class="diff-bonus">×1.5 XP</div>
+        </button>
       </div>
     </div>
-    <button id="flg-lbl-start" onclick="flgStart()" style="width:100%;padding:18px;border-radius:20px;background:var(--orange);color:#fff;font-weight:900;font-size:1rem;cursor:pointer;border:none;font-family:inherit">Start Quiz →</button>
+    <button id="flg-lbl-start" class="setup-start orange" onclick="flgStart()">Start Quiz →</button>
   </div>
 </div>
 <!-- FLAGS GAME -->
@@ -526,19 +516,22 @@
   </div>
   <div class="prog-track"><div class="prog-fill" id="flg-prog" style="width:0%"></div></div>
   <div class="hl-body" style="gap:16px;padding:20px 16px">
-    <div style="width:100%;max-width:680px;display:flex;flex-direction:column;align-items:center;gap:14px">
-      <div id="flg-display" style="font-size:6rem;text-align:center;line-height:1"></div>
-      <div id="flg-q" style="font-size:1rem;font-weight:700;text-align:center"></div>
+    <div style="width:100%;max-width:520px;display:flex;flex-direction:column;align-items:center;gap:14px">
+      <!-- Flag in a frame -->
+      <div class="flg-frame">
+        <div class="flg-emoji" id="flg-display"></div>
+      </div>
+      <div id="flg-q" style="font-size:1.05rem;font-weight:800;text-align:center;line-height:1.4"></div>
       <div id="flg-opts" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%"></div>
       <div id="flg-type-wrap" style="display:none;flex-direction:column;gap:10px;width:100%;position:relative">
         <input id="flg-inp" placeholder="Type the country name..." autocomplete="off" onkeydown="if(event.key==='Enter'){document.getElementById('flg-suggestions').classList.remove('show');flgTypeSubmit();}if(event.key==='Escape')document.getElementById('flg-suggestions').classList.remove('show');" oninput="flgAutoComplete()" style="width:100%;padding:16px 18px;border-radius:14px;border:1.5px solid var(--border);background:var(--ink2);color:var(--text);font-size:1rem;font-family:inherit;box-sizing:border-box">
         <div id="flg-suggestions" class="bdr-suggest-list" style="top:58px;border-radius:12px"></div>
       </div>
-      <div id="flg-feedback" style="font-size:.9rem;color:var(--muted2);min-height:20px;text-align:center"></div>
+      <div id="flg-feedback" style="font-size:.95rem;font-weight:700;min-height:24px;text-align:center"></div>
     </div>
-    <div style="display:flex;gap:10px;width:100%;max-width:680px;justify-content:center">
+    <div style="display:flex;gap:10px;width:100%;max-width:520px;justify-content:center">
       <button id="flg-next" onclick="flgNext()" style="display:none;padding:14px 48px;border-radius:100px;background:var(--lime);color:#000;font-weight:900;font-size:.95rem;cursor:pointer;border:none;font-family:inherit;flex:1">Next →</button>
-      <button id="flg-skip" onclick="flgSkip()" style="display:none;padding:14px 28px;border-radius:100px;background:transparent;color:var(--muted);border:1.5px solid var(--border);font-weight:700;font-size:.85rem;cursor:pointer;font-family:inherit;white-space:nowrap">⏭ Skip</button>
+      <button id="flg-skip" onclick="flgSkip()" style="display:none;padding:14px 20px;border-radius:100px;background:transparent;color:var(--muted);border:1.5px solid var(--border);font-weight:700;font-size:.8rem;cursor:pointer;font-family:inherit;white-space:nowrap">⏭ Skip</button>
     </div>
   </div>
 </div>
@@ -664,7 +657,7 @@
   <div class="over-card">
     <div class="over-emoji" id="over-emoji">🏆</div>
     <div class="over-title" id="over-title">Great!</div>
-    <!-- Quiz mode (cap/flg/gtc/sort): score display -->
+    <!-- Quiz mode (cap/flg/gtc): score display -->
     <div id="quiz-over-block" style="display:none;width:100%;text-align:center;padding:6px 0 4px">
       <div style="font-family:var(--font-d);font-size:3.2rem;line-height:1;color:var(--lime)" id="quiz-over-score">0/0</div>
       <div style="font-family:var(--font-m);font-size:.6rem;color:var(--muted);letter-spacing:.14em;margin-top:6px" id="quiz-over-lbl">CORRECT</div>
@@ -835,7 +828,7 @@ function saveAvatarEdit(){
 function refreshAvatarEditPreview(){
   var el = document.getElementById('avatar-edit-preview');
   if(!el || !window.AvatarEngine) return;
-  el.innerHTML = '<svg viewBox="-55 -60 110 120" width="100" height="100">' + window.AvatarEngine.renderAvatarFace(_avatarEditCfg) + '</svg>';
+  el.innerHTML = '<svg viewBox="-40 -52 80 100" width="100" height="100" style="border-radius:50%;overflow:hidden">' + window.AvatarEngine.renderBustSilhouette(_avatarEditCfg) + '</svg>';
 }
 
 var _onboardCfg = {};
@@ -860,7 +853,7 @@ function openOnboardingModal(){
 function refreshOnboardPreview(){
   var el = document.getElementById('onboard-avatar-preview');
   if(!el || !window.AvatarEngine) return;
-  el.innerHTML = '<svg viewBox="-55 -60 110 120" width="110" height="110">' + window.AvatarEngine.renderAvatarFace(_onboardCfg) + '</svg>';
+  el.innerHTML = '<svg viewBox="-40 -52 80 100" width="110" height="110" style="border-radius:50%;overflow:hidden">' + window.AvatarEngine.renderBustSilhouette(_onboardCfg) + '</svg>';
 }
 
 function confirmOnboarding(){

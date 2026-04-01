@@ -15,59 +15,79 @@
   body{background:var(--ink);color:var(--text);font-family:inherit;min-height:100dvh;display:flex;flex-direction:column;align-items:center}
 
   /* ── Screens ── */
-  .screen{display:none;flex-direction:column;align-items:center;width:100%;max-width:460px;padding:20px 16px;min-height:100dvh}
+  .screen{display:none;flex-direction:column;align-items:center;width:100%;max-width:500px;padding:20px 16px;min-height:100dvh}
   .screen.active{display:flex}
 
   /* ── Header ── */
   .br-header{width:100%;display:flex;align-items:center;justify-content:space-between;margin-bottom:24px}
-  .br-logo{font-family:var(--font-d);font-size:1.5rem;color:var(--lime)}
-  .br-logo span{color:var(--muted2);font-size:.75rem;display:block;font-family:var(--font-m);letter-spacing:.1em}
-  .back-link{color:var(--muted2);font-size:.8rem;text-decoration:none;padding:6px 10px;border-radius:8px;border:1px solid var(--border);cursor:pointer;background:none}
+  .br-logo{font-family:var(--font-d);font-size:1.7rem;color:var(--lime);letter-spacing:.03em}
+  .br-logo span{color:var(--muted2);font-size:.68rem;display:block;font-family:var(--font-m);letter-spacing:.12em}
+  .back-link{color:var(--muted2);font-size:.78rem;text-decoration:none;padding:7px 12px;border-radius:10px;border:1px solid var(--border);cursor:pointer;background:var(--ink2);transition:border-color .15s}
+  .back-link:hover{border-color:var(--muted)}
 
-  /* ── Lang bar ── */
-  .br-lang{display:flex;gap:6px;margin-bottom:20px}
-  .br-lang button{padding:5px 10px;border-radius:8px;border:1px solid var(--border);background:var(--ink2);color:var(--muted2);font-size:.72rem;cursor:pointer;display:flex;align-items:center;gap:4px}
-  .br-lang button.active{border-color:var(--lime);color:var(--lime)}
+  /* ── Tabbed card ── */
+  .br-lobby-card{background:var(--ink2);border:1.5px solid var(--border);border-radius:18px;width:100%;margin-bottom:14px;overflow:hidden}
+  .br-tabs{display:flex;border-bottom:1.5px solid var(--border)}
+  .br-tab{flex:1;padding:14px;text-align:center;font-family:var(--font-d);font-size:1rem;letter-spacing:.03em;color:var(--muted);cursor:pointer;transition:all .15s;background:transparent;border:none;border-bottom:2px solid transparent}
+  .br-tab.active{color:var(--lime);border-bottom-color:var(--lime);background:rgba(200,241,53,.03)}
+  .br-tab:hover:not(.active){color:var(--text);background:rgba(255,255,255,.02)}
+  .br-tab-body{padding:22px;display:none}
+  .br-tab-body.active{display:block}
 
   /* ── Cards ── */
-  .br-card{background:var(--ink2);border:1px solid var(--border);border-radius:16px;padding:20px;width:100%;margin-bottom:12px}
-  .br-card-title{font-family:var(--font-d);font-size:1.1rem;color:var(--text);margin-bottom:12px}
+  .br-card{background:var(--ink2);border:1.5px solid var(--border);border-radius:18px;padding:22px;width:100%;margin-bottom:14px;transition:border-color .2s}
+  .br-card:hover{border-color:rgba(200,241,53,.15)}
+  .br-card-title{font-family:var(--font-d);font-size:1.15rem;color:var(--text);margin-bottom:12px;letter-spacing:.02em}
 
   /* ── Buttons ── */
-  .btn-lime{width:100%;padding:14px;border-radius:12px;background:var(--lime);color:#000;font-weight:700;font-size:1rem;border:none;cursor:pointer;font-family:inherit;transition:opacity .15s}
-  .btn-lime:hover{opacity:.88}
+  .btn-lime{width:100%;padding:14px;border-radius:12px;background:var(--lime);color:#000;font-weight:700;font-size:1rem;border:none;cursor:pointer;font-family:inherit;transition:all .15s}
+  .btn-lime:hover{opacity:.88;transform:translateY(-1px)}
   .btn-outline{width:100%;padding:12px;border-radius:12px;background:transparent;color:var(--lime);font-weight:700;font-size:.9rem;border:2px solid var(--lime);cursor:pointer;font-family:inherit;margin-top:8px}
-  .btn-muted{width:100%;padding:10px;border-radius:10px;background:var(--ink3);color:var(--muted2);font-size:.85rem;border:1px solid var(--border);cursor:pointer;font-family:inherit;margin-top:8px}
+  .btn-muted{width:100%;padding:10px;border-radius:10px;background:var(--ink3);color:var(--muted2);font-size:.85rem;border:1px solid var(--border);cursor:pointer;font-family:inherit;margin-top:8px;transition:all .15s}
+  .btn-muted:hover{border-color:var(--muted);color:var(--text)}
 
   /* ── Code input ── */
-  .br-input{width:100%;padding:12px 14px;border-radius:10px;border:1px solid var(--border);background:var(--ink3);color:var(--text);font-family:var(--font-m);font-size:1.1rem;letter-spacing:.15em;text-transform:uppercase;outline:none;text-align:center;margin-bottom:10px}
-  .br-input:focus{border-color:var(--lime)}
+  .br-input{width:100%;padding:14px;border-radius:12px;border:1.5px solid var(--border);background:var(--ink3);color:var(--text);font-family:var(--font-m);font-size:1.2rem;letter-spacing:.2em;text-transform:uppercase;outline:none;text-align:center;margin-bottom:10px;transition:border-color .15s}
+  .br-input:focus{border-color:var(--lime);box-shadow:0 0 20px rgba(200,241,53,.08)}
 
   /* ── Code display ── */
-  .br-code{font-family:var(--font-m);font-size:2rem;letter-spacing:.25em;color:var(--lime);text-align:center;padding:16px;background:var(--ink3);border-radius:12px;border:1px solid rgba(200,241,53,.3);margin-bottom:12px}
-  .br-code-label{font-size:.65rem;letter-spacing:.15em;color:var(--muted2);text-align:center;margin-bottom:6px;text-transform:uppercase}
+  .br-code{font-family:var(--font-m);font-size:2.4rem;letter-spacing:.3em;color:var(--lime);text-align:center;padding:20px;background:var(--ink3);border-radius:14px;border:1.5px solid rgba(200,241,53,.25);margin-bottom:14px;text-shadow:0 0 20px rgba(200,241,53,.3);cursor:pointer;transition:all .15s}
+  .br-code:hover{border-color:var(--lime);transform:scale(1.02)}
+  .br-code:active{transform:scale(.98)}
+  .br-code-label{font-size:.62rem;letter-spacing:.18em;color:var(--muted2);text-align:center;margin-bottom:8px;text-transform:uppercase}
+
+  /* ── Waiting screen ── */
+  .br-wait-players{display:flex;align-items:center;justify-content:center;gap:24px;margin-bottom:20px}
+  .br-wait-player{display:flex;flex-direction:column;align-items:center;gap:6px}
+  .br-wait-avatar{width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.4rem}
+  .br-wait-avatar.you{background:rgba(200,241,53,.12);border:2px solid var(--lime)}
+  .br-wait-avatar.opp{background:var(--ink3);border:2px dashed var(--muted);animation:pulse 1.5s ease-in-out infinite}
+  .br-wait-label{font-family:var(--font-m);font-size:.6rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted2)}
+  .br-wait-vs{font-family:var(--font-d);font-size:1.2rem;color:var(--muted)}
+  .br-share-row{display:flex;gap:8px;width:100%}
+  .br-share-row button{flex:1}
 
   /* ── Waiting pulse ── */
   .waiting-dot{width:8px;height:8px;border-radius:50%;background:var(--amber);display:inline-block;animation:pulse 1.2s ease-in-out infinite}
   @keyframes pulse{0%,100%{opacity:.3;transform:scale(.8)}50%{opacity:1;transform:scale(1.2)}}
 
   /* ── Route display (start → target) ── */
-  .br-route{display:flex;align-items:center;justify-content:center;gap:8px;padding:14px;background:var(--ink3);border-radius:12px;margin-bottom:14px;width:100%}
-  .br-route-country{display:flex;flex-direction:column;align-items:center;gap:4px;min-width:80px}
-  .br-route-flag{width:44px;height:32px;border-radius:4px;object-fit:cover}
-  .br-route-name{font-size:.68rem;color:var(--muted2);text-align:center;font-weight:600}
+  .br-route{display:flex;align-items:center;justify-content:center;gap:10px;padding:16px;background:var(--ink2);border:1.5px solid var(--border);border-radius:14px;margin-bottom:14px;width:100%}
+  .br-route-country{display:flex;flex-direction:column;align-items:center;gap:5px;min-width:80px}
+  .br-route-flag{width:48px;height:34px;border-radius:5px;object-fit:cover;box-shadow:0 2px 8px rgba(0,0,0,.3)}
+  .br-route-name{font-size:.7rem;color:var(--muted2);text-align:center;font-weight:700}
   .br-route-arrow{font-size:1.4rem;color:var(--muted);flex:1;text-align:center}
 
   /* ── Player positions ── */
-  .br-players{display:grid;grid-template-columns:1fr 1fr;gap:8px;width:100%;margin-bottom:14px}
-  .br-player{background:var(--ink3);border-radius:12px;padding:12px;border:1px solid var(--border)}
-  .br-player.me{border-color:rgba(200,241,53,.4)}
-  .br-player.opp{border-color:rgba(255,184,48,.2)}
-  .br-player-label{font-size:.6rem;letter-spacing:.12em;color:var(--muted);margin-bottom:6px;text-transform:uppercase}
-  .br-player-flag{width:32px;height:22px;border-radius:3px;object-fit:cover;margin-bottom:4px}
-  .br-player-name{font-size:.78rem;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .br-player-moves{font-size:.65rem;color:var(--muted2);margin-top:2px}
-  .br-player-path{font-size:.58rem;color:var(--muted);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .br-players{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%;margin-bottom:14px}
+  .br-player{background:var(--ink2);border-radius:14px;padding:14px;border:1.5px solid var(--border)}
+  .br-player.me{border-color:rgba(200,241,53,.35);box-shadow:inset 0 0 20px rgba(200,241,53,.04)}
+  .br-player.opp{border-color:rgba(255,184,48,.2);box-shadow:inset 0 0 20px rgba(255,184,48,.03)}
+  .br-player-label{font-size:.6rem;letter-spacing:.14em;color:var(--muted);margin-bottom:6px;text-transform:uppercase;font-weight:700}
+  .br-player-flag{width:36px;height:24px;border-radius:4px;object-fit:cover;margin-bottom:4px;box-shadow:0 2px 6px rgba(0,0,0,.3)}
+  .br-player-name{font-size:.82rem;font-weight:800;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .br-player-moves{font-size:.65rem;color:var(--muted2);margin-top:3px;font-family:var(--font-m)}
+  .br-player-path{font-size:.58rem;color:var(--muted);margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
   /* ── World map ── */
   .br-map-wrap{width:100%;position:relative;border-radius:12px;overflow:hidden;border:1px solid var(--border);margin-bottom:10px;cursor:grab;touch-action:none;background:#0b1d35}
@@ -77,13 +97,13 @@
   .br-map-zoom button{width:26px;height:26px;border-radius:6px;background:rgba(0,0,0,.5);color:#fff;border:1px solid rgba(255,255,255,.2);font-size:1rem;cursor:pointer;line-height:1;display:flex;align-items:center;justify-content:center}
   /* ── Country input + suggestions ── */
   .br-suggest{position:relative;width:100%;margin-bottom:8px}
-  .br-country-input{width:100%;padding:12px 14px;border-radius:10px;border:1px solid var(--border);background:var(--ink3);color:var(--text);font-family:inherit;font-size:.95rem;outline:none}
-  .br-country-input:focus{border-color:var(--lime)}
-  .br-suggest-list{position:absolute;top:100%;left:0;right:0;z-index:50;background:var(--ink2);border:1px solid var(--border);border-radius:10px;overflow:hidden;display:none;margin-top:3px}
+  .br-country-input{width:100%;padding:13px 16px;border-radius:12px;border:1.5px solid var(--border);background:var(--ink2);color:var(--text);font-family:inherit;font-size:.95rem;outline:none;transition:all .15s}
+  .br-country-input:focus{border-color:var(--lime);box-shadow:0 0 20px rgba(200,241,53,.06)}
+  .br-suggest-list{position:absolute;top:100%;left:0;right:0;z-index:50;background:var(--ink2);border:1.5px solid var(--border);border-top:none;border-radius:0 0 12px 12px;overflow:hidden;display:none}
   .br-suggest-list.show{display:block}
-  .br-suggest-item{padding:9px 14px;cursor:pointer;font-size:.88rem;display:flex;align-items:center;gap:8px}
-  .br-suggest-item:hover{background:var(--ink3)}
-  .br-suggest-not-nb{opacity:.45}
+  .br-suggest-item{padding:10px 16px;cursor:pointer;font-size:.88rem;display:flex;align-items:center;gap:10px;border-bottom:1px solid rgba(255,255,255,.04);transition:background .1s}
+  .br-suggest-item:hover{background:rgba(200,241,53,.06);color:var(--lime)}
+  .br-suggest-not-nb{opacity:.35}
   /* ── Countdown overlay ── */
   .br-countdown{position:fixed;inset:0;z-index:999;display:flex;align-items:center;justify-content:center;pointer-events:all;background:rgba(0,0,0,.55);backdrop-filter:blur(2px)}
   .br-countdown.hidden{display:none}
@@ -92,20 +112,26 @@
   .br-countdown-go{font-size:clamp(3rem,14vw,6rem);font-weight:900;color:var(--lime);text-shadow:0 0 50px rgba(200,241,53,1);animation:br-go .8s ease-out forwards}
   @keyframes br-go{0%{transform:scale(.5);opacity:0}20%{opacity:1;transform:scale(1.15)}50%{transform:scale(1)}90%{opacity:1}100%{opacity:0;transform:scale(1.3)}}
   /* ── Feedback ── */
-  .br-fb{height:20px;font-size:.82rem;text-align:center;margin-bottom:6px;transition:opacity .3s}
+  .br-fb{height:24px;font-size:.85rem;font-weight:700;text-align:center;margin-bottom:6px;transition:opacity .3s}
   .br-fb.ok{color:var(--lime)}
-  .br-fb.bad{color:#ef4444}
+  .br-fb.bad{color:var(--rose)}
 
   /* ── Victory screen ── */
-  .br-victory-icon{font-size:4rem;margin-bottom:8px}
-  .br-victory-title{font-family:var(--font-d);font-size:1.8rem;margin-bottom:6px}
+  .br-victory-icon{font-size:4rem;margin-bottom:8px;animation:br-pop-in .5s cubic-bezier(.175,.885,.32,1.275)}
+  @keyframes br-pop-in{0%{transform:scale(0);opacity:0}100%{transform:scale(1);opacity:1}}
+  .br-victory-title{font-family:var(--font-d);font-size:2rem;margin-bottom:6px;letter-spacing:.03em}
   .br-victory-sub{font-size:.88rem;color:var(--muted2);margin-bottom:20px;text-align:center}
-  .br-path-display{background:var(--ink3);border-radius:10px;padding:12px;width:100%;margin-bottom:8px;font-size:.78rem;line-height:1.7;color:var(--muted2)}
+  .br-path-display{background:var(--ink3);border:1px solid var(--border);border-radius:12px;padding:14px;width:100%;margin-bottom:8px;font-size:.78rem;line-height:1.7;color:var(--muted2)}
   .br-path-display b{color:var(--text)}
 
+  /* ── Confetti ── */
+  .br-confetti-wrap{position:fixed;inset:0;pointer-events:none;z-index:101;overflow:hidden}
+  .br-confetti{position:absolute;width:8px;height:8px;border-radius:2px;animation:br-confettiFall 2.5s ease-in forwards}
+  @keyframes br-confettiFall{0%{transform:translateY(-20px) rotate(0deg);opacity:1}100%{transform:translateY(100vh) rotate(720deg);opacity:0}}
+
   /* ── Toast ── */
-  .br-toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--ink2);border:1px solid var(--border);border-radius:10px;padding:10px 18px;font-size:.85rem;color:var(--text);z-index:999;opacity:0;transition:opacity .2s;pointer-events:none;white-space:nowrap}
-  .br-toast.show{opacity:1}
+  .br-toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(60px);background:var(--ink2);border:1.5px solid var(--border);border-radius:12px;padding:10px 22px;font-size:.82rem;color:var(--text);z-index:999;transition:transform .3s;pointer-events:none;white-space:nowrap;backdrop-filter:blur(8px)}
+  .br-toast.show{transform:translateX(-50%) translateY(0)}
 
   /* ── Misc ── */
   .br-divider{width:100%;border:none;border-top:1px solid var(--border);margin:12px 0}
@@ -115,12 +141,13 @@
   .color-amber{color:var(--amber)}
 
   /* ── Difficulty selector ── */
-  .br-diff-btns{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
-  .br-diff-btn{padding:10px 6px;border-radius:10px;border:1px solid var(--border);background:var(--ink3);cursor:pointer;text-align:center;transition:border-color .15s,background .15s;font-family:inherit}
-  .br-diff-btn.active{border-color:var(--lime);background:rgba(200,241,53,.08)}
+  .br-diff-btns{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+  .br-diff-btn{padding:12px 8px;border-radius:12px;border:1.5px solid var(--border);background:var(--ink3);cursor:pointer;text-align:center;transition:all .15s;font-family:inherit}
+  .br-diff-btn:hover{border-color:var(--muted)}
+  .br-diff-btn.active{border-color:var(--lime);background:rgba(200,241,53,.06)}
   .br-diff-btn.active .br-diff-name{color:var(--lime)}
-  .br-diff-name{font-weight:700;font-size:.85rem;color:var(--text);margin-bottom:2px}
-  .br-diff-desc{font-size:.65rem;color:var(--muted2)}
+  .br-diff-name{font-weight:700;font-size:.85rem;color:var(--text);margin-bottom:3px}
+  .br-diff-desc{font-size:.63rem;color:var(--muted2)}
 </style>
 </head>
 <body>
@@ -135,27 +162,22 @@
     <a class="back-link" href="index.html">← Home</a>
   </div>
 
-  <div class="br-lang">
-    <button data-lang="en" onclick="setLang('en')" class="active"><img src="https://flagcdn.com/w40/gb.png" style="height:12px;border-radius:2px"> EN</button>
-    <button data-lang="de" onclick="setLang('de')"><img src="https://flagcdn.com/w40/de.png" style="height:12px;border-radius:2px"> DE</button>
-    <button data-lang="fr" onclick="setLang('fr')"><img src="https://flagcdn.com/w40/fr.png" style="height:12px;border-radius:2px"> FR</button>
-    <button data-lang="es" onclick="setLang('es')"><img src="https://flagcdn.com/w40/es.png" style="height:12px;border-radius:2px"> ES</button>
-  </div>
-
-  <div class="br-card" style="text-align:center;border-color:rgba(200,241,53,.25);margin-bottom:20px">
-    <div style="font-size:2.2rem;margin-bottom:8px">🏁</div>
-    <div style="font-family:var(--font-d);font-size:1.4rem;color:var(--lime);margin-bottom:6px" id="t-game-title">Race Across Borders</div>
-    <div style="font-size:.82rem;color:var(--muted2);line-height:1.5" id="t-game-desc">
+  <!-- Hero -->
+  <div style="text-align:center;margin-bottom:20px">
+    <div style="font-size:2.8rem;margin-bottom:6px">🏁</div>
+    <div style="font-family:var(--font-d);font-size:1.5rem;color:var(--lime);margin-bottom:6px" id="t-game-title">Race Across Borders</div>
+    <div style="font-size:.8rem;color:var(--muted2);line-height:1.5;max-width:360px;margin:0 auto" id="t-game-desc">
       Both players start at the same country and race to the target — moving only through land borders. First to arrive wins!
     </div>
   </div>
 
+  <!-- Difficulty -->
   <div class="br-card" id="diff-card">
     <div class="br-card-title" id="t-diff-lbl">Difficulty</div>
     <div class="br-diff-btns">
       <button class="br-diff-btn" data-diff="easy" onclick="setDifficulty('easy')">
         <div class="br-diff-name" id="t-diff-easy">Easy</div>
-        <div class="br-diff-desc" id="t-diff-easy-desc">European · 4-6 hops</div>
+        <div class="br-diff-desc" id="t-diff-easy-desc">Europe · 4-6 hops</div>
       </button>
       <button class="br-diff-btn active" data-diff="medium" onclick="setDifficulty('medium')">
         <div class="br-diff-name" id="t-diff-medium">Medium</div>
@@ -166,18 +188,22 @@
         <div class="br-diff-desc" id="t-diff-hard-desc">Global · 7-11 hops</div>
       </button>
     </div>
-    <div style="font-size:.7rem;color:var(--muted2);margin-top:8px;text-align:center" id="t-diff-note">Only the room creator's choice applies</div>
+    <div style="font-size:.68rem;color:var(--muted2);margin-top:8px;text-align:center" id="t-diff-note">Only the room creator's choice applies</div>
   </div>
 
-  <div class="br-card">
-    <div class="br-card-title" id="t-create-title">Create a Match</div>
-    <button class="btn-lime" onclick="createMatch()" id="t-create-btn">Create Match →</button>
-  </div>
-
-  <div class="br-card">
-    <div class="br-card-title" id="t-join-title">Join a Match</div>
-    <input class="br-input" id="join-code-input" maxlength="6" placeholder="XXXXXX" oninput="this.value=this.value.toUpperCase()">
-    <button class="btn-outline" onclick="joinMatch()" id="t-join-btn">Join →</button>
+  <!-- Tabbed Create / Join -->
+  <div class="br-lobby-card">
+    <div class="br-tabs">
+      <button class="br-tab active" onclick="switchBrTab('create')" id="t-create-title">Create Match</button>
+      <button class="br-tab" onclick="switchBrTab('join')" id="t-join-title">Join Match</button>
+    </div>
+    <div class="br-tab-body active" id="br-tab-create">
+      <button class="btn-lime" onclick="createMatch()" id="t-create-btn">Create Match →</button>
+    </div>
+    <div class="br-tab-body" id="br-tab-join">
+      <input class="br-input" id="join-code-input" maxlength="6" placeholder="XXXXXX" oninput="this.value=this.value.toUpperCase()">
+      <button class="btn-lime" onclick="joinMatch()" id="t-join-btn">Join →</button>
+    </div>
   </div>
 </div>
 
@@ -188,23 +214,32 @@
     <button class="back-link" onclick="goLobby()" id="t-cancel">Cancel</button>
   </div>
 
-  <div class="br-card text-center" style="border-color:rgba(200,241,53,.25);padding:28px 20px">
-    <div style="font-size:2rem;margin-bottom:12px">⏳</div>
-    <div style="font-size:.85rem;color:var(--muted2);margin-bottom:16px" id="t-waiting-for">Waiting for opponent...</div>
-
-    <div class="br-code-label" id="t-your-code">Your room code</div>
-    <div class="br-code" id="display-code">------</div>
-    <div id="w-diff-badge" style="font-size:.72rem;color:var(--amber);text-align:center;margin-bottom:8px"></div>
-
-    <button class="btn-lime" onclick="copyInviteLink()" id="t-copy-link">📋 Copy Invite Link</button>
-    <button class="btn-muted" onclick="copyCode()" id="t-copy-code">Copy Code</button>
-  </div>
-
-  <div class="br-card" style="margin-top:8px">
-    <div style="font-size:.78rem;color:var(--muted2);line-height:1.6" id="t-how-to-share">
-      Share the link or code with your opponent. The game starts automatically when they join.
+  <!-- Player silhouettes -->
+  <div class="br-wait-players">
+    <div class="br-wait-player">
+      <div class="br-wait-avatar you">🏃</div>
+      <div class="br-wait-label" id="t-wait-you">You</div>
+    </div>
+    <div class="br-wait-vs">VS</div>
+    <div class="br-wait-player">
+      <div class="br-wait-avatar opp">❓</div>
+      <div class="br-wait-label" id="t-wait-opp"><span class="waiting-dot"></span> Waiting...</div>
     </div>
   </div>
+
+  <div id="w-diff-badge" style="font-size:.72rem;color:var(--amber);text-align:center;margin-bottom:12px"></div>
+
+  <div class="br-code-label" id="t-your-code">Tap code to copy</div>
+  <div class="br-code" id="display-code" onclick="copyCode()">------</div>
+
+  <div class="br-share-row">
+    <button class="btn-muted" onclick="copyCode()" style="margin-top:0" id="t-copy-code">📋 Copy Code</button>
+    <button class="btn-muted" onclick="copyInviteLink()" style="margin-top:0" id="t-copy-link">🔗 Copy Link</button>
+  </div>
+
+  <p style="font-size:.68rem;color:var(--muted);text-align:center;margin-top:16px;line-height:1.5;max-width:280px" id="t-how-to-share">
+    Send the code or link to your friend. The game starts automatically when they join.
+  </p>
 </div>
 
 <!-- ══════════════ SCREEN: GAME ══════════════ -->
@@ -298,6 +333,8 @@
   <button class="btn-muted" onclick="goLobby()" id="t-home-btn2">← Home</button>
 </div>
 
+<!-- Confetti -->
+<div class="br-confetti-wrap" id="br-confetti-wrap"></div>
 <!-- Toast -->
 <div class="br-toast" id="toast"></div>
 
@@ -326,8 +363,9 @@ const LANGS = {
     gameDesc:'Both players start at the same country and race to the target — moving only through land borders. First to arrive wins!',
     createTitle:'Create a Match', createBtn:'Create Match →',
     joinTitle:'Join a Match', joinBtn:'Join →',
-    waitingFor:'Waiting for opponent...', yourCode:'Your room code',
-    copyLink:'📋 Copy Invite Link', copyCode:'Copy Code',
+    waitingFor:'Waiting for opponent...', yourCode:'Tap code to copy',
+    copyLink:'🔗 Copy Link', copyCode:'📋 Copy Code',
+    waitYou:'You', waitOpp:'Waiting...',
     howToShare:'Share the link or code with your opponent. The game starts automatically when they join.',
     cancel:'Cancel', targetLbl:'TARGET', youLbl:'YOU', oppLbl:'OPPONENT',
     movesLbl:'moves', moveTo:'MOVE TO:', resultsLbl:'Results',
@@ -353,8 +391,9 @@ const LANGS = {
     gameDesc:'Beide Spieler starten im selben Land und rasen zum Ziel — nur über Landgrenzen. Wer zuerst ankommt, gewinnt!',
     createTitle:'Spiel erstellen', createBtn:'Spiel erstellen →',
     joinTitle:'Spiel beitreten', joinBtn:'Beitreten →',
-    waitingFor:'Warte auf Gegner...', yourCode:'Dein Raumcode',
-    copyLink:'📋 Einladungslink kopieren', copyCode:'Code kopieren',
+    waitingFor:'Warte auf Gegner...', yourCode:'Tippe auf Code zum Kopieren',
+    copyLink:'🔗 Link kopieren', copyCode:'📋 Code kopieren',
+    waitYou:'Du', waitOpp:'Warte...',
     howToShare:'Teile den Link oder Code mit deinem Gegner. Das Spiel startet automatisch.',
     cancel:'Abbrechen', targetLbl:'ZIEL', youLbl:'DU', oppLbl:'GEGNER',
     movesLbl:'Züge', moveTo:'ZIEHE ZU:', resultsLbl:'Ergebnisse',
@@ -380,8 +419,9 @@ const LANGS = {
     gameDesc:'Les deux joueurs démarrent dans le même pays et courent vers la cible — en traversant uniquement des frontières terrestres. Le premier arrivé gagne!',
     createTitle:'Créer une partie', createBtn:'Créer →',
     joinTitle:'Rejoindre une partie', joinBtn:'Rejoindre →',
-    waitingFor:"En attente de l'adversaire...", yourCode:'Code de la salle',
-    copyLink:"📋 Copier le lien d'invitation", copyCode:'Copier le code',
+    waitingFor:"En attente de l'adversaire...", yourCode:'Touche le code pour copier',
+    copyLink:"🔗 Copier le lien", copyCode:'📋 Copier le code',
+    waitYou:'Toi', waitOpp:'En attente...',
     howToShare:"Partagez le lien ou le code avec votre adversaire. La partie démarre automatiquement.",
     cancel:'Annuler', targetLbl:'CIBLE', youLbl:'VOUS', oppLbl:'ADVERSAIRE',
     movesLbl:'coups', moveTo:'SE DÉPLACER VERS:', resultsLbl:'Résultats',
@@ -407,8 +447,9 @@ const LANGS = {
     gameDesc:'Ambos jugadores comienzan en el mismo país y corren hacia el objetivo — moviéndose solo por fronteras terrestres. ¡El primero en llegar gana!',
     createTitle:'Crear partida', createBtn:'Crear →',
     joinTitle:'Unirse a partida', joinBtn:'Unirse →',
-    waitingFor:'Esperando al oponente...', yourCode:'Tu código de sala',
-    copyLink:'📋 Copiar enlace de invitación', copyCode:'Copiar código',
+    waitingFor:'Esperando al oponente...', yourCode:'Toca el código para copiar',
+    copyLink:'🔗 Copiar enlace', copyCode:'📋 Copiar código',
+    waitYou:'Tú', waitOpp:'Esperando...',
     howToShare:'Comparte el enlace o código con tu oponente. El juego empieza automáticamente.',
     cancel:'Cancelar', targetLbl:'OBJETIVO', youLbl:'TÚ', oppLbl:'OPONENTE',
     movesLbl:'movimientos', moveTo:'MOVER A:', resultsLbl:'Resultados',
@@ -462,15 +503,8 @@ function updateScoreDisplay() {
   if (vs) vs.textContent = (T.score || 'Score') + ': ' + scoreStr;
 }
 
-function setLang(code) {
-  curLang = code;
-  T = LANGS[code];
-  localStorage.setItem('geovs_lang', code);
-  document.querySelectorAll('.br-lang button').forEach(b => {
-    b.classList.toggle('active', b.dataset.lang === code);
-  });
-  applyTranslations();
-}
+// Language is auto-read from localStorage (set on the home screen)
+// No in-page language switcher needed
 
 function applyTranslations() {
   const ids = {
@@ -478,7 +512,7 @@ function applyTranslations() {
     't-game-title': 'gameTitle', 't-game-desc': 'gameDesc',
     't-create-title': 'createTitle', 't-create-btn': 'createBtn',
     't-join-title': 'joinTitle', 't-join-btn': 'joinBtn',
-    't-waiting-for': 'waitingFor', 't-your-code': 'yourCode',
+    't-your-code': 'yourCode',
     't-copy-link': 'copyLink', 't-copy-code': 'copyCode',
     't-how-to-share': 'howToShare', 't-cancel': 'cancel',
     't-target-lbl': 'targetLbl', 't-you-lbl': 'youLbl', 't-opp-lbl': 'oppLbl',
@@ -490,11 +524,40 @@ function applyTranslations() {
     't-diff-medium': 'diffMedium', 't-diff-medium-desc': 'diffMediumDesc',
     't-diff-hard': 'diffHard', 't-diff-hard-desc': 'diffHardDesc',
     't-diff-note': 'diffNote',
+    't-wait-you': 'waitYou', 't-wait-opp': 'waitOpp',
   };
   for (const [id, key] of Object.entries(ids)) {
     const el = document.getElementById(id);
     if (el && T[key]) el.textContent = T[key];
   }
+}
+
+function switchBrTab(tab) {
+  document.querySelectorAll('.br-tab').forEach((t, i) => {
+    t.classList.toggle('active', (tab === 'create' ? 0 : 1) === i);
+  });
+  document.getElementById('br-tab-create').classList.toggle('active', tab === 'create');
+  document.getElementById('br-tab-join').classList.toggle('active', tab === 'join');
+  if (tab === 'join') setTimeout(() => document.getElementById('join-code-input')?.focus(), 100);
+}
+
+function brSpawnConfetti() {
+  const wrap = document.getElementById('br-confetti-wrap');
+  wrap.innerHTML = '';
+  const colors = ['#c8f135','#60a5fa','#ff3d6b','#ffb830','#a855f7','#00e5c0','#ff6b35'];
+  for (let i = 0; i < 50; i++) {
+    const c = document.createElement('div');
+    c.className = 'br-confetti';
+    c.style.left = Math.random() * 100 + '%';
+    c.style.top = '-10px';
+    c.style.background = colors[Math.floor(Math.random() * colors.length)];
+    c.style.animationDelay = (Math.random() * 1.5) + 's';
+    c.style.animationDuration = (2 + Math.random() * 1.5) + 's';
+    c.style.width = (5 + Math.random() * 6) + 'px';
+    c.style.height = (5 + Math.random() * 6) + 'px';
+    wrap.appendChild(c);
+  }
+  setTimeout(() => wrap.innerHTML = '', 4000);
 }
 
 // ── Socket.io ──────────────────────────────────────────────────────────────────
@@ -750,7 +813,7 @@ function _renderMapToSvg(svg, state, showOpponent) {
     } else {
       fill = '#1e4a66'; stroke = '#163a52'; opacity = '0.7';
     }
-    html += `<path d="${path}" fill="${fill}" stroke="${stroke}" stroke-width="${strokeW}" stroke-linejoin="round" opacity="${opacity}"><title>${name}</title></path>`;
+    html += `<path d="${path}" fill="${fill}" stroke="${stroke}" stroke-width="${strokeW}" stroke-linejoin="round" opacity="${opacity}"></path>`;
   }
 
   // Labels for highlighted countries
@@ -986,6 +1049,7 @@ function renderVictory(state) {
   setText('v-icon', win ? '🏆' : '😔');
   setText('v-title', win ? T.youWin : T.youLose);
   setText('v-sub',  win ? T.winSub  : T.loseSub);
+  if (win) brSpawnConfetti();
 
   // Update session score
   if (win) { sessionScore.me++; } else { sessionScore.opp++; }
@@ -1008,7 +1072,15 @@ function copyInviteLink() {
 
 function copyCode() {
   if (!myRoomCode) return;
-  navigator.clipboard.writeText(myRoomCode).then(() => showToast(T.codeCopied));
+  navigator.clipboard.writeText(myRoomCode).then(() => {
+    showToast(T.codeCopied);
+    const el = document.getElementById('display-code');
+    if (el) {
+      el.style.borderColor = 'var(--lime)';
+      el.style.textShadow = '0 0 30px rgba(200,241,53,.5)';
+      setTimeout(() => { el.style.borderColor = ''; el.style.textShadow = ''; }, 600);
+    }
+  });
 }
 
 // ── Utils ──────────────────────────────────────────────────────────────────────
@@ -1031,16 +1103,14 @@ function brStartCountdown() {
 
   function showStep() {
     if (count > 0) {
-      numEl.className = 'br-countdown-num';
+      numEl.className = '';
       numEl.textContent = count;
-      // Restart animation
-      void numEl.offsetWidth;
+      void numEl.offsetWidth; // force reflow
       numEl.className = 'br-countdown-num';
       count--;
       setTimeout(showStep, 900);
     } else {
-      // GO!
-      numEl.className = 'br-countdown-go';
+      numEl.className = '';
       numEl.textContent = 'GO!';
       void numEl.offsetWidth;
       numEl.className = 'br-countdown-go';
@@ -1075,7 +1145,7 @@ function showToast(msg) {
 }
 
 // ── Init ───────────────────────────────────────────────────────────────────────
-setLang(curLang);
+applyTranslations();
 
 // Auto-join if URL has ?code=
 const urlCode = new URLSearchParams(window.location.search).get('code');

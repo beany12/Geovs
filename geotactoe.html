@@ -1,0 +1,1140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>GeoTacToe — GeoVs</title>
+<link rel="stylesheet" href="style.css">
+<script src="/socket.io/socket.io.js"></script>
+<script src="app-profile.js"></script>
+<script src="avatar.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--ink);color:var(--text);font-family:inherit;min-height:100dvh;display:flex;flex-direction:column;align-items:center}
+
+/* ── Screens ── */
+.screen{display:none;flex-direction:column;align-items:center;width:100%;max-width:540px;padding:20px 16px;min-height:100dvh}
+.screen.active{display:flex}
+
+/* ── Header ── */
+.gtt-header{width:100%;display:flex;align-items:center;justify-content:space-between;margin-bottom:24px}
+.gtt-logo{font-family:var(--font-d);font-size:1.8rem;color:var(--lime);letter-spacing:.03em}
+.gtt-logo span{color:var(--muted2);font-size:.68rem;display:block;font-family:var(--font-m);letter-spacing:.12em}
+.back-link{color:var(--muted2);font-size:.78rem;text-decoration:none;padding:7px 12px;border-radius:10px;border:1px solid var(--border);cursor:pointer;background:var(--ink2);transition:border-color .15s}
+.back-link:hover{border-color:var(--muted)}
+
+/* ── Lobby card (tabbed) ── */
+.gtt-lobby-card{background:var(--ink2);border:1.5px solid var(--border);border-radius:18px;width:100%;margin-bottom:16px;overflow:hidden}
+.gtt-tabs{display:flex;border-bottom:1.5px solid var(--border)}
+.gtt-tab{flex:1;padding:14px;text-align:center;font-family:var(--font-d);font-size:1rem;letter-spacing:.03em;color:var(--muted);cursor:pointer;transition:all .15s;background:transparent;border:none;border-bottom:2px solid transparent}
+.gtt-tab.active{color:var(--lime);border-bottom-color:var(--lime);background:rgba(200,241,53,.03)}
+.gtt-tab:hover:not(.active){color:var(--text);background:rgba(255,255,255,.02)}
+.gtt-tab-body{padding:22px;display:none}
+.gtt-tab-body.active{display:block}
+
+/* ── Lobby hero ── */
+.gtt-hero{display:flex;flex-direction:column;align-items:center;margin-bottom:20px}
+.gtt-globe{font-size:3rem;animation:spin 20s linear infinite;margin-bottom:8px}
+@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+.gtt-hero-grid{display:grid;grid-template-columns:repeat(3,38px);gap:3px;border:2px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:8px}
+.gtt-hero-cell{width:38px;height:38px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;background:var(--ink3);border:1px solid rgba(255,255,255,.04)}
+.gtt-hero-cell.p1{background:rgba(96,165,250,.12);border-color:rgba(96,165,250,.3)}
+.gtt-hero-cell.p2{background:rgba(255,61,107,.1);border-color:rgba(255,61,107,.3)}
+.gtt-how{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;width:100%;margin-top:16px}
+.gtt-step{background:var(--ink2);border:1px solid var(--border);border-radius:14px;padding:14px 10px;text-align:center}
+.gtt-step-num{font-family:var(--font-m);font-size:.58rem;color:var(--lime);letter-spacing:.15em;margin-bottom:6px}
+.gtt-step-icon{font-size:1.4rem;margin-bottom:6px}
+.gtt-step-text{font-size:.63rem;color:var(--muted2);line-height:1.4}
+
+/* ── Waiting screen ── */
+.gtt-wait-players{display:flex;align-items:center;justify-content:center;gap:24px;margin-bottom:20px}
+.gtt-wait-player{display:flex;flex-direction:column;align-items:center;gap:6px}
+.gtt-wait-avatar{width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.4rem}
+.gtt-wait-avatar.you{background:rgba(96,165,250,.15);border:2px solid #60a5fa}
+.gtt-wait-avatar.opp{background:var(--ink3);border:2px dashed var(--muted);animation:pulse 1.5s ease-in-out infinite}
+.gtt-wait-label{font-family:var(--font-m);font-size:.6rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted2)}
+.gtt-wait-vs{font-family:var(--font-d);font-size:1.2rem;color:var(--muted)}
+.gtt-code-click{cursor:pointer;transition:all .15s}
+.gtt-code-click:hover{border-color:var(--lime);transform:scale(1.02)}
+.gtt-code-click:active{transform:scale(.98)}
+.gtt-share-row{display:flex;gap:8px;width:100%}
+.gtt-share-row button{flex:1}
+
+/* ── Buttons ── */
+.btn-lime{width:100%;padding:14px;border-radius:12px;background:var(--lime);color:#000;font-weight:700;font-size:1rem;border:none;cursor:pointer;font-family:inherit;transition:all .15s}
+.btn-lime:hover{opacity:.88;transform:translateY(-1px)}
+.btn-lime:disabled{opacity:.4;cursor:not-allowed;transform:none}
+.btn-outline{width:100%;padding:12px;border-radius:12px;background:transparent;color:var(--lime);font-weight:700;font-size:.9rem;border:2px solid var(--lime);cursor:pointer;font-family:inherit;margin-top:8px}
+.btn-muted{width:100%;padding:10px;border-radius:10px;background:var(--ink3);color:var(--muted2);font-size:.85rem;border:1px solid var(--border);cursor:pointer;font-family:inherit;margin-top:8px;transition:all .15s}
+.btn-muted:hover{border-color:var(--muted);color:var(--text)}
+.btn-rose{width:100%;padding:10px;border-radius:10px;background:rgba(255,61,107,.12);color:var(--rose);font-weight:700;font-size:.85rem;border:1px solid rgba(255,61,107,.25);cursor:pointer;font-family:inherit;margin-top:0;transition:all .15s}
+.btn-rose:hover{background:rgba(255,61,107,.2)}
+.btn-rose:disabled{opacity:.4;cursor:not-allowed}
+
+/* ── Code ── */
+.gtt-input{width:100%;padding:14px;border-radius:12px;border:1.5px solid var(--border);background:var(--ink3);color:var(--text);font-family:var(--font-m);font-size:1.2rem;letter-spacing:.2em;text-transform:uppercase;outline:none;text-align:center;margin-bottom:10px;transition:border-color .15s}
+.gtt-input:focus{border-color:var(--lime);box-shadow:0 0 20px rgba(200,241,53,.08)}
+.gtt-code{font-family:var(--font-m);font-size:2.4rem;letter-spacing:.3em;color:var(--lime);text-align:center;padding:20px;background:var(--ink3);border-radius:14px;border:1.5px solid rgba(200,241,53,.25);margin-bottom:14px;text-shadow:0 0 20px rgba(200,241,53,.3)}
+.gtt-code-label{font-size:.62rem;letter-spacing:.18em;color:var(--muted2);text-align:center;margin-bottom:8px;text-transform:uppercase}
+.waiting-dot{width:8px;height:8px;border-radius:50%;background:var(--amber);display:inline-block;animation:pulse 1.2s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:.3;transform:scale(.8)}50%{opacity:1;transform:scale(1.2)}}
+
+/* ── HUD / Score bar ── */
+.gtt-hud{display:flex;align-items:center;width:100%;margin-bottom:10px;background:var(--ink2);border:1px solid var(--border);border-radius:14px;padding:10px 14px;gap:10px}
+.gtt-hud-side{display:flex;align-items:center;gap:8px;flex:1}
+.gtt-hud-side.right{justify-content:flex-end}
+.gtt-hud-emblem{width:44px;height:34px;flex-shrink:0;display:flex;align-items:center;justify-content:center;pointer-events:none}
+.gtt-hud-emblem svg{max-height:34px;width:auto}
+.gtt-hud-info{display:flex;flex-direction:column;gap:1px}
+.gtt-hud-name{font-family:var(--font-m);font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;font-weight:700}
+.gtt-hud-name.p1{color:#60a5fa}
+.gtt-hud-name.p2{color:var(--rose)}
+.gtt-hud-lvl{font-family:var(--font-m);font-size:.55rem;color:var(--muted2);letter-spacing:.05em}
+.gtt-hud-center{display:flex;flex-direction:column;align-items:center;gap:2px}
+.gtt-hud-score{font-family:var(--font-d);font-size:1.6rem;color:var(--text);letter-spacing:.05em;line-height:1}
+.gtt-hud-round{display:flex;gap:5px;align-items:center}
+.gtt-hud-round-dot{width:8px;height:8px;border-radius:50%;border:1.5px solid var(--muted);background:transparent}
+.gtt-hud-round-dot.won-p1{background:#60a5fa;border-color:#60a5fa}
+.gtt-hud-round-dot.won-p2{background:var(--rose);border-color:var(--rose)}
+.gtt-hud-round-dot.draw{background:var(--amber);border-color:var(--amber)}
+.gtt-hud-round-dot.current{border-color:var(--lime)}
+
+.gtt-turn-label{font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted2);text-align:center;margin-bottom:8px;font-weight:600;transition:color .2s}
+.gtt-turn-label.my-turn{color:var(--lime);animation:turnGlow 2s ease-in-out infinite}
+@keyframes turnGlow{0%,100%{text-shadow:none}50%{text-shadow:0 0 12px rgba(200,241,53,.4)}}
+
+/* ── Board ── */
+.gtt-board{display:grid;grid-template-columns:94px 1fr 1fr 1fr;grid-template-rows:auto;gap:0;width:100%;max-width:500px;margin-bottom:10px;border-radius:16px;overflow:hidden;border:2.5px solid rgba(255,255,255,.12)}
+.gtt-corner{background:var(--ink2);display:flex;align-items:center;justify-content:center;padding:8px;border-right:2px solid rgba(255,255,255,.1);border-bottom:2px solid rgba(255,255,255,.1)}
+.gtt-col-header{background:linear-gradient(180deg,rgba(30,30,50,.95),var(--ink2));padding:12px 6px;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-height:62px;border-bottom:2px solid rgba(255,255,255,.1);border-right:1px solid rgba(255,255,255,.06)}
+.gtt-col-header:last-of-type{border-right:none}
+.gtt-row-header{background:linear-gradient(90deg,rgba(30,30,50,.95),var(--ink2));padding:10px 8px;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;border-right:2px solid rgba(255,255,255,.1);border-bottom:1px solid rgba(255,255,255,.06)}
+.gtt-header-icon{font-size:1.15rem;line-height:1}
+.gtt-header-label{font-family:var(--font-d);font-size:.72rem;letter-spacing:.04em;color:var(--text);line-height:1.2;text-transform:uppercase}
+
+/* ── Cells ── */
+.gtt-cell{background:var(--ink3);min-height:84px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:all .2s;gap:3px;padding:6px;position:relative;border-right:1px solid rgba(255,255,255,.06);border-bottom:1px solid rgba(255,255,255,.06)}
+.gtt-cell:nth-child(4n+1){border-right:none} /* last col in each row */
+.gtt-cell::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 50% 50%,rgba(200,241,53,.04),transparent 70%);opacity:0;transition:opacity .2s}
+.gtt-cell:hover:not(.taken):not(.disabled)::before{opacity:1}
+.gtt-cell:hover:not(.taken):not(.disabled){transform:scale(1.03);z-index:2;box-shadow:0 0 24px rgba(200,241,53,.12)}
+.gtt-cell.taken{cursor:default}
+.gtt-cell.disabled{cursor:not-allowed;opacity:.6}
+.gtt-cell.selected{animation:selectedPulse 1.5s ease-in-out infinite;z-index:2}
+@keyframes selectedPulse{0%,100%{box-shadow:0 0 0 0 rgba(200,241,53,.3)}50%{box-shadow:0 0 0 6px rgba(200,241,53,.1)}}
+.gtt-cell.p1{background:rgba(96,165,250,.1);box-shadow:inset 0 0 20px rgba(96,165,250,.08)}
+.gtt-cell.p2{background:rgba(255,61,107,.08);box-shadow:inset 0 0 20px rgba(255,61,107,.06)}
+.gtt-cell.win-cell{animation:winPulse .6s ease-in-out 3}
+@keyframes winPulse{50%{transform:scale(1.1);filter:brightness(1.5)}}
+.gtt-cell.pop-in .gtt-cell-flag{animation:popIn .35s cubic-bezier(.175,.885,.32,1.275)}
+@keyframes popIn{0%{transform:scale(0);opacity:0}100%{transform:scale(1);opacity:1}}
+.gtt-cell.shake{animation:shake .4s ease-in-out}
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-6px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}
+.gtt-cell-empty{font-size:.55rem;color:var(--muted);opacity:.5;text-transform:uppercase;letter-spacing:.1em}
+.gtt-cell-flag{font-size:1.6rem;line-height:1}
+.gtt-cell-name{font-size:.55rem;color:var(--muted2);text-align:center;line-height:1.2;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:600}
+
+/* ── Country search ── */
+.gtt-search-wrap{position:relative;width:100%;max-width:500px;margin-bottom:8px}
+.gtt-search{width:100%;padding:13px 16px;border-radius:12px;border:1.5px solid var(--border);background:var(--ink2);color:var(--text);font-family:inherit;font-size:.95rem;outline:none;transition:all .15s}
+.gtt-search:focus{border-color:var(--lime);box-shadow:0 0 20px rgba(200,241,53,.06)}
+.gtt-search:disabled{opacity:.35}
+.gtt-suggest{position:absolute;top:100%;left:0;right:0;background:var(--ink2);border:1.5px solid var(--border);border-top:none;border-radius:0 0 12px 12px;max-height:220px;overflow-y:auto;z-index:50;display:none}
+.gtt-suggest.open{display:block}
+.gtt-suggest-item{padding:11px 16px;cursor:pointer;display:flex;align-items:center;gap:10px;font-size:.88rem;border-bottom:1px solid rgba(255,255,255,.04);transition:background .1s}
+.gtt-suggest-item:hover,.gtt-suggest-item.highlighted{background:rgba(200,241,53,.06);color:var(--lime)}
+.gtt-suggest-flag{font-size:1.3rem}
+
+/* ── Feedback ── */
+.gtt-feedback{text-align:center;font-size:.85rem;font-weight:700;min-height:24px;margin-bottom:4px;transition:opacity .2s}
+.gtt-feedback.ok{color:var(--lime)}
+.gtt-feedback.bad{color:var(--rose)}
+
+/* ── Actions ── */
+.gtt-actions{display:flex;gap:8px;width:100%;max-width:500px}
+.gtt-actions button{flex:1}
+
+/* ── Round overlay ── */
+.gtt-overlay{position:fixed;inset:0;background:rgba(5,8,16,.94);display:none;flex-direction:column;align-items:center;justify-content:center;z-index:100;gap:16px;backdrop-filter:blur(8px)}
+.gtt-overlay.active{display:flex}
+.gtt-overlay-emoji{font-size:3rem;animation:popIn .5s cubic-bezier(.175,.885,.32,1.275)}
+.gtt-overlay-title{font-family:var(--font-d);font-size:2.2rem;letter-spacing:.03em}
+.gtt-overlay-sub{font-size:.88rem;color:var(--muted2);text-align:center;max-width:300px}
+.gtt-overlay-score{font-family:var(--font-m);font-size:2.8rem;font-weight:900;color:var(--text);letter-spacing:.1em}
+.gtt-overlay .btn-lime,.gtt-overlay .btn-outline,.gtt-overlay .btn-muted{max-width:300px}
+.confetti-wrap{position:fixed;inset:0;pointer-events:none;z-index:101;overflow:hidden}
+.confetti{position:absolute;width:8px;height:8px;border-radius:2px;animation:confettiFall 2.5s ease-in forwards}
+@keyframes confettiFall{0%{transform:translateY(-20px) rotate(0deg);opacity:1}100%{transform:translateY(100vh) rotate(720deg);opacity:0}}
+
+/* ── Draw banner ── */
+.gtt-draw-banner{display:flex;align-items:center;gap:10px;width:100%;max-width:500px;padding:12px 16px;border-radius:12px;background:rgba(255,184,48,.08);border:1.5px solid rgba(255,184,48,.25);margin-bottom:8px;font-size:.8rem;color:var(--amber)}
+.gtt-draw-banner span{flex:1}
+
+/* ── Timer ── */
+.gtt-timer{display:flex;align-items:center;gap:10px;margin-bottom:8px;width:100%;max-width:500px}
+.gtt-timer-bar{flex:1;height:8px;border-radius:4px;background:var(--ink3);overflow:hidden;border:1px solid var(--border)}
+.gtt-timer-fill{height:100%;border-radius:4px;background:var(--lime);transition:width .5s linear}
+.gtt-timer-fill.warn{background:var(--amber)}
+.gtt-timer-fill.danger{background:var(--rose);box-shadow:0 0 10px rgba(255,61,107,.3)}
+.gtt-timer-num{font-family:var(--font-m);font-size:.9rem;font-weight:700;color:var(--muted2);min-width:34px;text-align:right}
+.gtt-timer-num.warn{color:var(--amber)}
+.gtt-timer-num.danger{color:var(--rose);animation:timerPulse .5s ease-in-out infinite}
+@keyframes timerPulse{50%{opacity:.5}}
+body.timer-danger{box-shadow:inset 0 0 80px rgba(255,61,107,.06)}
+
+/* ── Toast ── */
+.gtt-toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--ink2);border:1.5px solid var(--border);color:var(--text);padding:10px 24px;border-radius:12px;font-size:.82rem;z-index:200;transition:transform .3s;pointer-events:none;backdrop-filter:blur(8px)}
+.gtt-toast.show{transform:translateX(-50%) translateY(0)}
+
+@media(max-width:520px){
+  .gtt-board{grid-template-columns:68px 1fr 1fr 1fr}
+  .gtt-col-header{padding:8px 3px;min-height:52px}
+  .gtt-row-header{padding:6px 4px}
+  .gtt-header-icon{font-size:.95rem}
+  .gtt-header-label{font-size:.56rem}
+  .gtt-cell{min-height:68px}
+  .gtt-cell-flag{font-size:1.3rem}
+  .gtt-cell-name{font-size:.48rem}
+  .gtt-how{grid-template-columns:1fr;gap:8px}
+  .gtt-hero-grid{grid-template-columns:repeat(3,34px)}
+  .gtt-hero-cell{width:34px;height:34px;font-size:.95rem}
+}
+</style>
+</head>
+<body>
+
+<!-- ═══ LOBBY ═══ -->
+<div class="screen active" id="screen-lobby">
+  <div class="gtt-header">
+    <div class="gtt-logo">GeoTacToe<span>Best of 3 · 2 Players</span></div>
+    <a class="back-link" href="index.html">← Back</a>
+  </div>
+
+  <!-- Hero -->
+  <div class="gtt-hero">
+    <div class="gtt-globe">🌍</div>
+    <div class="gtt-hero-grid">
+      <div class="gtt-hero-cell p1">🇫🇷</div><div class="gtt-hero-cell"></div><div class="gtt-hero-cell p2">🇧🇷</div>
+      <div class="gtt-hero-cell"></div><div class="gtt-hero-cell p1">🇩🇪</div><div class="gtt-hero-cell"></div>
+      <div class="gtt-hero-cell p2">🇯🇵</div><div class="gtt-hero-cell"></div><div class="gtt-hero-cell p1">🇬🇧</div>
+    </div>
+  </div>
+
+  <!-- Tabbed Create / Join -->
+  <div class="gtt-lobby-card">
+    <div class="gtt-tabs">
+      <button class="gtt-tab active" id="tab-create-label" onclick="switchLobbyTab('create')">Create Match</button>
+      <button class="gtt-tab" id="tab-join-label" onclick="switchLobbyTab('join')">Join Match</button>
+    </div>
+    <div class="gtt-tab-body active" id="tab-create">
+      <p style="font-size:.78rem;color:var(--muted2);margin-bottom:14px" id="create-desc">Start a new game and share the code with a friend.</p>
+      <button class="btn-lime" id="btn-create" onclick="createRoom()">Create Room</button>
+    </div>
+    <div class="gtt-tab-body" id="tab-join">
+      <p style="font-size:.78rem;color:var(--muted2);margin-bottom:10px" id="join-desc">Enter the 6-letter room code to join.</p>
+      <input class="gtt-input" id="join-code" maxlength="6" placeholder="ENTER CODE" autocomplete="off">
+      <button class="btn-lime" id="btn-join" onclick="joinRoom()">Join Room</button>
+    </div>
+  </div>
+
+  <!-- How to play -->
+  <div class="gtt-how">
+    <div class="gtt-step">
+      <div class="gtt-step-num">STEP 1</div>
+      <div class="gtt-step-icon">🎯</div>
+      <div class="gtt-step-text" id="step1-text">Pick a cell on the board</div>
+    </div>
+    <div class="gtt-step">
+      <div class="gtt-step-num">STEP 2</div>
+      <div class="gtt-step-icon">🌍</div>
+      <div class="gtt-step-text" id="step2-text">Name a country matching both criteria</div>
+    </div>
+    <div class="gtt-step">
+      <div class="gtt-step-num">STEP 3</div>
+      <div class="gtt-step-icon">🏆</div>
+      <div class="gtt-step-text" id="step3-text">Get 3 in a row to win!</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ WAITING ═══ -->
+<div class="screen" id="screen-waiting">
+  <div class="gtt-header">
+    <div class="gtt-logo">GeoTacToe</div>
+    <button class="back-link" onclick="showScreen('screen-lobby')">← Back</button>
+  </div>
+
+  <!-- Player silhouettes -->
+  <div class="gtt-wait-players">
+    <div class="gtt-wait-player">
+      <div class="gtt-wait-avatar you">👤</div>
+      <div class="gtt-wait-label" id="wait-you-label">You</div>
+    </div>
+    <div class="gtt-wait-vs">VS</div>
+    <div class="gtt-wait-player">
+      <div class="gtt-wait-avatar opp">❓</div>
+      <div class="gtt-wait-label" id="wait-opp-label"><span class="waiting-dot"></span> Waiting...</div>
+    </div>
+  </div>
+
+  <div class="gtt-code-label" id="wait-tap-label">Tap code to copy</div>
+  <div class="gtt-code gtt-code-click" id="wait-code" onclick="copyCode()">------</div>
+
+  <div class="gtt-share-row">
+    <button class="btn-muted" id="btn-copy-code" onclick="copyCode()" style="margin-top:0">📋 Copy Code</button>
+    <button class="btn-muted" id="btn-copy-link" onclick="copyLink()" style="margin-top:0">🔗 Copy Link</button>
+  </div>
+
+  <p style="font-size:.68rem;color:var(--muted);text-align:center;margin-top:16px;line-height:1.5;max-width:280px">
+    <span id="wait-help">Send the code or link to your friend. The game starts automatically when they join.</span>
+  </p>
+</div>
+
+<!-- ═══ GAME ═══ -->
+<div class="screen" id="screen-game">
+  <!-- HUD -->
+  <div class="gtt-hud">
+    <div class="gtt-hud-side">
+      <div class="gtt-hud-emblem" id="p1-emblem"></div>
+      <div class="gtt-hud-info">
+        <span class="gtt-hud-name p1" id="p1-label">YOU</span>
+        <span class="gtt-hud-lvl" id="p1-lvl"></span>
+      </div>
+    </div>
+    <div class="gtt-hud-center">
+      <div class="gtt-hud-score" id="score-display">0 — 0</div>
+      <div class="gtt-hud-round" id="round-dots"></div>
+    </div>
+    <div class="gtt-hud-side right">
+      <div class="gtt-hud-info" style="text-align:right">
+        <span class="gtt-hud-name p2" id="p2-label">OPP</span>
+        <span class="gtt-hud-lvl" id="p2-lvl"></span>
+      </div>
+      <div class="gtt-hud-emblem" id="p2-emblem"></div>
+    </div>
+  </div>
+
+  <div class="gtt-turn-label" id="turn-label">Your turn</div>
+
+  <!-- Timer -->
+  <div class="gtt-timer" id="timer-wrap">
+    <div class="gtt-timer-bar"><div class="gtt-timer-fill" id="timer-fill" style="width:100%"></div></div>
+    <div class="gtt-timer-num" id="timer-num">60</div>
+  </div>
+
+  <!-- Board -->
+  <div class="gtt-board" id="board"></div>
+
+  <!-- Feedback -->
+  <div class="gtt-feedback" id="feedback"></div>
+
+  <!-- Search -->
+  <div class="gtt-search-wrap">
+    <input class="gtt-search" id="country-search" placeholder="Type a country..." disabled autocomplete="off">
+    <div class="gtt-suggest" id="suggest-list"></div>
+  </div>
+
+  <!-- Actions -->
+  <div class="gtt-actions">
+    <button class="btn-rose" id="btn-skip" onclick="skipTurn()">Skip Turn</button>
+    <button class="btn-muted" id="btn-draw" onclick="proposeDraw()">🤝 Offer Draw</button>
+  </div>
+  <div class="gtt-draw-banner" id="draw-banner" style="display:none">
+    <span id="draw-banner-text">Opponent wants to draw this round</span>
+    <button class="btn-lime" style="width:auto;padding:8px 16px;font-size:.8rem" onclick="acceptDraw()">Accept Draw</button>
+  </div>
+</div>
+
+<!-- ═══ ROUND/MATCH OVERLAY ═══ -->
+<div class="confetti-wrap" id="confetti-wrap"></div>
+<div class="gtt-overlay" id="overlay">
+  <div class="gtt-overlay-emoji" id="overlay-emoji">🏆</div>
+  <div class="gtt-overlay-title" id="overlay-title">Round Over</div>
+  <div class="gtt-overlay-sub" id="overlay-sub"></div>
+  <div class="gtt-overlay-score" id="overlay-score">0 - 0</div>
+  <button class="btn-lime" id="overlay-btn" onclick="nextRound()">Next Round</button>
+  <button class="btn-muted" id="overlay-btn2" style="display:none">Back to Lobby</button>
+</div>
+
+<div class="gtt-toast" id="toast"></div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════════════════════
+// GeoTacToe — Frontend
+// ═══════════════════════════════════════════════════════════════════════════════
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// Translations
+// ═══════════════════════════════════════════════════════════════════════════════
+const GTT_LANGS = {
+  en: {
+    title: 'GeoTacToe', subtitle: 'Best of 3 · 2 Players', back: '← Back',
+    tabCreate: 'Create Match', tabJoin: 'Join Match',
+    createDesc: 'Start a new game and share the code with a friend.',
+    createBtn: 'Create Room',
+    joinDesc: 'Enter the 6-letter room code to join.',
+    joinBtn: 'Join Room', joinPlaceholder: 'ENTER CODE',
+    step1: 'Pick a cell on the board', step2: 'Name a country matching both criteria', step3: 'Get 3 in a row to win!',
+    waitYou: 'You', waitOpp: 'Waiting...', waitTap: 'Tap code to copy',
+    waitCopy: 'Copy Code', waitLink: 'Copy Link',
+    waitHelp: 'Send the code or link to your friend.\nThe game starts automatically when they join.',
+    yourTurn: 'Your turn — pick a cell, then name a country',
+    oppTurn: "Opponent's turn...",
+    searchCell: 'First click a cell...', searchCountry: 'Type a country...', searchOpp: "Opponent's turn...",
+    skipBtn: 'Skip Turn', drawOffer: 'Offer Draw', drawOffered: 'Draw offered...',
+    drawAccept: 'Accept Draw', drawBanner: 'Opponent wants to draw this round',
+    wrongMatch: "doesn't match both criteria!", wrongUsed: 'was already used!', wrongNotFound: 'not found!',
+    wrongLost: 'Turn lost.', wrongOpp: 'Opponent guessed wrong — your turn!',
+    wrongPrefix: 'Wrong! ',
+    timeoutYou: "Time's up! Turn lost.", timeoutOpp: "Opponent ran out of time — your turn!",
+    roundWon: 'Round Won!', roundLost: 'Round Lost', roundDraw: 'Draw!',
+    roundWonSub: 'Great geography knowledge!', roundLostSub: 'Better luck next round.',
+    roundDrawSub: 'Nobody got 3 in a row this round.',
+    matchWon: 'Match Won!', matchLost: 'Match Lost',
+    matchWonSub: 'You are the GeoTacToe champion!', matchLostSub: 'Better luck next time.',
+    nextRound: 'Next Round →', rematch: 'Rematch', backLobby: 'Back to Lobby',
+    pickCountry: 'pick country',
+    codeCopied: 'Code copied!', linkCopied: 'Link copied!',
+    connFail: 'Connection failed', oppLeft: 'Opponent disconnected',
+    errNotFound: 'Room not found', errFull: 'Room is full', errCode: 'Invalid code', errValid: 'Enter a valid code',
+    errTurn: 'Not your turn!', errTaken: 'Cell already taken!', errCell: 'Invalid cell!',
+  },
+  de: {
+    title: 'GeoTacToe', subtitle: 'Best of 3 · 2 Spieler', back: '← Zurück',
+    tabCreate: 'Spiel erstellen', tabJoin: 'Spiel beitreten',
+    createDesc: 'Starte ein neues Spiel und teile den Code mit einem Freund.',
+    createBtn: 'Raum erstellen',
+    joinDesc: 'Gib den 6-stelligen Raum-Code ein.',
+    joinBtn: 'Beitreten', joinPlaceholder: 'CODE EINGEBEN',
+    step1: 'Wähle ein Feld', step2: 'Nenne ein Land, das beide Kriterien erfüllt', step3: '3 in einer Reihe gewinnt!',
+    waitYou: 'Du', waitOpp: 'Warte...', waitTap: 'Tippe auf den Code zum Kopieren',
+    waitCopy: 'Code kopieren', waitLink: 'Link kopieren',
+    waitHelp: 'Sende den Code oder Link an deinen Freund.\nDas Spiel startet automatisch.',
+    yourTurn: 'Dein Zug — wähle ein Feld, dann nenne ein Land',
+    oppTurn: 'Gegner ist dran...',
+    searchCell: 'Erst ein Feld wählen...', searchCountry: 'Land eingeben...', searchOpp: 'Gegner ist dran...',
+    skipBtn: 'Überspringen', drawOffer: 'Remis anbieten', drawOffered: 'Remis angeboten...',
+    drawAccept: 'Remis annehmen', drawBanner: 'Gegner möchte Remis',
+    wrongMatch: 'passt nicht zu beiden Kriterien!', wrongUsed: 'wurde schon benutzt!', wrongNotFound: 'nicht gefunden!',
+    wrongLost: 'Zug verloren.', wrongOpp: 'Gegner hat falsch geraten — du bist dran!',
+    wrongPrefix: 'Falsch! ',
+    timeoutYou: 'Zeit abgelaufen! Zug verloren.', timeoutOpp: 'Gegner: Zeit abgelaufen — du bist dran!',
+    roundWon: 'Runde gewonnen!', roundLost: 'Runde verloren', roundDraw: 'Unentschieden!',
+    roundWonSub: 'Tolles Geografie-Wissen!', roundLostSub: 'Nächste Runde besser.',
+    roundDrawSub: 'Niemand hat 3 in einer Reihe geschafft.',
+    matchWon: 'Spiel gewonnen!', matchLost: 'Spiel verloren',
+    matchWonSub: 'Du bist der GeoTacToe-Champion!', matchLostSub: 'Nächstes Mal besser.',
+    nextRound: 'Nächste Runde →', rematch: 'Revanche', backLobby: 'Zurück zur Lobby',
+    pickCountry: 'Land wählen',
+    codeCopied: 'Code kopiert!', linkCopied: 'Link kopiert!',
+    connFail: 'Verbindung fehlgeschlagen', oppLeft: 'Gegner getrennt',
+    errNotFound: 'Raum nicht gefunden', errFull: 'Raum ist voll', errCode: 'Ungültiger Code', errValid: 'Gültigen Code eingeben',
+    errTurn: 'Nicht dein Zug!', errTaken: 'Feld bereits belegt!', errCell: 'Ungültiges Feld!',
+  },
+  fr: {
+    title: 'GeoTacToe', subtitle: 'Best of 3 · 2 Joueurs', back: '← Retour',
+    tabCreate: 'Créer une partie', tabJoin: 'Rejoindre',
+    createDesc: 'Crée une partie et partage le code avec un ami.',
+    createBtn: 'Créer un salon',
+    joinDesc: 'Entre le code à 6 lettres pour rejoindre.',
+    joinBtn: 'Rejoindre', joinPlaceholder: 'ENTRER CODE',
+    step1: 'Choisis une case', step2: 'Nomme un pays qui correspond aux deux critères', step3: '3 en ligne pour gagner !',
+    waitYou: 'Toi', waitOpp: 'En attente...', waitTap: 'Touche le code pour copier',
+    waitCopy: 'Copier le code', waitLink: 'Copier le lien',
+    waitHelp: 'Envoie le code ou le lien à ton ami.\nLa partie démarre automatiquement.',
+    yourTurn: 'Ton tour — choisis une case, puis nomme un pays',
+    oppTurn: "Tour de l'adversaire...",
+    searchCell: "D'abord une case...", searchCountry: 'Chercher un pays...', searchOpp: "Tour de l'adversaire...",
+    skipBtn: 'Passer', drawOffer: 'Proposer nul', drawOffered: 'Nul proposé...',
+    drawAccept: 'Accepter nul', drawBanner: "L'adversaire propose le nul",
+    wrongMatch: 'ne correspond pas aux deux critères !', wrongUsed: 'déjà utilisé !', wrongNotFound: 'introuvable !',
+    wrongLost: 'Tour perdu.', wrongOpp: "L'adversaire s'est trompé — à toi !",
+    wrongPrefix: 'Faux ! ',
+    timeoutYou: 'Temps écoulé ! Tour perdu.', timeoutOpp: "Temps écoulé pour l'adversaire — à toi !",
+    roundWon: 'Manche gagnée !', roundLost: 'Manche perdue', roundDraw: 'Égalité !',
+    roundWonSub: 'Belles connaissances géo !', roundLostSub: 'Meilleure chance au prochain tour.',
+    roundDrawSub: 'Personne n\'a fait 3 en ligne.',
+    matchWon: 'Match gagné !', matchLost: 'Match perdu',
+    matchWonSub: 'Tu es le champion GeoTacToe !', matchLostSub: 'La prochaine sera la bonne.',
+    nextRound: 'Tour suivant →', rematch: 'Revanche', backLobby: 'Retour au lobby',
+    pickCountry: 'choisir pays',
+    codeCopied: 'Code copié !', linkCopied: 'Lien copié !',
+    connFail: 'Connexion échouée', oppLeft: 'Adversaire déconnecté',
+    errNotFound: 'Salon introuvable', errFull: 'Salon complet', errCode: 'Code invalide', errValid: 'Entre un code valide',
+    errTurn: 'Pas ton tour !', errTaken: 'Case déjà prise !', errCell: 'Case invalide !',
+  },
+  es: {
+    title: 'GeoTacToe', subtitle: 'Mejor de 3 · 2 Jugadores', back: '← Volver',
+    tabCreate: 'Crear partida', tabJoin: 'Unirse',
+    createDesc: 'Crea una partida y comparte el código con un amigo.',
+    createBtn: 'Crear sala',
+    joinDesc: 'Introduce el código de 6 letras para unirte.',
+    joinBtn: 'Unirse', joinPlaceholder: 'INGRESAR CÓDIGO',
+    step1: 'Elige una casilla', step2: 'Nombra un país que cumpla ambos criterios', step3: '¡3 en línea para ganar!',
+    waitYou: 'Tú', waitOpp: 'Esperando...', waitTap: 'Toca el código para copiar',
+    waitCopy: 'Copiar código', waitLink: 'Copiar enlace',
+    waitHelp: 'Envía el código o enlace a tu amigo.\nEl juego empieza automáticamente.',
+    yourTurn: 'Tu turno — elige una casilla y nombra un país',
+    oppTurn: 'Turno del oponente...',
+    searchCell: 'Primero elige una casilla...', searchCountry: 'Buscar país...', searchOpp: 'Turno del oponente...',
+    skipBtn: 'Pasar turno', drawOffer: 'Ofrecer empate', drawOffered: 'Empate ofrecido...',
+    drawAccept: 'Aceptar empate', drawBanner: 'El oponente quiere empatar',
+    wrongMatch: '¡no cumple ambos criterios!', wrongUsed: '¡ya fue usado!', wrongNotFound: '¡no encontrado!',
+    wrongLost: 'Turno perdido.', wrongOpp: '¡El oponente falló — tu turno!',
+    wrongPrefix: '¡Error! ',
+    timeoutYou: '¡Tiempo agotado! Turno perdido.', timeoutOpp: '¡Oponente sin tiempo — tu turno!',
+    roundWon: '¡Ronda ganada!', roundLost: 'Ronda perdida', roundDraw: '¡Empate!',
+    roundWonSub: '¡Gran conocimiento geográfico!', roundLostSub: 'Mejor suerte en la siguiente.',
+    roundDrawSub: 'Nadie logró 3 en línea.',
+    matchWon: '¡Partida ganada!', matchLost: 'Partida perdida',
+    matchWonSub: '¡Eres el campeón de GeoTacToe!', matchLostSub: 'Mejor suerte la próxima.',
+    nextRound: 'Siguiente ronda →', rematch: 'Revancha', backLobby: 'Volver al lobby',
+    pickCountry: 'elegir país',
+    codeCopied: '¡Código copiado!', linkCopied: '¡Enlace copiado!',
+    connFail: 'Conexión fallida', oppLeft: 'Oponente desconectado',
+    errNotFound: 'Sala no encontrada', errFull: 'Sala llena', errCode: 'Código inválido', errValid: 'Ingresa un código válido',
+    errTurn: '¡No es tu turno!', errTaken: '¡Casilla ocupada!', errCell: '¡Casilla inválida!',
+  },
+};
+
+// Criteria label translations (override server English labels)
+const CRIT_LABELS = {
+  en: {},
+  de: {
+    'Starts with "S"':'Beginnt mit "S"','Starts with "C"':'Beginnt mit "C"','Starts with a vowel':'Beginnt mit Vokal',
+    'Ends in "-stan"':'Endet auf "-stan"','Ends in "-ia"':'Endet auf "-ia"','4-letter name':'4-Buchstaben-Name',
+    '10+ letter name':'10+ Buchstaben','Contains "Z"':'Enthält "Z"','Two-word name':'Zwei-Wort-Name',
+    'Island nation':'Inselstaat','Landlocked':'Binnenstaat','Touches Pacific':'Am Pazifik',
+    'Touches Atlantic':'Am Atlantik','On the Equator':'Am Äquator','Southern Hemisphere':'Südhalbkugel',
+    'Has a desert':'Hat eine Wüste','Bigger than India':'Größer als Indien','Smaller than Belgium':'Kleiner als Belgien',
+    'Has a monarchy':'Hat Monarchie','Drives on the left':'Linksverkehr','Red in the flag':'Rot in der Flagge',
+    'Blue in the flag':'Blau in der Flagge','Star on the flag':'Stern auf der Flagge','Uses the Euro':'Nutzt den Euro',
+    'French-speaking':'Französischsprachig','Spanish-speaking':'Spanischsprachig','Arabic-speaking':'Arabischsprachig',
+    'Hosted Olympics':'Olympia-Gastgeber','Hosted World Cup':'WM-Gastgeber',
+    '100M+ people':'100M+ Einwohner','Under 1M people':'Unter 1M Einwohner','Lives past 80':'Wird über 80',
+    '90%+ internet':'90%+ Internet','In Europe':'In Europa','In Africa':'In Afrika','In Asia':'In Asien','In the Americas':'In Amerika',
+  },
+  fr: {
+    'Starts with "S"':'Commence par "S"','Starts with "C"':'Commence par "C"','Starts with a vowel':'Commence par voyelle',
+    'Ends in "-stan"':'Finit en "-stan"','Ends in "-ia"':'Finit en "-ia"','4-letter name':'Nom de 4 lettres',
+    '10+ letter name':'10+ lettres','Contains "Z"':'Contient "Z"','Two-word name':'Nom en 2 mots',
+    'Island nation':'Île-nation','Landlocked':'Enclavé','Touches Pacific':'Touche le Pacifique',
+    'Touches Atlantic':"Touche l'Atlantique",'On the Equator':"Sur l'équateur",'Southern Hemisphere':'Hémisphère sud',
+    'Has a desert':'A un désert','Bigger than India':"Plus grand que l'Inde",'Smaller than Belgium':'Plus petit que la Belgique',
+    'Has a monarchy':'A une monarchie','Drives on the left':'Roule à gauche','Red in the flag':'Rouge dans le drapeau',
+    'Blue in the flag':'Bleu dans le drapeau','Star on the flag':'Étoile sur le drapeau','Uses the Euro':"Utilise l'Euro",
+    'French-speaking':'Francophone','Spanish-speaking':'Hispanophone','Arabic-speaking':'Arabophone',
+    'Hosted Olympics':'A accueilli les JO','Hosted World Cup':'A accueilli la Coupe du Monde',
+    '100M+ people':'100M+ habitants','Under 1M people':'Moins de 1M','Lives past 80':'Vit plus de 80 ans',
+    '90%+ internet':'90%+ internet','In Europe':'En Europe','In Africa':'En Afrique','In Asia':'En Asie','In the Americas':'En Amérique',
+  },
+  es: {
+    'Starts with "S"':'Empieza con "S"','Starts with "C"':'Empieza con "C"','Starts with a vowel':'Empieza con vocal',
+    'Ends in "-stan"':'Termina en "-stan"','Ends in "-ia"':'Termina en "-ia"','4-letter name':'Nombre de 4 letras',
+    '10+ letter name':'10+ letras','Contains "Z"':'Contiene "Z"','Two-word name':'Nombre de 2 palabras',
+    'Island nation':'Isla-nación','Landlocked':'Sin costa','Touches Pacific':'Toca el Pacífico',
+    'Touches Atlantic':'Toca el Atlántico','On the Equator':'En el Ecuador','Southern Hemisphere':'Hemisferio sur',
+    'Has a desert':'Tiene desierto','Bigger than India':'Más grande que India','Smaller than Belgium':'Más pequeño que Bélgica',
+    'Has a monarchy':'Tiene monarquía','Drives on the left':'Conduce por la izquierda','Red in the flag':'Rojo en la bandera',
+    'Blue in the flag':'Azul en la bandera','Star on the flag':'Estrella en la bandera','Uses the Euro':'Usa el Euro',
+    'French-speaking':'Francófono','Spanish-speaking':'Hispanohablante','Arabic-speaking':'Arabófono',
+    'Hosted Olympics':'Sede olímpica','Hosted World Cup':'Sede del Mundial',
+    '100M+ people':'100M+ habitantes','Under 1M people':'Menos de 1M','Lives past 80':'Vive más de 80',
+    '90%+ internet':'90%+ internet','In Europe':'En Europa','In Africa':'En África','In Asia':'En Asia','In the Americas':'En América',
+  },
+};
+
+// Load saved language
+const _savedLang = localStorage.getItem('geovs_lang') || 'en';
+const L = GTT_LANGS[_savedLang] || GTT_LANGS.en;
+const _critMap = CRIT_LABELS[_savedLang] || {};
+function tCrit(label) { return _critMap[label] || label; }
+
+// Apply translations to static HTML elements
+function applyGttTranslations() {
+  const m = {
+    'gtt-title': L.title, 'gtt-subtitle': L.subtitle,
+    'tab-create-label': L.tabCreate, 'tab-join-label': L.tabJoin,
+    'create-desc': L.createDesc, 'btn-create': L.createBtn,
+    'join-desc': L.joinDesc, 'btn-join': L.joinBtn,
+    'step1-text': L.step1, 'step2-text': L.step2, 'step3-text': L.step3,
+    'wait-you-label': L.waitYou, 'wait-opp-label': L.waitOpp,
+    'wait-tap-label': L.waitTap,
+    'btn-copy-code': L.waitCopy, 'btn-copy-link': L.waitLink,
+    'wait-help': L.waitHelp,
+    'btn-skip': L.skipBtn, 'btn-draw': L.drawOffer,
+  };
+  for (const [id, text] of Object.entries(m)) {
+    const el = document.getElementById(id);
+    if (el) el.textContent = text;
+  }
+  // Placeholders
+  const joinInput = document.getElementById('join-code');
+  if (joinInput) joinInput.placeholder = L.joinPlaceholder;
+  // Back links
+  document.querySelectorAll('.back-link').forEach(el => el.textContent = L.back);
+  // Logo subtitles
+  document.querySelectorAll('.gtt-logo span').forEach(el => el.textContent = L.subtitle);
+}
+
+const SOCKET_URL = window.location.origin;
+const TURN_TIME = 60;
+let socket = null;
+let currentState = null;
+let selectedCell = null;
+let selectedCountry = null;
+let highlightIdx = -1;
+let timerInterval = null;
+let timerEnd = 0;
+
+// ── Socket.io ────────────────────────────────────────────────────────────────
+function initSocket() {
+  if (socket) return;
+  socket = io(SOCKET_URL, { transports: ['websocket', 'polling'] });
+
+  socket.on('gtt:created', ({ code }) => {
+    document.getElementById('wait-code').textContent = code;
+    showScreen('screen-waiting');
+  });
+
+  socket.on('gtt:start', (state) => {
+    currentState = state;
+    selectedCell = null;
+    selectedCountry = null;
+    document.getElementById('overlay').classList.remove('active');
+    showScreen('screen-game');
+    renderGame();
+    startTimer(state);
+  });
+
+  socket.on('gtt:state', (state) => {
+    currentState = state;
+
+    // Handle wrong answer — show feedback then update
+    if (state.wrongAnswer) {
+      const wasMe = state.wrongAnswer.by === state.myIdx;
+      const msgs = {
+        COUNTRY_NO_MATCH: L.wrongMatch,
+        COUNTRY_USED: L.wrongUsed,
+        COUNTRY_NOT_FOUND: L.wrongNotFound,
+      };
+      const msg = wasMe
+        ? '✗ ' + L.wrongPrefix + (msgs[state.wrongAnswer.error] || '') + ' ' + L.wrongLost
+        : '✗ ' + L.wrongOpp;
+      showFeedback(msg, wasMe ? 'bad' : 'ok');
+      selectedCell = null;
+      selectedCountry = null;
+      renderGame();
+      // Shake all empty cells briefly on wrong answer
+      if (wasMe) {
+        document.querySelectorAll('.gtt-cell:not(.taken)').forEach(c => {
+          c.classList.add('shake');
+          setTimeout(() => c.classList.remove('shake'), 500);
+        });
+      }
+      startTimer(state);
+      return;
+    }
+
+    // Handle timeout
+    if (state.timedOut) {
+      showFeedback(state.isMyTurn ? L.timeoutOpp : L.timeoutYou, state.isMyTurn ? 'ok' : 'bad');
+    }
+
+    if (state.roundWinner !== undefined) {
+      stopTimer();
+      showRoundResult(state);
+    } else {
+      selectedCell = null;
+      selectedCountry = null;
+      renderGame();
+      startTimer(state);
+    }
+  });
+
+  socket.on('gtt:move_error', (err) => {
+    const msgs = { NOT_YOUR_TURN: L.errTurn, CELL_TAKEN: L.errTaken, INVALID_CELL: L.errCell };
+    showFeedback(msgs[err] || err, 'bad');
+  });
+
+  socket.on('gtt:error', (err) => {
+    const msgs = { ROOM_NOT_FOUND: L.errNotFound, ROOM_FULL: L.errFull, INVALID_CODE: L.errCode };
+    showToast(msgs[err] || err);
+  });
+
+  socket.on('gtt:opponent_left', () => showToast(L.oppLeft));
+  socket.on('connect_error', () => showToast(L.connFail));
+}
+
+// ── Room actions ─────────────────────────────────────────────────────────────
+function getMyProfile() {
+  try {
+    const p = window.pGet ? window.pGet() : JSON.parse(localStorage.getItem('geovs_p') || '{}');
+    const ld = window.getLvlData ? window.getLvlData(p.xp || 0) : { cur: { lvl: 1 } };
+    return { username: p.username || 'Player', lvl: ld.cur.lvl, avatar: p.avatar || null };
+  } catch(e) { return { username: 'Player', lvl: 1, avatar: null }; }
+}
+
+function createRoom() {
+  initSocket();
+  const profile = getMyProfile();
+  const send = () => socket.emit('gtt:create', { profile });
+  socket.connected ? send() : socket.once('connect', send);
+}
+
+function joinRoom() {
+  initSocket();
+  const code = document.getElementById('join-code').value.trim().toUpperCase();
+  if (code.length < 4) { showToast(L.errValid); return; }
+  const profile = getMyProfile();
+  const send = () => socket.emit('gtt:join', { code, profile });
+  socket.connected ? send() : socket.once('connect', send);
+}
+
+function switchLobbyTab(tab) {
+  document.querySelectorAll('.gtt-tab').forEach((t, i) => {
+    t.classList.toggle('active', (tab === 'create' ? 0 : 1) === i);
+  });
+  document.getElementById('tab-create').classList.toggle('active', tab === 'create');
+  document.getElementById('tab-join').classList.toggle('active', tab === 'join');
+  if (tab === 'join') setTimeout(() => document.getElementById('join-code')?.focus(), 100);
+}
+
+function copyCode() {
+  const code = document.getElementById('wait-code').textContent;
+  navigator.clipboard.writeText(code).then(() => {
+    showToast(L.codeCopied);
+    // Flash effect on the code element
+    const el = document.getElementById('wait-code');
+    el.style.borderColor = 'var(--lime)';
+    el.style.textShadow = '0 0 30px rgba(200,241,53,.5)';
+    setTimeout(() => { el.style.borderColor = ''; el.style.textShadow = ''; }, 600);
+  });
+}
+function copyLink() {
+  const code = document.getElementById('wait-code').textContent;
+  const url = window.location.origin + '/geotactoe.html?code=' + code;
+  navigator.clipboard.writeText(url).then(() => showToast(L.linkCopied));
+}
+
+// ── Render Game ──────────────────────────────────────────────────────────────
+function renderGame() {
+  const s = currentState;
+  if (!s) return;
+
+  // HUD — profiles & emblems
+  const myProfile = s.profiles?.[s.myIdx] || { username: 'You', lvl: 1 };
+  const oppProfile = s.profiles?.[1 - s.myIdx] || { username: 'Opponent', lvl: 1 };
+  document.getElementById('p1-label').textContent = myProfile.username;
+  document.getElementById('p2-label').textContent = oppProfile.username;
+  document.getElementById('p1-lvl').textContent = 'LVL ' + myProfile.lvl;
+  document.getElementById('p2-lvl').textContent = 'LVL ' + oppProfile.lvl;
+  document.getElementById('score-display').textContent = s.scores[s.myIdx] + ' — ' + s.scores[1 - s.myIdx];
+  // Render emblems with each player's own avatar
+  try {
+    if (window.drawEmblemFor) {
+      document.getElementById('p1-emblem').innerHTML = drawEmblemFor(myProfile.lvl, 0.5, myProfile.avatar);
+      document.getElementById('p2-emblem').innerHTML = drawEmblemFor(oppProfile.lvl, 0.5, oppProfile.avatar);
+    }
+  } catch(e) {}
+  // Round dots
+  const dotsEl = document.getElementById('round-dots');
+  dotsEl.innerHTML = '';
+  for (let i = 1; i <= 3; i++) {
+    const dot = document.createElement('div');
+    dot.className = 'gtt-hud-round-dot';
+    if (i === s.round) dot.classList.add('current');
+    dotsEl.appendChild(dot);
+  }
+
+  // Turn label
+  const tl = document.getElementById('turn-label');
+  if (s.isMyTurn) {
+    tl.textContent = L.yourTurn;
+    tl.className = 'gtt-turn-label my-turn';
+  } else {
+    tl.textContent = L.oppTurn;
+    tl.className = 'gtt-turn-label';
+  }
+
+  // Board
+  const board = document.getElementById('board');
+  const prevCells = [...board.querySelectorAll('.gtt-cell')];
+  board.innerHTML = '';
+  // Corner
+  board.appendChild(el('div', 'gtt-corner', '<div style="font-size:1.4rem;opacity:.35">🌍</div>'));
+  // Col headers with icons
+  s.cols.forEach(c => {
+    const h = document.createElement('div');
+    h.className = 'gtt-col-header';
+    h.innerHTML = `<span class="gtt-header-icon">${c.icon || ''}</span><span class="gtt-header-label">${tCrit(c.label)}</span>`;
+    board.appendChild(h);
+  });
+  // Rows
+  for (let r = 0; r < 3; r++) {
+    const rh = document.createElement('div');
+    rh.className = 'gtt-row-header';
+    rh.innerHTML = `<span class="gtt-header-icon">${s.rows[r].icon || ''}</span><span class="gtt-header-label">${tCrit(s.rows[r].label)}</span>`;
+    board.appendChild(rh);
+    for (let c = 0; c < 3; c++) {
+      const idx = r * 3 + c;
+      const cell = document.createElement('div');
+      const data = s.cells[idx];
+      cell.className = 'gtt-cell';
+      if (data) {
+        cell.classList.add('taken', data.player === 0 ? 'p1' : 'p2');
+        // Check if this cell is newly placed (wasn't there before)
+        const wasEmpty = !prevCells[idx] || !prevCells[idx]?.classList.contains('taken');
+        if (wasEmpty) cell.classList.add('pop-in');
+        cell.innerHTML = `<span class="gtt-cell-flag">${data.flag}</span><span class="gtt-cell-name">${esc(data.country)}</span>`;
+      } else if (selectedCell === idx) {
+        cell.classList.add('selected');
+        cell.innerHTML = `<span class="gtt-cell-empty">${L.pickCountry}</span>`;
+      } else if (!s.isMyTurn) {
+        cell.classList.add('disabled');
+        cell.innerHTML = '<span class="gtt-cell-empty">·</span>';
+      } else {
+        cell.innerHTML = '<span class="gtt-cell-empty">·</span>';
+      }
+      if (!data) {
+        cell.onclick = () => selectCell(idx);
+      }
+      board.appendChild(cell);
+    }
+  }
+
+  // Search state
+  const search = document.getElementById('country-search');
+  const skip = document.getElementById('btn-skip');
+  const drawBtn = document.getElementById('btn-draw');
+  search.disabled = !s.isMyTurn || selectedCell === null;
+  skip.disabled = !s.isMyTurn;
+  if (selectedCell === null && s.isMyTurn) {
+    search.value = '';
+    search.placeholder = L.searchCell;
+  } else if (s.isMyTurn) {
+    search.placeholder = L.searchCountry;
+  } else {
+    search.value = '';
+    search.placeholder = L.searchOpp;
+  }
+
+  // Draw proposal UI
+  const banner = document.getElementById('draw-banner');
+  const bannerText = document.getElementById('draw-banner-text');
+  if (s.drawProposedBy !== null && s.drawProposedBy !== undefined) {
+    if (s.drawProposedBy === s.myIdx) {
+      // I proposed — show waiting state, change button
+      banner.style.display = 'none';
+      drawBtn.textContent = '⏳ ' + L.drawOffered;
+      drawBtn.disabled = true;
+      drawBtn.onclick = () => cancelDraw();
+    } else {
+      banner.style.display = 'flex';
+      bannerText.textContent = '🤝 ' + L.drawBanner;
+      drawBtn.textContent = '🤝 ' + L.drawAccept;
+      drawBtn.disabled = false;
+      drawBtn.onclick = () => acceptDraw();
+    }
+  } else {
+    banner.style.display = 'none';
+    drawBtn.textContent = '🤝 ' + L.drawOffer;
+    drawBtn.disabled = false;
+    drawBtn.onclick = () => proposeDraw();
+  }
+}
+
+function selectCell(idx) {
+  if (!currentState || !currentState.isMyTurn) return;
+  if (currentState.cells[idx]) return;
+  selectedCell = idx;
+  selectedCountry = null;
+  document.getElementById('country-search').value = '';
+  document.getElementById('country-search').disabled = false;
+  document.getElementById('country-search').focus();
+  renderGame();
+}
+
+// ── Country search / autocomplete ────────────────────────────────────────────
+document.getElementById('country-search').addEventListener('input', function() {
+  const q = this.value.trim().toLowerCase();
+  const list = document.getElementById('suggest-list');
+  highlightIdx = -1;
+  if (q.length < 1) { list.classList.remove('open'); return; }
+
+  const used = new Set(currentState?.usedCountries || []);
+  const matches = _countries.filter(c =>
+    c.n.toLowerCase().includes(q) && !used.has(c.n.toLowerCase())
+  ).slice(0, 8);
+
+  if (matches.length === 0) { list.classList.remove('open'); return; }
+
+  list.innerHTML = matches.map((c, i) =>
+    `<div class="gtt-suggest-item" data-i="${i}" onclick="pickCountry('${esc(c.n)}','${c.f}')">`+
+    `<span class="gtt-suggest-flag">${c.f}</span>${esc(c.n)}</div>`
+  ).join('');
+  list.classList.add('open');
+});
+
+document.getElementById('country-search').addEventListener('keydown', function(e) {
+  const list = document.getElementById('suggest-list');
+  const items = list.querySelectorAll('.gtt-suggest-item');
+  if (!items.length) return;
+
+  if (e.key === 'ArrowDown') {
+    e.preventDefault();
+    highlightIdx = Math.min(highlightIdx + 1, items.length - 1);
+    items.forEach((it, i) => it.classList.toggle('highlighted', i === highlightIdx));
+  } else if (e.key === 'ArrowUp') {
+    e.preventDefault();
+    highlightIdx = Math.max(highlightIdx - 1, 0);
+    items.forEach((it, i) => it.classList.toggle('highlighted', i === highlightIdx));
+  } else if (e.key === 'Enter') {
+    e.preventDefault();
+    if (highlightIdx >= 0 && items[highlightIdx]) {
+      items[highlightIdx].click();
+    } else if (items.length === 1) {
+      items[0].click();
+    }
+  }
+});
+
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('.gtt-search-wrap')) {
+    document.getElementById('suggest-list').classList.remove('open');
+  }
+});
+
+function pickCountry(name, flag) {
+  selectedCountry = { n: name, f: flag };
+  document.getElementById('country-search').value = '';
+  document.getElementById('suggest-list').classList.remove('open');
+  // Auto-submit immediately
+  if (selectedCell !== null) {
+    socket.emit('gtt:move', { cellIdx: selectedCell, country: name });
+    selectedCell = null;
+    selectedCountry = null;
+  }
+}
+
+// ── Skip / Draw ──────────────────────────────────────────────────────────────
+function skipTurn() {
+  if (!currentState || !currentState.isMyTurn) return;
+  socket.emit('gtt:skip');
+}
+
+function proposeDraw() {
+  socket.emit('gtt:propose_draw');
+}
+
+function acceptDraw() {
+  // Accepting = also proposing from the other side → backend resolves as draw
+  socket.emit('gtt:propose_draw');
+}
+
+function cancelDraw() {
+  socket.emit('gtt:cancel_draw');
+}
+
+// ── Round result ─────────────────────────────────────────────────────────────
+function showRoundResult(state) {
+  currentState = state;
+  renderGame(); // Update board to show final state
+
+  // Highlight winning line
+  if (state.roundWinner >= 0) {
+    const LINES = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+    for (const [a,b,c] of LINES) {
+      if (state.cells[a] && state.cells[b] && state.cells[c] &&
+          state.cells[a].player === state.cells[b].player &&
+          state.cells[b].player === state.cells[c].player) {
+        setTimeout(() => {
+          const cells = document.querySelectorAll('.gtt-cell');
+          // Offset by 3 for header row elements + 1 for each row header
+          [a,b,c].forEach(idx => {
+            const r = Math.floor(idx / 3);
+            const cl = idx % 3;
+            const boardIdx = (r + 1) * 4 + (cl + 1); // grid position
+            const el = document.getElementById('board').children[boardIdx];
+            if (el) el.classList.add('win-cell');
+          });
+        }, 200);
+      }
+    }
+  }
+
+  stopTimerDanger();
+
+  const ov = document.getElementById('overlay');
+  const emoji = document.getElementById('overlay-emoji');
+  const title = document.getElementById('overlay-title');
+  const sub = document.getElementById('overlay-sub');
+  const score = document.getElementById('overlay-score');
+  const btn = document.getElementById('overlay-btn');
+  const btn2 = document.getElementById('overlay-btn2');
+
+  const isMatchOver = state.matchWinner !== null && state.matchWinner !== undefined;
+
+  if (state.roundWinner === -1) {
+    emoji.textContent = '🤝';
+    title.textContent = L.roundDraw;
+    title.style.color = 'var(--amber)';
+    sub.textContent = L.roundDrawSub;
+  } else {
+    const iWon = state.roundWinner === state.myIdx;
+    emoji.textContent = iWon ? '🎉' : '😤';
+    title.textContent = iWon ? L.roundWon : L.roundLost;
+    title.style.color = iWon ? 'var(--lime)' : 'var(--rose)';
+    sub.textContent = iWon ? L.roundWonSub : L.roundLostSub;
+    if (iWon) spawnConfetti();
+  }
+
+  score.textContent = state.scores[0] + ' — ' + state.scores[1];
+
+  if (isMatchOver) {
+    const iWonMatch = state.matchWinner === state.myIdx;
+    emoji.textContent = iWonMatch ? '🏆' : '💀';
+    title.textContent = iWonMatch ? L.matchWon : L.matchLost;
+    sub.textContent = iWonMatch ? L.matchWonSub : L.matchLostSub;
+    if (iWonMatch) spawnConfetti();
+    btn.textContent = L.rematch;
+    btn.onclick = () => { socket.emit('gtt:rematch'); ov.classList.remove('active'); };
+    btn2.style.display = '';
+    btn2.textContent = L.backLobby;
+    btn2.onclick = () => { ov.classList.remove('active'); showScreen('screen-lobby'); };
+  } else {
+    btn.textContent = L.nextRound;
+    btn.onclick = () => nextRound();
+    btn2.style.display = 'none';
+  }
+
+  setTimeout(() => ov.classList.add('active'), 1200);
+}
+
+function spawnConfetti() {
+  const wrap = document.getElementById('confetti-wrap');
+  wrap.innerHTML = '';
+  const colors = ['#c8f135','#60a5fa','#ff3d6b','#ffb830','#a855f7','#00e5c0','#ff6b35'];
+  for (let i = 0; i < 60; i++) {
+    const c = document.createElement('div');
+    c.className = 'confetti';
+    c.style.left = Math.random() * 100 + '%';
+    c.style.top = -10 + 'px';
+    c.style.background = colors[Math.floor(Math.random() * colors.length)];
+    c.style.animationDelay = (Math.random() * 1.5) + 's';
+    c.style.animationDuration = (2 + Math.random() * 1.5) + 's';
+    c.style.width = (5 + Math.random() * 6) + 'px';
+    c.style.height = (5 + Math.random() * 6) + 'px';
+    wrap.appendChild(c);
+  }
+  setTimeout(() => wrap.innerHTML = '', 4000);
+}
+
+function nextRound() {
+  document.getElementById('overlay').classList.remove('active');
+  socket.emit('gtt:next_round');
+}
+
+// ── Timer ────────────────────────────────────────────────────────────────────
+function startTimer(state) {
+  stopTimer();
+  if (!state || state.status !== 'playing') return;
+  timerEnd = state.turnDeadline || (Date.now() + TURN_TIME * 1000);
+  updateTimerUI();
+  timerInterval = setInterval(() => {
+    const left = Math.max(0, timerEnd - Date.now());
+    updateTimerUI();
+    // If it's my turn and time is up, emit timeout
+    if (left <= 0 && currentState && currentState.isMyTurn) {
+      stopTimer();
+      socket.emit('gtt:timeout');
+    } else if (left <= 0) {
+      stopTimer();
+    }
+  }, 500);
+}
+
+function stopTimer() {
+  if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+}
+
+function updateTimerUI() {
+  const fill = document.getElementById('timer-fill');
+  const num = document.getElementById('timer-num');
+  if (!fill || !num) return;
+  const left = Math.max(0, timerEnd - Date.now());
+  const secs = Math.ceil(left / 1000);
+  const pct = Math.max(0, left / (TURN_TIME * 1000) * 100);
+  fill.style.width = pct + '%';
+  num.textContent = secs;
+  // Color changes
+  fill.className = 'gtt-timer-fill' + (secs <= 10 ? ' danger' : secs <= 20 ? ' warn' : '');
+  num.className = 'gtt-timer-num' + (secs <= 10 ? ' danger' : secs <= 20 ? ' warn' : '');
+  document.body.classList.toggle('timer-danger', secs <= 10 && currentState?.isMyTurn);
+}
+
+function stopTimerDanger() {
+  document.body.classList.remove('timer-danger');
+}
+
+// ── Helpers ──────────────────────────────────────────────────────────────────
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function el(tag, cls, html) {
+  const e = document.createElement(tag);
+  e.className = cls;
+  e.innerHTML = html || '';
+  return e;
+}
+
+function esc(str) {
+  const d = document.createElement('span');
+  d.textContent = str;
+  return d.innerHTML;
+}
+
+function showFeedback(msg, type) {
+  const fb = document.getElementById('feedback');
+  fb.textContent = msg;
+  fb.className = 'gtt-feedback ' + (type || '');
+}
+function clearFeedback() {
+  document.getElementById('feedback').textContent = '';
+  document.getElementById('feedback').className = 'gtt-feedback';
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// ── Country data ─────────────────────────────────────────────────────────────
+let _countries = [];
+(async function loadCountries() {
+  try {
+    const res = await fetch('/api/geotactoe/countries');
+    if (res.ok) _countries = await res.json();
+  } catch {}
+})();
+
+// ── Auto-join from URL ──────────────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded', () => {
+  applyGttTranslations();
+
+  const params = new URLSearchParams(window.location.search);
+  const code = params.get('code');
+  if (code) {
+    document.getElementById('join-code').value = code.toUpperCase();
+    initSocket();
+    const send = () => socket.emit('gtt:join', { code: code.toUpperCase() });
+    socket.connected ? send() : socket.once('connect', send);
+  }
+});
+</script>
+</body>
+</html>

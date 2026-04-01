@@ -326,7 +326,7 @@
   };
   // ─────────────────────────────────────────────────────────────────────
 
-  const BACKEND = 'http://localhost:3000'; // ← nach Deploy: https://dein-backend.railway.app
+  const BACKEND = window.location.origin; // Uses current origin; override for production deploy
 
   const app  = initializeApp(firebaseConfig);
   const auth = getAuth(app);

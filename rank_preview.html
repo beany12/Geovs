@@ -445,8 +445,8 @@ function makeCard(rank) {
   // Inject real avatar via AvatarEngine if available, else fallback placeholder
   let avG = avatar(); // placeholder
   if (window.AvatarEngine) {
-    const face = window.AvatarEngine.renderAvatarFace(AV);
-    avG = `<g transform="translate(75,64) scale(0.52)"><circle cx="0" cy="4" r="44" fill="rgba(13,13,20,.72)"/>${face}</g>`;
+    const bust = window.AvatarEngine.renderBustSilhouette(AV, t);
+    avG = `<g transform="translate(75,68) scale(0.58)">${bust}</g>`;
   }
 
   const content = `${base}<circle cx="75" cy="64" r="21.5" fill="#1a2030" clip-path="url(#${clipId})"/><g clip-path="url(#${clipId})">${avG}</g>`;
@@ -476,10 +476,9 @@ function updateAvPreview() {
   if (!window.AvatarEngine) return;
   const el = document.getElementById('av-preview');
   if (!el) return;
-  const face = window.AvatarEngine.renderAvatarFace(AV);
-  el.innerHTML = `<svg viewBox="-50 -55 100 110" width="42" height="42">
-    <circle cx="0" cy="4" r="48" fill="#1a2030"/>
-    ${face}
+  const bust = window.AvatarEngine.renderBustSilhouette(AV);
+  el.innerHTML = `<svg viewBox="-40 -52 80 100" width="42" height="42" style="border-radius:50%;overflow:hidden">
+    ${bust}
   </svg>`;
 }
 

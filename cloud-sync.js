@@ -44,6 +44,26 @@ function lsSet(key, val) {
   try { localStorage.setItem(key, typeof val === 'string' ? val : JSON.stringify(val)); } catch {}
 }
 
+// Sanitize untrusted strings from Firestore to prevent XSS when rendered
+function _sanitize(str) {
+  if (typeof str !== 'string') return '';
+  const el = document.createElement('span');
+  el.textContent = str;
+  return el.innerHTML;
+}
+
+// Validate avatar config — only allow known numeric keys within expected ranges
+function _sanitizeAvatar(av) {
+  if (!av || typeof av !== 'object') return null;
+  const LIMITS = { skin: 5, hair: 5, hairColor: 6, eyes: 4, mouth: 4, beard: 4 };
+  const clean = {};
+  for (const [key, max] of Object.entries(LIMITS)) {
+    const v = parseInt(av[key]);
+    clean[key] = (Number.isFinite(v) && v >= 0 && v < max) ? v : 0;
+  }
+  return clean;
+}
+
 // ── Snapshot aller lokalen Daten ───────────────────────────────────────────
 function buildSnapshot() {
   const p = lsGet(LS.profile, {});
@@ -166,10 +186,10 @@ function watchLeaderboard(onUpdate) {
     const entries = snapshot.docs.map((d, i) => ({
       rank:     i + 1,
       uid:      d.id,
-      username: d.data().username || 'Anonym',
-      xp:       d.data().xp       || 0,
-      avatar:   d.data().avatar   || null,
-      hlHS:     d.data().highscores?.hl || 0,
+      username: _sanitize(d.data().username || 'Anonym').slice(0, 30),
+      xp:       Math.max(0, parseInt(d.data().xp) || 0),
+      avatar:   _sanitizeAvatar(d.data().avatar),
+      hlHS:     Math.max(0, parseInt(d.data().highscores?.hl) || 0),
     }));
     onUpdate(entries);
   }, (err) => {

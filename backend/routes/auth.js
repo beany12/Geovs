@@ -30,6 +30,13 @@ function isValidPassword(pw) {
   return typeof pw === 'string' && pw.length >= 8;
 }
 
+// DisplayName sanitisieren — nur Alphanumerisch, Leerzeichen, Bindestriche; max 30 Zeichen
+function sanitizeDisplayName(name) {
+  if (typeof name !== 'string') return undefined;
+  const clean = name.trim().replace(/[^a-zA-Z0-9À-ÿ \-_.]/g, '').slice(0, 30);
+  return clean || undefined;
+}
+
 // ── POST /api/auth/signup ─────────────────────────────────────────────────
 // Legt einen neuen Firebase-User an und sendet eine Bestätigungs-E-Mail.
 router.post('/signup', signupLimiter, async (req, res) => {
@@ -48,22 +55,21 @@ router.post('/signup', signupLimiter, async (req, res) => {
     const userRecord = await admin.auth().createUser({
       email: email.trim().toLowerCase(),
       password,
-      displayName: displayName?.trim() || undefined,
+      displayName: sanitizeDisplayName(displayName),
       emailVerified: false,
     });
 
-    // Bestätigungs-E-Mail-Link generieren (wird vom Frontend versendet)
-    const verificationLink = await admin.auth().generateEmailVerificationLink(
+    // Bestätigungs-E-Mail-Link generieren
+    // In Produktion: per E-Mail senden (z.B. via SendGrid/Resend), niemals an Client zurückgeben
+    await admin.auth().generateEmailVerificationLink(
       email.trim().toLowerCase()
     );
 
-    console.log(`[Auth] User registriert: ${userRecord.uid} (${userRecord.email})`);
+    console.log(`[Auth] User registriert: ${userRecord.uid}`);
 
     res.status(201).json({
       message: 'Account erstellt — bitte E-Mail bestätigen',
       uid: userRecord.uid,
-      email: userRecord.email,
-      verificationLink, // nur zu Testzwecken zurückgeben; in Produktion per E-Mail senden
     });
   } catch (err) {
     // Firebase-Fehlercodes in lesbare Meldungen übersetzen
@@ -132,8 +138,7 @@ router.post('/reset-password', resetLimiter, async (req, res) => {
     );
 
     // In Produktion: Link per E-Mail senden (z.B. via SendGrid/Resend)
-    // Hier loggen wir ihn nur für Entwicklung
-    console.log(`[Auth] Reset-Link für ${email}:`, resetLink);
+    console.log(`[Auth] Reset-Link generiert`);
 
     // Immer dieselbe Antwort — verhindert, dass man prüfen kann ob eine E-Mail existiert
     res.json({ message: 'Falls ein Account existiert, wurde ein Reset-Link gesendet' });

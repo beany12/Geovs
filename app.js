@@ -30,13 +30,13 @@ const LANGS = {
     eyebrow:'World Knowledge Arena',
     homeSub:'Test your knowledge of the world\'s nations across economics, geography, health and more.',
     m1name:'Higher or Lower',m1desc:'Compare two nations head-to-head. Which has the higher value? Race for the longest streak.',
-    m2name:'Sort Challenge',m2desc:'Four countries, one stat. Drag them into the correct order from highest to lowest.',
+    m2name:'GeoTacToe',m2desc:'2-player tic-tac-toe — name countries that match both criteria to claim cells.',
     m3name:'Guess the Country',m3desc:'One clue at a time — guess the country. Up to 8 clues, but wrong guesses cost you.',
     m4name:'Capitals Quiz',m4desc:'Name the capital — or pick the right country. Choose region and question count.',
     m5name:'Flags Quiz',m5desc:'See the flag, name the country. Multiple choice or type your answer. Choose region and rounds.',
     capBadge:'🏛️ Capitals',flgBadge:'🚩 Flags',
     playAgain:'Play Again',homeLbl:'← Home',copied:'Copied ✓',
-    badgeHL:'Higher or Lower',badgeSort:'Sort Challenge',badgeDaily:'Guess the Country',
+    badgeHL:'Higher or Lower',badgeDaily:'Guess the Country',
     gtcBadge:'🌍 Guess the Country',
     capMode:'GAME MODE',capRegion:'REGION',capQuestions:'QUESTIONS',capStart:'Start Quiz →',capMC:'🔤 Multiple Choice',capType:'⌨️ Type Answer',
     flgMode:'GAME MODE',flgRegion:'REGION',flgQuestions:'QUESTIONS',flgStart:'Start Quiz →',flgFTC:'Flag → Country',flgCTF:'Country → Flag',flgQFTC:'Which country does this flag belong to?',flgQCTF:'Which flag belongs to',
@@ -51,11 +51,9 @@ const LANGS = {
     bdrHintMsg:(name)=>`💡 Try: ${name}`,bdrNoHints:'No hints left!',bdrTimesUp:'⏱ Time\'s up!',
     capRegs:{all:'🌍 All',europe:'🌍 Europe',asia:'🌏 Asia',africa:'🌍 Africa',americas:'🌎 Americas',oceania:'🌊 Oceania'},gtcCluesLbl:'CLUES REVEALED',gtcGuessLbl:'YOUR GUESS',gtcBtn:'Guess →',gtcPlaceholder:'Type a country name...',
     higher:'▲ Higher',lower:'▼ Lower',
-    sortH:'Sort: <span style="color:var(--lime)">highest</span> → <span style="color:var(--rose)">lowest</span>',
-    sortHint:'Drag to reorder · then confirm',sortConfirm:'Confirm ✓',
     next:'Next →',results:'See Results 🏆',
     themeLabel:'Today\'s Theme',questionsLbl:'Questions',
-    chTitle:'Daily Geography Quiz',chSub:'8 questions · New challenge every day',
+    chTitle:'Guess the Country of the Day',chSub:'1 mystery country · 8 clues · Fewer clues = more XP',
     points:'POINTS',correct:'Correct',bestStreak:'Best Streak',accuracy:'Accuracy',
     shareTitle:'Share your result!',playCta:'Play →',
     streakLbl:'day streak — keep it going!',
@@ -66,11 +64,11 @@ const LANGS = {
     streak_msg:(n)=>`🔥 ${n}x Streak!`,
     pts:(n)=>`+${n} pts`,
     perfect:'🎯 Perfect Order!',
-    sort_partial:(n)=>`✓ ${n}/4 correct positions!`,
-    sort_zero:'✗ 0 correct positions',
     msgs:[[90,'🏆','Legend!','You\'re a geography master. Absolutely outstanding.'],[70,'🌟','Excellent!','Your world knowledge is impressive. Keep it up!'],[50,'💪','Good Job!','Solid performance. Keep playing to reach elite level.'],[25,'📚','Keep Going!','Geography is a journey. You\'re on the right path.'],[0,'🌱','Just Starting','Everyone starts somewhere. Play again to improve!']],
-    dbTitle:'Today\'s Daily Challenge is ready!',dbSub:'8 questions · Shareable results · New every day',
-    dbDone:(c,s)=>`Today's Challenge — Completed ✓ · ${c}/8 correct · ${s} pts`,
+    sectionSolo:'👤 Single Player',sectionMulti:'👥 Multiplayer',
+    dbTitle:'Today\'s Country is ready!',dbSub:'1 mystery country · 8 clues · Guess it!',
+    dbHow:'Clues reveal one by one — fewer clues = more XP. Can you guess it in 1?',
+    dbDone:(c,s)=>c>0?`Today's Country — Guessed ✓ · ${s} XP`:`Today's Country — Not guessed · Try tomorrow!`,
     categories:['🌍 All','👥 Population','💰 Economy','🗺️ Geography','🏥 Health','📚 Society','🌱 Environment','🌟 Development'],
     continents:['🌍 All Regions','🌍 Africa','🌏 Asia','🌍 Europe','🌎 N. America','🌎 S. America','🌏 Oceania'],
     themes:[
@@ -98,13 +96,13 @@ const LANGS = {
     eyebrow:'Welt-Wissens-Arena',
     homeSub:'Teste dein Wissen über die Länder der Welt — Wirtschaft, Geografie, Gesundheit und mehr.',
     m1name:'Höher oder Niedriger',m1desc:'Vergleiche zwei Länder direkt. Welches hat den höheren Wert? Baue die längste Serie auf.',
-    m2name:'Sortier-Challenge',m2desc:'Vier Länder, eine Statistik. Ziehe sie in die richtige Reihenfolge von hoch nach niedrig.',
+    m2name:'GeoTacToe',m2desc:'2-Spieler Tic-Tac-Toe — nenne Länder, die beide Kriterien erfüllen, um Felder zu erobern.',
     m3name:'Land erraten',m3desc:'Ein Hinweis nach dem anderen — errate das Land. Bis zu 8 Hinweise, aber falsche Antworten kosten dich.',
     m4name:'Hauptstadt-Quiz',m4desc:'Nenne die Hauptstadt — oder wähle das richtige Land. Wähle Region und Fragenanzahl.',
     m5name:'Flaggen-Quiz',m5desc:'Sieh die Flagge, nenne das Land. Multiple Choice oder selbst tippen. Wähle Region und Runden.',
     capBadge:'🏛️ Hauptstädte',flgBadge:'🚩 Flaggen',
     playAgain:'Nochmal spielen',homeLbl:'← Startseite',copied:'Kopiert ✓',
-    badgeHL:'Höher oder Niedriger',badgeSort:'Sortier-Challenge',badgeDaily:'Land erraten',
+    badgeHL:'Höher oder Niedriger',badgeDaily:'Land erraten',
     gtcBadge:'🌍 Land erraten',
     capMode:'SPIELMODUS',capRegion:'REGION',capQuestions:'FRAGEN',capStart:'Quiz starten →',capMC:'🔤 Multiple Choice',capType:'⌨️ Eingabe',
     flgMode:'SPIELMODUS',flgRegion:'REGION',flgQuestions:'FRAGEN',flgStart:'Quiz starten →',flgFTC:'Flagge → Land',flgCTF:'Land → Flagge',flgQFTC:'Zu welchem Land gehört diese Flagge?',flgQCTF:'Welche Flagge gehört zu',
@@ -119,11 +117,9 @@ const LANGS = {
     bdrHintMsg:(name)=>`💡 Versuch: ${name}`,bdrNoHints:'Keine Hinweise mehr!',bdrTimesUp:'⏱ Zeit abgelaufen!',
     capRegs:{all:'🌍 Alle',europe:'🌍 Europa',asia:'🌏 Asien',africa:'🌍 Afrika',americas:'🌎 Amerika',oceania:'🌊 Ozeanien'},gtcCluesLbl:'HINWEISE ENTHÜLLT',gtcGuessLbl:'DEIN TIPP',gtcBtn:'Raten →',gtcPlaceholder:'Ländernamen eingeben...',
     higher:'▲ Höher',lower:'▼ Niedriger',
-    sortH:'Sortiere: <span style="color:var(--lime)">höchste</span> → <span style="color:var(--rose)">niedrigste</span>',
-    sortHint:'Ziehen zum Sortieren · dann bestätigen',sortConfirm:'Bestätigen ✓',
     next:'Weiter →',results:'Ergebnis sehen 🏆',
     themeLabel:'Heutiges Thema',questionsLbl:'Fragen',
-    chTitle:'Tägliches Geografie-Quiz',chSub:'8 Fragen · Täglich neues Quiz',
+    chTitle:'Land des Tages erraten',chSub:'1 mysteriöses Land · 8 Hinweise · Weniger = mehr XP',
     points:'PUNKTE',correct:'Richtig',bestStreak:'Beste Serie',accuracy:'Genauigkeit',
     shareTitle:'Teile dein Ergebnis!',playCta:'Spielen →',
     streakLbl:'Tage am Stück — weiter so!',
@@ -132,10 +128,12 @@ const LANGS = {
     whatsIs:'Was ist',
     correct_msg:'✓ Richtig!',wrong_msg:'✗ Falsch!',
     streak_msg:(n)=>`🔥 ${n}x Serie!`,pts:(n)=>`+${n} Pkt`,
-    perfect:'🎯 Perfekte Reihenfolge!',sort_partial:(n)=>`✓ ${n}/4 richtig!`,sort_zero:'✗ 0 richtige Positionen',
+    perfect:'🎯 Perfekte Reihenfolge!',
     msgs:[[90,'🏆','Legende!','Du bist ein Geografie-Meister!'],[70,'🌟','Ausgezeichnet!','Dein Weltwissen ist beeindruckend!'],[50,'💪','Gut gemacht!','Solide Leistung. Bleib dabei!'],[25,'📚','Weiter so!','Geografie ist eine Reise. Du bist auf dem richtigen Weg.'],[0,'🌱','Guter Anfang','Jeder fängt irgendwo an. Spiel nochmal!']],
-    dbTitle:'Die heutige Tages-Challenge wartet!',dbSub:'8 Fragen · Teilbares Ergebnis · Täglich neu',
-    dbDone:(c,s)=>`Tages-Challenge abgeschlossen ✓ · ${c}/8 richtig · ${s} Pkt`,
+    sectionSolo:'👤 Einzelspieler',sectionMulti:'👥 Mehrspieler',
+    dbTitle:'Das Land des Tages wartet!',dbSub:'1 mysteriöses Land · 8 Hinweise · Errate es!',
+    dbHow:'Hinweise werden einzeln enthüllt — weniger Hinweise = mehr XP. Schaffst du es mit nur 1?',
+    dbDone:(c,s)=>c>0?`Land des Tages — Erraten ✓ · ${s} XP`:`Land des Tages — Nicht erraten`,
     categories:['🌍 Alle','👥 Bevölkerung','💰 Wirtschaft','🗺️ Geografie','🏥 Gesundheit','📚 Gesellschaft','🌱 Umwelt','🌟 Entwicklung'],
     continents:['🌍 Alle Regionen','🌍 Afrika','🌏 Asien','🌍 Europa','🌎 N. Amerika','🌎 S. Amerika','🌏 Ozeanien'],
     themes:[
@@ -163,13 +161,13 @@ const LANGS = {
     eyebrow:'Arène de Connaissance Mondiale',
     homeSub:'Testez vos connaissances sur les pays du monde — économie, géographie, santé et plus.',
     m1name:'Plus ou Moins',m1desc:'Comparez deux pays. Lequel a la valeur la plus élevée? Visez la plus longue série.',
-    m2name:'Défi Classement',m2desc:'Quatre pays, une stat. Glissez-les dans le bon ordre du plus haut au plus bas.',
+    m2name:'GeoTacToe',m2desc:'Tic-tac-toe à 2 joueurs — nommez des pays qui correspondent aux deux critères.',
     m3name:'Devinez le Pays',m3desc:'Un indice à la fois — devinez le pays. Jusqu\'à 8 indices, mais les mauvaises réponses vous coûtent.',
     m4name:'Quiz Capitales',m4desc:'Nommez la capitale — ou choisissez le bon pays. Choisissez la région et le nombre de questions.',
     m5name:'Quiz Drapeaux',m5desc:'Voyez le drapeau, nommez le pays. Choix multiples ou saisie libre. Choisissez région et tours.',
     capBadge:'🏛️ Capitales',flgBadge:'🚩 Drapeaux',
     playAgain:'Rejouer',homeLbl:'← Accueil',copied:'Copié ✓',
-    badgeHL:'Plus ou Moins',badgeSort:'Défi Classement',badgeDaily:'Devinez le Pays',
+    badgeHL:'Plus ou Moins',badgeDaily:'Devinez le Pays',
     gtcBadge:'🌍 Devinez le Pays',
     capMode:'MODE DE JEU',capRegion:'RÉGION',capQuestions:'QUESTIONS',capStart:'Commencer →',capMC:'🔤 Choix multiple',capType:'⌨️ Saisie libre',
     flgMode:'MODE DE JEU',flgRegion:'RÉGION',flgQuestions:'QUESTIONS',flgStart:'Commencer →',flgFTC:'Drapeau → Pays',flgCTF:'Pays → Drapeau',flgQFTC:'À quel pays appartient ce drapeau?',flgQCTF:'Quel drapeau appartient à',
@@ -184,11 +182,9 @@ const LANGS = {
     bdrHintMsg:(name)=>`💡 Essayez: ${name}`,bdrNoHints:'Plus d\'indices!',bdrTimesUp:'⏱ Temps écoulé!',
     capRegs:{all:'🌍 Tous',europe:'🌍 Europe',asia:'🌏 Asie',africa:'🌍 Afrique',americas:'🌎 Amériques',oceania:'🌊 Océanie'},gtcCluesLbl:'INDICES RÉVÉLÉS',gtcGuessLbl:'VOTRE RÉPONSE',gtcBtn:'Deviner →',gtcPlaceholder:'Tapez un nom de pays...',
     higher:'▲ Plus',lower:'▼ Moins',
-    sortH:'Classer: <span style="color:var(--lime)">plus haut</span> → <span style="color:var(--rose)">plus bas</span>',
-    sortHint:'Glisser pour trier · puis confirmer',sortConfirm:'Confirmer ✓',
     next:'Suivant →',results:'Voir les résultats 🏆',
     themeLabel:"Thème d'aujourd'hui",questionsLbl:'Questions',
-    chTitle:'Quiz Géographie Quotidien',chSub:'8 questions · Nouveau défi chaque jour',
+    chTitle:'Devine le pays du jour',chSub:'1 pays mystère · 8 indices · Moins = plus de XP',
     points:'POINTS',correct:'Correct',bestStreak:'Meilleure Série',accuracy:'Précision',
     shareTitle:'Partagez votre résultat!',playCta:'Jouer →',
     streakLbl:'jours de suite — continuez!',
@@ -197,10 +193,12 @@ const LANGS = {
     whatsIs:'Quel est',
     correct_msg:'✓ Correct!',wrong_msg:'✗ Incorrect!',
     streak_msg:(n)=>`🔥 Série de ${n}!`,pts:(n)=>`+${n} pts`,
-    perfect:'🎯 Ordre Parfait!',sort_partial:(n)=>`✓ ${n}/4 bonne(s) position(s)!`,sort_zero:'✗ 0 bonne position',
+    perfect:'🎯 Ordre Parfait!',
     msgs:[[90,'🏆','Légende!','Vous êtes un maître de la géographie!'],[70,'🌟','Excellent!','Vos connaissances mondiales sont impressionnantes!'],[50,'💪','Bien joué!','Performance solide. Continuez!'],[25,'📚','Continuez!','La géographie est un voyage.'],[0,'🌱','Débutant','Tout le monde commence quelque part!']],
-    dbTitle:"Le défi quotidien d'aujourd'hui est prêt!",dbSub:'8 questions · Résultats partageables · Nouveau chaque jour',
-    dbDone:(c,s)=>`Défi terminé ✓ · ${c}/8 correct · ${s} pts`,
+    sectionSolo:'👤 Solo',sectionMulti:'👥 Multijoueur',
+    dbTitle:'Le pays du jour est prêt !',dbSub:'1 pays mystère · 8 indices · Devine-le !',
+    dbHow:'Les indices apparaissent un par un — moins d\'indices = plus de XP. Tu peux le deviner en 1 ?',
+    dbDone:(c,s)=>c>0?`Pays du jour — Deviné ✓ · ${s} XP`:`Pays du jour — Pas deviné`,
     categories:['🌍 Tous','👥 Population','💰 Économie','🗺️ Géographie','🏥 Santé','📚 Société','🌱 Environnement','🌟 Développement'],
     continents:['🌍 Toutes Régions','🌍 Afrique','🌏 Asie','🌍 Europe','🌎 N. Amérique','🌎 S. Amérique','🌏 Océanie'],
     themes:[
@@ -228,13 +226,13 @@ const LANGS = {
     eyebrow:'Arena del Conocimiento Mundial',
     homeSub:'Pon a prueba tu conocimiento de las naciones del mundo — economía, geografía, salud y más.',
     m1name:'Mayor o Menor',m1desc:'Compara dos naciones. ¿Cuál tiene el valor más alto? Construye la racha más larga.',
-    m2name:'Desafío de Orden',m2desc:'Cuatro países, una estadística. Arrástralos en orden correcto de mayor a menor.',
+    m2name:'GeoTacToe',m2desc:'Tic-tac-toe para 2 — nombra países que cumplan ambos criterios para ganar casillas.',
     m3name:'Adivina el País',m3desc:'Una pista a la vez — adivina el país. Hasta 8 pistas, pero las respuestas incorrectas te cuestan.',
     m4name:'Quiz Capitales',m4desc:'Nombra la capital — o elige el país correcto. Elige región y número de preguntas.',
     m5name:'Quiz Banderas',m5desc:'Mira la bandera, nombra el país. Opción múltiple o escribe tu respuesta. Elige región y rondas.',
     capBadge:'🏛️ Capitales',flgBadge:'🚩 Banderas',
     playAgain:'Jugar de nuevo',homeLbl:'← Inicio',copied:'Copiado ✓',
-    badgeHL:'Mayor o Menor',badgeSort:'Desafío de Orden',badgeDaily:'Adivina el País',
+    badgeHL:'Mayor o Menor',badgeDaily:'Adivina el País',
     gtcBadge:'🌍 Adivina el País',
     capMode:'MODO DE JUEGO',capRegion:'REGIÓN',capQuestions:'PREGUNTAS',capStart:'Iniciar →',capMC:'🔤 Opción múltiple',capType:'⌨️ Escribir',
     flgMode:'MODO DE JUEGO',flgRegion:'REGIÓN',flgQuestions:'PREGUNTAS',flgStart:'Iniciar →',flgFTC:'Bandera → País',flgCTF:'País → Bandera',flgQFTC:'¿A qué país pertenece esta bandera?',flgQCTF:'¿Qué bandera pertenece a',
@@ -249,11 +247,9 @@ const LANGS = {
     bdrHintMsg:(name)=>`💡 Prueba: ${name}`,bdrNoHints:'¡Sin pistas!',bdrTimesUp:'⏱ ¡Se acabó el tiempo!',
     capRegs:{all:'🌍 Todo',europe:'🌍 Europa',asia:'🌏 Asia',africa:'🌍 África',americas:'🌎 Américas',oceania:'🌊 Oceanía'},gtcCluesLbl:'PISTAS REVELADAS',gtcGuessLbl:'TU RESPUESTA',gtcBtn:'Adivinar →',gtcPlaceholder:'Escribe un nombre de país...',
     higher:'▲ Mayor',lower:'▼ Menor',
-    sortH:'Ordenar: <span style="color:var(--lime)">mayor</span> → <span style="color:var(--rose)">menor</span>',
-    sortHint:'Arrastrar para ordenar · luego confirmar',sortConfirm:'Confirmar ✓',
     next:'Siguiente →',results:'Ver Resultados 🏆',
     themeLabel:'Tema de Hoy',questionsLbl:'Preguntas',
-    chTitle:'Quiz de Geografía Diario',chSub:'8 preguntas · Nuevo desafío cada día',
+    chTitle:'Adivina el país del día',chSub:'1 país misterioso · 8 pistas · Menos = más XP',
     points:'PUNTOS',correct:'Correcto',bestStreak:'Mejor Racha',accuracy:'Precisión',
     shareTitle:'¡Comparte tu resultado!',playCta:'Jugar →',
     streakLbl:'días seguidos — ¡sigue así!',
@@ -262,10 +258,12 @@ const LANGS = {
     whatsIs:'¿Cuál es',
     correct_msg:'✓ ¡Correcto!',wrong_msg:'✗ ¡Incorrecto!',
     streak_msg:(n)=>`🔥 ¡Racha de ${n}!`,pts:(n)=>`+${n} pts`,
-    perfect:'🎯 ¡Orden Perfecto!',sort_partial:(n)=>`✓ ¡${n}/4 posiciones correctas!`,sort_zero:'✗ 0 posiciones correctas',
+    perfect:'🎯 ¡Orden Perfecto!',
     msgs:[[90,'🏆','¡Leyenda!','Eres un maestro de la geografía.'],[70,'🌟','¡Excelente!','Tu conocimiento mundial es impresionante.'],[50,'💪','¡Bien hecho!','Sólida actuación. ¡Sigue jugando!'],[25,'📚','¡Continúa!','La geografía es un viaje.'],[0,'🌱','Empezando','¡Todo el mundo empieza en algún lugar!']],
-    dbTitle:'¡El desafío diario de hoy está listo!',dbSub:'8 preguntas · Resultados compartibles · Nuevo cada día',
-    dbDone:(c,s)=>`Desafío completado ✓ · ${c}/8 correctas · ${s} pts`,
+    sectionSolo:'👤 Un jugador',sectionMulti:'👥 Multijugador',
+    dbTitle:'¡El país del día está listo!',dbSub:'1 país misterioso · 8 pistas · ¡Adivínalo!',
+    dbHow:'Las pistas aparecen una a una — menos pistas = más XP. ¿Puedes adivinarlo con solo 1?',
+    dbDone:(c,s)=>c>0?`País del día — Adivinado ✓ · ${s} XP`:`País del día — No adivinado`,
     categories:['🌍 Todo','👥 Población','💰 Economía','🗺️ Geografía','🏥 Salud','📚 Sociedad','🌱 Medio Ambiente','🌟 Desarrollo'],
     continents:['🌍 Todas las Regiones','🌍 África','🌏 Asia','🌍 Europa','🌎 N. América','🌎 S. América','🌏 Oceanía'],
     themes:[
@@ -322,12 +320,11 @@ function applyTranslations() {
     't-m1-label':'m1label','t-m1-name':'m1name','t-m1-desc':'m1desc',
     't-m2-label':'m2label','t-m2-name':'m2name','t-m2-desc':'m2desc',
     't-m3-label':'m3label',
-    't-badge-hl':'badgeHL','t-badge-sort':'badgeSort',
+    't-badge-hl':'badgeHL',
     't-gtc-badge':'gtcBadge','t-gtc-clues-lbl':'gtcCluesLbl','t-gtc-guess-lbl':'gtcGuessLbl','t-gtc-btn':'gtcBtn',
     't-m3-name':'m3name','t-m3-desc':'m3desc',
     't-m4-name':'m4name','t-m4-desc':'m4desc',
     't-m5-name':'m5name','t-m5-desc':'m5desc',
-    't-sort-hint':'sortHint',
     't-theme-label':'themeLabel','t-questions-lbl':'questionsLbl',
     't-ch-title':'chTitle','t-ch-sub':'chSub',
     't-points-lbl':'points','t-os-correct':'correct','t-os-streak':'bestStreak','t-os-acc':'accuracy',
@@ -336,30 +333,29 @@ function applyTranslations() {
     't-stat-countries':'statCountries','t-stat-metrics':'statMetrics',
     't-stat-modes':'statModes','t-stat-replay':'statReplay',
     't-m6-name':'bdrName','t-m6-desc':'bdrDesc',
+    't-section-solo':'sectionSolo','t-section-multi':'sectionMulti',
   };
   for(const [id, key] of Object.entries(ids)) {
     const el = document.getElementById(id);
     if(el && T[key] !== undefined) {
-      if(['t-sort-h'].includes(id)) el.innerHTML = T[key];
-      else el.textContent = T[key];
+      el.textContent = T[key];
     }
   }
-  // Sort header uses innerHTML
-  const sortH = document.getElementById('t-sort-h');
-  if(sortH) sortH.innerHTML = T.sortH;
-  // Sort confirm
-  const sc = document.getElementById('sort-submit');
-  if(sc) sc.textContent = T.sortConfirm;
   // Next buttons
-  document.getElementById('hl-next').textContent = T.next;
-  document.getElementById('sort-next').textContent = T.next;
-  document.getElementById('ch-next').textContent = T.next;
+  const hlN=document.getElementById('hl-next'); if(hlN) hlN.textContent = T.next;
+  const chN=document.getElementById('ch-share-btn'); if(chN&&!chN.style.display) chN.textContent = T.next;
   // Mode labels (01/02/03 stay numeric)
   const mlabels = ['Mode 01','Mode 02','Mode 03'];
   ['t-m1-label','t-m2-label','t-m3-label'].forEach((id,i) => {
     const el = document.getElementById(id);
     if(el) el.textContent = mlabels[i];
   });
+  // XP tag on daily banner
+  const xpTag=document.getElementById('ch-home-xp-tag');
+  if(xpTag){
+    const xpTagText={en:'⚡ UP TO 130 XP',de:'⚡ BIS ZU 130 XP',fr:'⚡ JUSQU\'À 130 XP',es:'⚡ HASTA 130 XP'}[curLang]||'⚡ UP TO 130 XP';
+    xpTag.textContent=xpTagText;
+  }
   // Update daily banner
   initHome();
 }
@@ -839,177 +835,6 @@ document.addEventListener('keydown',function(e){
 });
 
 /* ══════════════════════════════════════════
-   SORT
-══════════════════════════════════════════ */
-let sortS={}, dragSrc=null;
-
-function sortSliderChange(v){
-  document.getElementById('sort-count').textContent=v;
-}
-
-function launchSort(){
-  const sl=document.getElementById('sort-slider');
-  const rounds=sl?parseInt(sl.value):8;
-  const roundsLbl={en:'ROUNDS',de:'RUNDEN',fr:'TOURS',es:'RONDAS'}[curLang]||'ROUNDS';
-  const rlEl=document.getElementById('sort-rounds-lbl');if(rlEl)rlEl.textContent=roundsLbl;
-  sortS={score:0,round:0,total:rounds,correct:0,total_q:0,catIdx:0,contIdx:0,lastMode:'sort'};
-  buildCatBar('sort-cats',sortS,()=>{sortS.round=0;sortS.total=parseInt(document.getElementById('sort-slider').value)||8;sortRound();});
-  buildContBar('sort-conts',sortS,()=>{sortS.round=0;sortS.total=parseInt(document.getElementById('sort-slider').value)||8;sortRound();});
-  sortRound(); showScreen('sort');
-}
-function sortRound(){
-  if(sortS.round>=sortS.total){ showOver(sortS); return; }
-  sortS.round++;
-  document.getElementById('sort-prog').style.width=((sortS.round-1)/sortS.total*100)+'%';
-  document.getElementById('sort-round').textContent=sortS.round+'/'+sortS.total;
-  const fb=document.getElementById('sort-fb'); fb.className='sort-fb';
-  const nb=document.getElementById('sort-next'); nb.className='next-btn'; nb.textContent=T.next; nb.onclick=sortRound;
-  const sc=document.getElementById('sort-submit'); sc.disabled=false; sc.style.display='';
-  const mKeys=getMetricKeys(sortS.catIdx);
-  const mKey=rand(mKeys);
-  const m=T.metrics[mKey];
-  sortS.mKey=mKey;
-  sortS.countries=pick(getPool(sortS.catIdx,sortS.contIdx),4);
-  document.getElementById('sort-metric-lbl').textContent=m.label;
-  document.getElementById('t-sort-h').innerHTML=T.sortH;
-  renderSortCards(sortS.countries,mKey);
-}
-function renderSortCards(countries,mKey){
-  const con=document.getElementById('sort-container'); con.innerHTML='';
-  const shuffled=shuffle(countries); sortS.order=shuffled;
-  let touchDragSrc=null, touchClone=null, touchOffX=0, touchOffY=0;
-
-  function getInsertPosition(touchY){
-    const cards=[...con.querySelectorAll('.sort-card:not(.dragging-touch)')];
-    for(const c of cards){
-      const r=c.getBoundingClientRect();
-      if(touchY < r.top+r.height/2) return c; // insert before this card
-    }
-    return null; // insert at end
-  }
-
-  shuffled.forEach((c,i)=>{
-    const card=document.createElement('div'); card.className='sort-card'; card.draggable=true; card.dataset.i=i;
-    card.innerHTML=`<div class="sort-rank">${i+1}</div><div class="sort-flag">${flagImg(c.f,'1.7rem')}</div><div class="sort-name">${countryName(c.n)}</div><div class="sort-val" id="sv${i}"></div><div class="sort-drag-ico">⠿</div>`;
-
-    // Desktop drag
-    card.addEventListener('dragstart',e=>{dragSrc=card;card.classList.add('dragging');e.dataTransfer.effectAllowed='move';});
-    card.addEventListener('dragend',()=>{card.classList.remove('dragging');updateSortRanks();});
-    card.addEventListener('dragover',e=>{
-      e.preventDefault();
-      const r=card.getBoundingClientRect();
-      const mid=r.top+r.height/2;
-      card.classList.remove('drag-over-top','drag-over-bot');
-      if(dragSrc!==card) card.classList.add(e.clientY<mid?'drag-over-top':'drag-over-bot');
-    });
-    card.addEventListener('dragleave',()=>card.classList.remove('drag-over-top','drag-over-bot'));
-    card.addEventListener('drop',e=>{
-      e.preventDefault();
-      card.classList.remove('drag-over-top','drag-over-bot');
-      if(dragSrc===card) return;
-      const r=card.getBoundingClientRect();
-      if(e.clientY < r.top+r.height/2) con.insertBefore(dragSrc,card);
-      else con.insertBefore(dragSrc,card.nextSibling);
-      updateSortRanks();
-    });
-
-    // Touch drag
-    card.addEventListener('touchstart',e=>{
-      touchDragSrc=card;
-      const t=e.touches[0];
-      const r=card.getBoundingClientRect();
-      touchOffX=t.clientX-r.left; touchOffY=t.clientY-r.top;
-      touchClone=card.cloneNode(true);
-      touchClone.style.cssText=`position:fixed;z-index:9999;width:${r.width}px;opacity:.88;pointer-events:none;border-radius:14px;left:${r.left}px;top:${r.top}px;transition:none;box-shadow:0 8px 32px rgba(0,0,0,.4);`;
-      document.body.appendChild(touchClone);
-      card.classList.add('dragging-touch');
-      e.preventDefault();
-    },{passive:false});
-
-    card.addEventListener('touchmove',e=>{
-      if(!touchClone||!touchDragSrc) return;
-      const t=e.touches[0];
-      touchClone.style.left=(t.clientX-touchOffX)+'px';
-      touchClone.style.top=(t.clientY-touchOffY)+'px';
-      // Live highlight target
-      con.querySelectorAll('.sort-card').forEach(c=>c.classList.remove('drag-over-top','drag-over-bot'));
-      const insertBefore=getInsertPosition(t.clientY);
-      if(insertBefore && insertBefore!==touchDragSrc) insertBefore.classList.add('drag-over-top');
-      else if(!insertBefore){
-        const cards=[...con.querySelectorAll('.sort-card:not(.dragging-touch)')];
-        if(cards.length) cards[cards.length-1].classList.add('drag-over-bot');
-      }
-      e.preventDefault();
-    },{passive:false});
-
-    card.addEventListener('touchend',e=>{
-      if(!touchDragSrc||!touchClone) return;
-      touchClone.remove(); touchClone=null;
-      touchDragSrc.classList.remove('dragging-touch');
-      con.querySelectorAll('.sort-card').forEach(c=>c.classList.remove('drag-over-top','drag-over-bot'));
-      const t=e.changedTouches[0];
-      const insertBefore=getInsertPosition(t.clientY);
-      con.insertBefore(touchDragSrc, insertBefore); // insertBefore(x, null) = append — works for last position
-      updateSortRanks();
-      touchDragSrc=null;
-    },{passive:false});
-
-    con.appendChild(card);
-  });
-}
-function updateSortRanks(){
-  document.querySelectorAll('.sort-card').forEach((c,i)=>c.querySelector('.sort-rank').textContent=i+1);
-}
-function sortHUD(){
-  const p=document.getElementById('sort-perf-pill');
-  const s=document.getElementById('sort-perf-streak');
-  if(!p||!s) return;
-  if((sortS._perfStreak||0)>0){ p.style.display=''; s.textContent=sortS._perfStreak; }
-  else { p.style.display='none'; }
-}
-function checkSort(){
-  const con=document.getElementById('sort-container');
-  const cards=[...con.querySelectorAll('.sort-card')];
-  const mKey=sortS.mKey; const m=T.metrics[mKey];
-  const userOrder=cards.map(c=>sortS.order[parseInt(c.dataset.i)]);
-  const correct=[...sortS.countries].sort((a,b)=>b[mKey]-a[mKey]);
-  let exact=0;
-  userOrder.forEach((c,i)=>{ if(c.n===correct[i].n) exact++; });
-  const perfect=exact===4;
-  const pts=perfect?20:exact>=2?10:0;
-  sortS.score+=pts; sortS.total_q++; if(perfect) sortS.correct++; try{if(perfect)awardXP(10);else if(pts>0)awardXP(Math.round(pts/10));}catch(e){}
-  try{achTrack('sortRounds',1);if(perfect){achTrack('sortPerfects',1);sortS._perfStreak=(sortS._perfStreak||0)+1;achTrackMax('sortPerfectStreak',sortS._perfStreak);}else{sortS._perfStreak=0;}}catch(e){}
-  sortHUD();
-  cards.forEach((card,i)=>{
-    const ci=parseInt(card.dataset.i); const country=sortS.order[ci];
-    const sv=document.getElementById('sv'+ci);
-    sv.textContent=m.fmt(country[mKey]); sv.classList.add('show');
-    card.classList.remove('drag-over');
-    const correctIdx=correct.findIndex(c=>c.n===country.n);
-    card.classList.add(i===correctIdx?'correct-pos':'wrong-pos');
-    // Show position hint on wrong cards
-    if(i!==correctIdx){
-      const hint=document.createElement('span');
-      hint.className='sort-pos-hint';
-      hint.textContent='→ #'+(correctIdx+1);
-      card.appendChild(hint);
-    }
-  });
-  setTimeout(()=>{
-    correct.forEach(c=>{
-      const card=[...document.querySelectorAll('.sort-card')].find(el=>sortS.order[parseInt(el.dataset.i)].n===c.n);
-      if(card) con.appendChild(card);
-    }); updateSortRanks();
-  },800);
-  const fb=document.getElementById('sort-fb');
-  fb.className='sort-fb show '+(pts>0?'ok':'bad');
-  fb.textContent=perfect?T.perfect+' +20 pts':pts>0?T.sort_partial(exact)+' +'+pts+' pts':T.sort_zero+' +0 pts';
-  document.getElementById('sort-submit').disabled=true;
-  document.getElementById('sort-submit').style.display='none';
-  const nb=document.getElementById('sort-next'); nb.className='next-btn show';
-}
-
-/* ══════════════════════════════════════════
    BUILD QUESTION (shared by daily rounds + challenge)
 ══════════════════════════════════════════ */
 function buildQuestion(metricKeys, randFn){
@@ -1085,87 +910,194 @@ function launchChallenge(){
   const saved=loadDailyProgress();
   if(saved&&saved.done){
     chAnswers=saved.answers||[];
-    openShareModal(saved.score,saved.correct,chAnswers);
+    openShareModal(saved.score,saved.correct||0,chAnswers);
     return;
   }
-  chS={round:0,score:0,correct:0,total_q:0,lastMode:'challenge'};
+  // Pick today's country from GTC_DATA using seeded random
+  const seed=getDailySeed();
+  const R=seededRand(seed);
+  const idx=Math.floor(R()*GTC_DATA.length);
+  const country=GTC_DATA[idx];
+
+  chS={country,cluesShown:0,attempts:0,done:false,score:0,correct:0,lastMode:'challenge'};
   chAnswers=[];
-  resetJokers();
+
   const d=new Date();
   const langLocale2={en:'en-US',de:'de-DE',fr:'fr-FR',es:'es-ES'}[curLang]||'en-US';
   document.getElementById('ch-date').textContent=d.toLocaleDateString(langLocale2,{weekday:'long',month:'long',day:'numeric'});
-  document.getElementById('ch-title-txt')||document.getElementById('t-ch-title');
   document.getElementById('ch-xp').textContent='0';
-  document.getElementById('ch-correct').textContent='0/8';
-  chUpdateRing(0);
-  // Update XP banner text for current language
-  const xpBannerTitle = {en:'BONUS XP',de:'BONUS XP',fr:'XP BONUS',es:'XP BONUS'}[curLang]||'BONUS XP';
-  const xpBannerSub = {en:'Daily Challenge · Up to 150 XP',de:'Tages-Challenge · Bis zu 150 XP',fr:'Défi quotidien · Jusqu\'à 150 XP',es:'Desafío diario · Hasta 150 XP'}[curLang]||'Daily Challenge · Up to 150 XP';
+  const xpBannerTitle={en:'BONUS XP',de:'BONUS XP',fr:'XP BONUS',es:'XP BONUS'}[curLang]||'BONUS XP';
   const el1=document.getElementById('ch-xp-banner-title'); if(el1) el1.textContent=xpBannerTitle;
-  const el2=document.getElementById('ch-xp-banner-sub'); if(el2) el2.textContent=xpBannerSub;
-  document.getElementById('ch-next').className='next-btn';
-  chRound();
+  const guessLbl={en:'YOUR GUESS',de:'DEIN TIPP',fr:'TON ESSAI',es:'TU RESPUESTA'}[curLang]||'YOUR GUESS';
+  const gl=document.getElementById('ch-guess-lbl'); if(gl) gl.textContent=guessLbl;
+  const guessBtn={en:'Guess →',de:'Raten →',fr:'Deviner →',es:'Adivinar →'}[curLang]||'Guess →';
+  const gb=document.getElementById('ch-guess-btn'); if(gb) gb.textContent=guessBtn;
+  const placeholder={en:'Type a country name...',de:'Ländernamen eingeben...',fr:'Tapez un nom de pays...',es:'Escribe un nombre de país...'}[curLang]||'Type a country name...';
+  const inp=document.getElementById('ch-inp'); if(inp){inp.placeholder=placeholder;inp.value='';inp.disabled=false;}
+
+  document.getElementById('ch-clues').innerHTML='';
+  document.getElementById('ch-feedback').textContent='';
+  document.getElementById('ch-result').style.display='none';
+  document.getElementById('ch-share-btn').style.display='none';
+  document.getElementById('ch-guess-wrap').style.display='';
+  chUpdateRing(0);
+
+  // Show first clue
+  chRevealClue();
   showScreen('challenge');
+  setTimeout(()=>{if(inp)inp.focus();},200);
 }
 
-function chRound(){
-  if(chS.round>=8){ chFinish(); return; }
-  chS.round++;
-  document.getElementById('ch-prog').style.width=((chS.round-1)/8*100)+'%';
-  document.getElementById('ch-q-num').textContent='Q '+chS.round;
-  document.getElementById('ch-q-exp').className='q-explain';
-  document.getElementById('ch-next').className='next-btn';
+function chRevealClue(){
+  if(chS.cluesShown>=8) return;
+  const factsObj=chS.country.facts;
+  const facts=(factsObj[curLang]||factsObj.en);
+  const fact=facts[chS.cluesShown];
+  if(!fact) return;
 
-  const seed=getDailySeed()*1000+chS.round;
-  const R=seededRand(seed);
-  const q=buildEasyQ(R);
-  chCurrentQ=q;
-  const pollEl=document.getElementById('audience-poll');
-  if(pollEl) pollEl.style.display='none';
-  chS.currentQ=q;
+  const clueLabel={en:'CLUE',de:'HINWEIS',fr:'INDICE',es:'PISTA'}[curLang]||'CLUE';
+  const card=document.createElement('div');
+  card.style.cssText='background:var(--ink2);border:1px solid var(--border);border-radius:var(--r-md);padding:12px 14px;display:flex;gap:11px;align-items:flex-start;animation:fadeUp .3s ease';
+  card.innerHTML=`<span style="font-family:var(--font-m);font-size:.58rem;letter-spacing:.12em;color:var(--violet);flex-shrink:0;margin-top:2px">${clueLabel} ${chS.cluesShown+1}</span><span style="font-size:.88rem;line-height:1.5">${fact}</span>`;
+  document.getElementById('ch-clues').appendChild(card);
+  chS.cluesShown++;
+  chUpdateRing(chS.cluesShown);
+}
 
-  renderQuestion('ch-q-text','ch-q-type','ch-q-opts','ch-q-exp',q,(i,btn,q,opts)=>{
-    revealAnswer(i,btn,q,opts,(correct)=>{
-      const exp=document.getElementById('ch-q-exp');
-      exp.textContent=q.explanation; exp.className='q-explain show';
-      chAnswers.push(correct?'🟩':'🟥');
-      const xpGain = 15;
-      if(correct){chS.score+=xpGain;chS.correct++;try{awardXP(xpGain);}catch(e){}}
-      chS.total_q++;
-      chUpdateRing(chS.round);
-      document.getElementById('ch-xp').textContent=chS.score;
-      document.getElementById('ch-correct').textContent=chS.correct+'/8';
-      const nb=document.getElementById('ch-next');
-      nb.textContent=chS.round>=8?T.results:T.next;
-      nb.onclick=chS.round>=8?chFinish:chRound;
-      nb.className='next-btn show';
-    });
+function chGuess(){
+  if(chS.done) return;
+  const inp=document.getElementById('ch-inp');
+  const val=inp.value.trim();
+  if(!val) return;
+  const sugEl=document.getElementById('ch-suggestions');if(sugEl)sugEl.classList.remove('show');
+
+  const ok=gtcIsMatch(val,chS.country);
+  if(ok){
+    // Correct!
+    chS.done=true;
+    chS.correct=1;
+    const pts=Math.max(10,100-(chS.cluesShown-1)*10);
+    chS.score=pts;
+    try{awardXP(pts+30);}catch(e){} // pts + completion bonus
+    // Build emoji grid: 🟩 for unused clues, 🟨 for used clues before solve, ⬜ for remaining
+    chAnswers=[];
+    for(let i=0;i<8;i++){
+      if(i<chS.cluesShown) chAnswers.push('🟨');
+      else chAnswers.push('🟩');
+    }
+    chRevealResult(true,pts);
+  } else {
+    const isKnown=gtcIsRealCountry(val);
+    inp.value='';
+    if(isKnown){
+      chS.attempts++;
+      inp.style.borderColor='var(--rose)';
+      setTimeout(()=>inp.style.borderColor='var(--border)',800);
+
+      // Hot/cold feedback
+      const guessedEntry=ALL_WORLD_COUNTRIES.find(c=>{
+        const dn=(c.names&&c.names[curLang])?c.names[curLang]:c.n;
+        return normalizeStr(dn)===normalizeStr(val)||normalizeStr(c.n)===normalizeStr(val);
+      });
+      const guessedCont=guessedEntry?gtcGetContinent(guessedEntry.n):null;
+      const targetCont=gtcGetContinent(chS.country.n);
+      const warmMsg=guessedCont&&targetCont&&guessedCont===targetCont
+        ?{en:' 🌡️ Warm — same region!',de:' 🌡️ Warm — gleiche Region!',fr:' 🌡️ Chaud — même région!',es:' 🌡️ ¡Cálido — misma región!'}[curLang]||' 🌡️ Warm!'
+        :'';
+      const rem=8-chS.attempts;
+      const attWord={en:rem===1?'attempt':'attempts',de:rem===1?'Versuch':'Versuche',fr:rem===1?'essai':'essais',es:rem===1?'intento':'intentos'}[curLang]||'attempts';
+      const fbPrefix={en:`❌ No.`,de:`❌ Nein.`,fr:`❌ Non.`,es:`❌ No.`}[curLang];
+      const fbSuffix={en:`${rem} ${attWord} left.`,de:`Noch ${rem} ${attWord}.`,fr:`${rem} ${attWord} restant${rem===1?'':'s'}.`,es:`${rem} ${attWord} restante${rem===1?'':'s'}.`}[curLang];
+      document.getElementById('ch-feedback').textContent=`${fbPrefix}${warmMsg} ${fbSuffix}`;
+
+      if(chS.attempts>=8){
+        // Failed
+        chS.done=true;
+        chS.correct=0;
+        chS.score=0;
+        chAnswers=Array(8).fill('🟥');
+        chRevealResult(false,0);
+      } else if(chS.cluesShown<8){
+        chRevealClue();
+      }
+    } else {
+      const noCountryMsg={en:'❓ Not a country. Try again!',de:'❓ Kein Land. Versuch\'s nochmal!',fr:'❓ Pas un pays. Réessayez!',es:'❓ No es un país. ¡Inténtalo de nuevo!'}[curLang];
+      document.getElementById('ch-feedback').textContent=noCountryMsg;
+      inp.style.borderColor='var(--rose)';
+      setTimeout(()=>inp.style.borderColor='var(--border)',800);
+    }
+  }
+}
+
+function chRevealResult(won,pts){
+  const c=chS.country;
+  document.getElementById('ch-inp').disabled=true;
+  document.getElementById('ch-guess-wrap').style.display='none';
+  const res=document.getElementById('ch-result');
+  res.style.display='block';
+  res.style.borderColor=won?'rgba(168,85,247,.4)':'rgba(255,61,107,.2)';
+  document.getElementById('ch-rf').textContent=c.f;
+  const displayName=(c.names&&c.names[curLang])?c.names[curLang]:c.n;
+  document.getElementById('ch-rn').textContent=displayName;
+  const clueWord={en:'clue',de:'Hinweis',fr:'indice',es:'pista'}[curLang]||'clue';
+  const cluesWord={en:'clues',de:'Hinweisen',fr:'indices',es:'pistas'}[curLang]||'clues';
+  if(won){
+    const msg={en:`Guessed after ${chS.cluesShown} ${chS.cluesShown===1?clueWord:cluesWord}! 🎉`,de:`Erraten nach ${chS.cluesShown} ${chS.cluesShown===1?clueWord:cluesWord}! 🎉`,fr:`Deviné après ${chS.cluesShown} ${chS.cluesShown===1?clueWord:cluesWord} ! 🎉`,es:`¡Adivinado tras ${chS.cluesShown} ${chS.cluesShown===1?clueWord:cluesWord}! 🎉`}[curLang];
+    document.getElementById('ch-rs').textContent=msg;
+    document.getElementById('ch-rp').textContent='+'+pts+' XP';
+    document.getElementById('ch-rp').style.display='';
+  } else {
+    const msg={en:`The answer was ${displayName}`,de:`Die Antwort war ${displayName}`,fr:`La réponse était ${displayName}`,es:`La respuesta era ${displayName}`}[curLang];
+    document.getElementById('ch-rs').textContent=msg;
+    document.getElementById('ch-rp').style.display='none';
+  }
+  // Show all remaining clues
+  while(chS.cluesShown<8) chRevealClue();
+  document.getElementById('ch-xp').textContent=chS.score;
+
+  // Save & streak
+  saveDailyProgress({done:true,score:chS.score,correct:chS.correct,answers:chAnswers,cluesUsed:chS.cluesShown});
+  updateStreak();
+  try{achTrack('dailyDone',1);if(won&&chS.cluesShown===1)achTrack('dailyPerfect1Clue',1);}catch(e){}
+  try{flushXP();}catch(e){}
+
+  document.getElementById('ch-share-btn').style.display='';
+  document.getElementById('ch-share-btn').className='next-btn show';
+}
+
+function chShowShare(){
+  openShareModal(chS.score,chS.correct,chAnswers);
+}
+
+function chAutoComplete(){
+  const inp=document.getElementById('ch-inp');
+  const list=document.getElementById('ch-suggestions');
+  if(!inp||!list)return;
+  const val=inp.value.toLowerCase().trim();
+  if(val.length<2||inp.disabled){list.classList.remove('show');return;}
+  const matches=ALL_WORLD_COUNTRIES.filter(function(c){
+    const translated=(c.names&&c.names[curLang])?c.names[curLang]:c.n;
+    const low=translated.toLowerCase();
+    const enLow=c.n.toLowerCase();
+    return low.startsWith(val)||enLow.startsWith(val)||low.includes(val);
+  }).slice(0,6);
+  if(matches.length===0){list.classList.remove('show');return;}
+  list.innerHTML='';
+  matches.forEach(function(c){
+    const displayName=(c.names&&c.names[curLang])?c.names[curLang]:c.n;
+    const item=document.createElement('div');
+    item.className='bdr-suggest-item';
+    item.textContent=displayName;
+    item.onclick=function(){inp.value=displayName;list.classList.remove('show');chGuess();};
+    list.appendChild(item);
   });
+  list.classList.add('show');
 }
 
 function chUpdateRing(n){
   const circ=188.5;
-  document.getElementById('ch-ring').style.strokeDashoffset=circ-(circ*n/8);
-  document.getElementById('ch-ring-n').textContent=n;
-}
-
-function chFinish(){
-  const jbar=document.getElementById('joker-bar');if(jbar)jbar.style.display='none';
-  const jpoll=document.getElementById('audience-poll');if(jpoll)jpoll.style.display='none';
-  chUpdateRing(8);
-  document.getElementById('ch-prog').style.width='100%';
-  // Completion bonus XP based on correct answers
-  const bonusXP = chS.correct * 15; // already awarded per question
-  // Extra completion bonus for finishing
-  const completionBonus = 30;
-  try{awardXP(completionBonus);}catch(e){}
-  chS.score += completionBonus;
-  document.getElementById('ch-xp').textContent = chS.score;
-  saveDailyProgress({done:true,score:chS.score,correct:chS.correct,answers:chAnswers});
-  updateStreak();
-  try{achTrack('dailyDone',1);if(chS.correct===8&&!jokerFiftyUsed&&!jokerAudienceUsed)achTrack('dailyPerfectNoJoker',1);}catch(e){}
-  try{flushXP();}catch(e){}
-  openShareModal(chS.score,chS.correct,chAnswers);
+  const el=document.getElementById('ch-ring'); if(el) el.style.strokeDashoffset=circ-(circ*n/8);
+  const en=document.getElementById('ch-ring-n'); if(en) en.textContent=n;
 }
 
 /* ══════════════════════════════════════════
@@ -1196,10 +1128,15 @@ function openShareModal(score, correct, answers){
   const dateStr=new Date().toLocaleDateString(langLocale,{month:'short',day:'numeric',year:'numeric'});
   const emojis=(answers||[]).join('');
   const streak=loadStreak();
-  _shareText=['🌍 GeoGenius Daily — '+dateStr,`Score: ${score} pts · ${correct}/8 correct`,emojis,streak.count>1?`🔥 ${streak.count} day streak!`:'','Play free: geovs.netlify.app'].filter(Boolean).join('\n');
-  document.getElementById('share-grid').textContent=emojis||'🟩🟥🟩🟩🟥🟩🟩🟥';
-  document.getElementById('share-score-txt').textContent=score+' pts';
-  document.getElementById('share-sub-txt').textContent=`${correct}/8 correct · ${dateStr}${streak.count>1?' · 🔥 '+streak.count+' day streak':''}`;
+  const cluesUsed=(answers||[]).filter(a=>a==='🟨').length;
+  const solved=correct>0;
+  const summaryLine=solved
+    ?{en:`Guessed in ${cluesUsed}/8 clues! · ${score} XP`,de:`Erraten in ${cluesUsed}/8 Hinweisen! · ${score} XP`,fr:`Deviné en ${cluesUsed}/8 indices ! · ${score} XP`,es:`¡Adivinado en ${cluesUsed}/8 pistas! · ${score} XP`}[curLang]||`Guessed in ${cluesUsed}/8 clues!`
+    :{en:'Could not guess today\'s country',de:'Heutiges Land nicht erraten',fr:'Pas deviné le pays du jour',es:'No adiviné el país de hoy'}[curLang]||'Could not guess today\'s country';
+  _shareText=['🌍 GeoVs Daily — '+dateStr,summaryLine,emojis,streak.count>1?`🔥 ${streak.count} day streak!`:'','Play free: geovs.netlify.app'].filter(Boolean).join('\n');
+  document.getElementById('share-grid').textContent=emojis||'⬜⬜⬜⬜⬜⬜⬜⬜';
+  document.getElementById('share-score-txt').textContent=solved?score+' XP':'0 XP';
+  document.getElementById('share-sub-txt').textContent=`${summaryLine}${streak.count>1?' · 🔥 '+streak.count+' day streak':''}`;
   document.getElementById('share-overlay').classList.add('open');
 }
 function openShareFromOver(){
@@ -1253,9 +1190,9 @@ function showOver(state){
   } else {
     hlHsEl.style.display='none';
   }
-  /* Quiz-mode score block (cap, flg, gtc, sort, border) */
+  /* Quiz-mode score block (cap, flg, gtc, border) */
   const quizBlock=document.getElementById('quiz-over-block');
-  if(state.lastMode==='cap'||state.lastMode==='flg'||state.lastMode==='gtc'||state.lastMode==='sort'||state.lastMode==='border'){
+  if(state.lastMode==='cap'||state.lastMode==='flg'||state.lastMode==='gtc'||state.lastMode==='border'){
     quizBlock.style.display='block';
     document.getElementById('quiz-over-score').textContent=state.correct+'/'+state.total_q;
     const correctLbl={en:'CORRECT',de:'RICHTIG',fr:'CORRECT',es:'CORRECTO'}[curLang]||'CORRECT';
@@ -1272,7 +1209,7 @@ function showOver(state){
   } else {
     quizBlock.style.display='none';
   }
-  const isQuizMode=state.lastMode==='cap'||state.lastMode==='flg'||state.lastMode==='gtc'||state.lastMode==='sort'||state.lastMode==='border';
+  const isQuizMode=state.lastMode==='cap'||state.lastMode==='flg'||state.lastMode==='gtc'||state.lastMode==='border';
   let overRatio;
   if(isQuizMode&&state.total_q>0){
     overRatio=state.correct/state.total_q;
@@ -1362,7 +1299,6 @@ function showOver(state){
 function replayGame(){
   if(!_lastState) return goHome();
   if(_lastState.lastMode==='hl') launchHL();
-  else if(_lastState.lastMode==='sort') launchSort();
   else if(_lastState.lastMode==='border') launchBorderSetup();
   else if(_lastState.lastMode==='capitals') launchCapitals();
   else if(_lastState.lastMode==='flags') launchFlags();
@@ -1377,13 +1313,16 @@ function initHome(){
   const saved=loadDailyProgress();
   const d=new Date();
   const dateStr=d.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'});
+  const dbHow=document.getElementById('db-how');
   if(saved&&saved.done){
     document.getElementById('db-title').textContent=T.dbDone(saved.correct,saved.score);
     document.getElementById('db-sub').textContent='';
+    if(dbHow) dbHow.textContent='';
     document.querySelector('.daily-banner').style.borderColor='rgba(200,241,53,.4)';
   } else {
     document.getElementById('db-title').textContent=T.dbTitle;
     document.getElementById('db-sub').textContent=T.dbSub;
+    if(dbHow) dbHow.textContent=T.dbHow||'';
   }
   document.getElementById('db-cta').textContent=T.playCta;
   const streak=loadStreak();
@@ -1393,7 +1332,6 @@ function initHome(){
     badge.style.display='flex';
     document.getElementById('streak-num').textContent=streak.count;
   } else { badge.style.display='none'; }
-  document.getElementById('t-sort-h').innerHTML=T.sortH;
 }
 
 /* ══════════════════════════════════════════
@@ -1586,7 +1524,6 @@ function useJokerAudience() {
 ══════════════════════════════════════════ */
 const PCT_DIST = {
   hl:        [[200,1],[170,5],[145,10],[120,20],[95,35],[70,50],[50,65],[30,80],[10,90],[0,100]],
-  sort:      [[130,1],[110,5],[90,10],[70,20],[55,35],[40,50],[25,65],[15,80],[5,90],[0,100]],
   daily:     [[110,1],[90,5],[75,10],[60,20],[45,35],[30,50],[20,65],[10,80],[5,90],[0,100]],
   challenge: [[110,1],[90,5],[75,10],[60,20],[45,35],[30,50],[20,65],[10,80],[5,90],[0,100]],
 };
@@ -2486,8 +2423,7 @@ function capMode(m){
   ['mc','type'].forEach(function(x){
     var b=document.getElementById('cbtn-'+x);
     if(!b) return;
-    if(x===m){ b.style.borderColor='var(--blue)'; b.style.background='rgba(61,158,255,.08)'; b.style.color='var(--blue)'; }
-    else { b.style.borderColor='var(--border)'; b.style.background='var(--ink3)'; b.style.color='var(--text)'; }
+    b.classList.toggle('active-blue', x===m);
   });
 }
 
@@ -2496,8 +2432,7 @@ function capRegion(r,btn){
   ['all','europe','asia','africa','americas','oceania'].forEach(function(x){
     var b=document.getElementById('creg-'+x);
     if(!b) return;
-    if(x===r){ b.style.borderColor='var(--blue)'; b.style.background='rgba(61,158,255,.1)'; b.style.color='var(--blue)'; }
-    else { b.style.borderColor='var(--border)'; b.style.background='var(--ink3)'; b.style.color='var(--text)'; }
+    b.classList.toggle('active-blue', x===r);
   });
   var pool=qPool(r).filter(function(c){ return CAPITALS[c.n]; });
   var sl=document.getElementById('cap-slider');
@@ -2519,8 +2454,7 @@ function capDifficulty(d){
   cS.difficulty=d;
   ['easy','medium','hard'].forEach(function(x){
     var b=document.getElementById('cdiff-'+x); if(!b) return;
-    if(x===d){ b.style.borderColor='var(--blue)'; b.style.background='rgba(61,158,255,.1)'; b.style.color='var(--blue)'; }
-    else { b.style.borderColor='var(--border)'; b.style.background='var(--ink3)'; b.style.color='var(--text)'; }
+    b.classList.toggle('active-blue', x===d);
   });
 }
 function capStart(){
@@ -2602,7 +2536,7 @@ function capAnswer(ans,btn){
   document.getElementById('cap-feedback').textContent=capOk?capCorrectMsg:capWrongPfx+cS.answer;
   document.getElementById('cap-feedback').style.color=capOk?'var(--lime)':'var(--rose)';
   var skipBtn=document.getElementById('cap-skip'); if(skipBtn) skipBtn.style.display='none';
-  setTimeout(function(){ capNext(); }, capOk?1200:2200);
+  setTimeout(function(){ capNext(); }, capOk?500:1200);
 }
 
 function capAutoComplete(){
@@ -2652,7 +2586,7 @@ function capTypeSubmit(){
   document.getElementById('cap-feedback').textContent=ok?capCorrectMsg:capWrongPfx+cS.answer;
   document.getElementById('cap-feedback').style.color=ok?'var(--lime)':'var(--rose)';
   var skipBtn=document.getElementById('cap-skip'); if(skipBtn) skipBtn.style.display='none';
-  setTimeout(function(){ capNext(); }, ok?1200:2200);
+  setTimeout(function(){ capNext(); }, ok?500:1200);
 }
 
 function capComboHUD(){
@@ -2704,8 +2638,7 @@ function flgAnswerMode(m){
   ['mc','type'].forEach(function(x){
     var b=document.getElementById('fbtn-'+x);
     if(!b) return;
-    if(x===m){ b.style.borderColor='var(--orange)'; b.style.background='rgba(255,107,53,.08)'; b.style.color='var(--orange)'; }
-    else { b.style.borderColor='var(--border)'; b.style.background='var(--ink3)'; b.style.color='var(--text)'; }
+    b.classList.toggle('active-orange', x===m);
   });
 }
 
@@ -2714,8 +2647,7 @@ function flgRegion(r,btn){
   ['all','europe','asia','africa','americas','oceania'].forEach(function(x){
     var b=document.getElementById('freg-'+x);
     if(!b) return;
-    if(x===r){ b.style.borderColor='var(--orange)'; b.style.background='rgba(255,107,53,.1)'; b.style.color='var(--orange)'; }
-    else { b.style.borderColor='var(--border)'; b.style.background='var(--ink3)'; b.style.color='var(--text)'; }
+    b.classList.toggle('active-orange', x===r);
   });
   var pool=qPool(r);
   var sl=document.getElementById('flg-slider');
@@ -2736,8 +2668,7 @@ function flgDifficulty(d){
   fS.difficulty=d;
   ['easy','medium','hard'].forEach(function(x){
     var b=document.getElementById('fdiff-'+x); if(!b) return;
-    if(x===d){ b.style.borderColor='var(--orange)'; b.style.background='rgba(255,107,53,.1)'; b.style.color='var(--orange)'; }
-    else { b.style.borderColor='var(--border)'; b.style.background='var(--ink3)'; b.style.color='var(--text)'; }
+    b.classList.toggle('active-orange', x===d);
   });
 }
 function flgStart(){
@@ -2749,10 +2680,106 @@ function flgStart(){
   var pool=shuffle(filtPool);
   var sl=document.getElementById('flg-slider');
   var count=Math.min(parseInt(sl?sl.value:20),pool.length);
-  fS.pool=pool.slice(0,count); fS.allPool=[].concat(pool); fS.total=count; fS.round=0; fS.score=0; fS.streak=0;
+  // Ensure no duplicate countries in the pool
+  var seen=new Set(); var uniquePool=[];
+  for(var pi=0;pi<pool.length;pi++){if(!seen.has(pool[pi].n)){seen.add(pool[pi].n);uniquePool.push(pool[pi]);}}
+  fS.pool=uniquePool.slice(0,count); fS.allPool=[].concat(uniquePool); fS.total=Math.min(count,fS.pool.length); fS.round=0; fS.score=0; fS.streak=0;
   fS.diffMult=diff==='hard'?1.5:1.0;
   document.getElementById('flg-next').style.display='none';
   showScreen('flg'); flgRound();
+}
+
+// ── Similar flag confusers ──────────────────────────────────────────────────
+const FLAG_CONFUSERS = {
+  'Indonesia':['Poland','Monaco','Singapore'],
+  'Poland':['Indonesia','Monaco'],
+  'Monaco':['Indonesia','Poland'],
+  'Romania':['Chad','Moldova','Andorra'],
+  'Chad':['Romania','Moldova'],
+  'Moldova':['Romania','Chad'],
+  'Ireland':['Ivory Coast','Italy'],
+  'Ivory Coast':['Ireland','Italy'],
+  'Italy':['Ireland','Ivory Coast','Mexico'],
+  'France':['Netherlands','Luxembourg','Romania'],
+  'Netherlands':['France','Luxembourg','Russia'],
+  'Luxembourg':['Netherlands','France'],
+  'Russia':['Netherlands','France','Serbia'],
+  'Serbia':['Russia','Slovakia','Slovenia','Croatia'],
+  'Slovakia':['Slovenia','Serbia','Russia'],
+  'Slovenia':['Slovakia','Serbia','Czech Republic'],
+  'Croatia':['Serbia','Netherlands','Paraguay'],
+  'Australia':['New Zealand','UK','Fiji'],
+  'New Zealand':['Australia','UK','Fiji'],
+  'Colombia':['Ecuador','Venezuela','Romania'],
+  'Ecuador':['Colombia','Venezuela'],
+  'Venezuela':['Colombia','Ecuador'],
+  'Mali':['Senegal','Guinea','Cameroon'],
+  'Senegal':['Mali','Guinea','Cameroon'],
+  'Guinea':['Mali','Senegal'],
+  'Cameroon':['Senegal','Mali','Guinea'],
+  'India':['Niger','Ireland'],
+  'Niger':['India','Nigeria'],
+  'Nigeria':['Niger','India'],
+  'Mexico':['Italy','Hungary'],
+  'Hungary':['Italy','Tajikistan','Bulgaria'],
+  'Bulgaria':['Hungary','Russia'],
+  'Norway':['Iceland','France'],
+  'Iceland':['Norway','Australia','UK'],
+  'Sweden':['Finland','Denmark'],
+  'Finland':['Sweden','Denmark'],
+  'Denmark':['Norway','Switzerland'],
+  'Argentina':['Uruguay','Honduras','El Salvador'],
+  'Uruguay':['Argentina','Greece'],
+  'Turkey':['Tunisia','Singapore'],
+  'Tunisia':['Turkey','Singapore'],
+  'Singapore':['Turkey','Indonesia','Tunisia'],
+  'Bahrain':['Qatar','UAE'],
+  'Qatar':['Bahrain'],
+  'Thailand':['Costa Rica','Cambodia'],
+  'Costa Rica':['Thailand','North Korea'],
+  'Japan':['Bangladesh','Palau'],
+  'Bangladesh':['Japan','Palau'],
+  'Palau':['Japan','Bangladesh'],
+  'China':['Vietnam','Morocco'],
+  'Vietnam':['China'],
+  'Morocco':['China','Vietnam'],
+  'Pakistan':['Turkey','Algeria'],
+  'Algeria':['Pakistan','Nigeria'],
+  'Lebanon':['Austria','Canada'],
+  'Austria':['Lebanon','Latvia','Indonesia'],
+  'Latvia':['Austria','Lebanon'],
+  'Greece':['Uruguay'],
+  'South Korea':['Laos','North Korea'],
+  'North Korea':['South Korea','Laos'],
+  'Laos':['North Korea','Thailand','Cambodia'],
+  'Cambodia':['Laos','Thailand'],
+  'Ghana':['Ethiopia','Bolivia'],
+  'Ethiopia':['Ghana','Bolivia'],
+  'Bolivia':['Ghana','Ethiopia'],
+  'Egypt':['Syria','Iraq','Yemen'],
+  'Syria':['Egypt','Iraq','Yemen'],
+  'Iraq':['Egypt','Syria','Yemen'],
+  'Yemen':['Egypt','Syria','Iraq'],
+  'Liberia':['USA','Malaysia'],
+  'Malaysia':['USA','Liberia'],
+  'USA':['Liberia','Malaysia'],
+};
+
+function pickConfuserFlags(correct, pool) {
+  var confusers = FLAG_CONFUSERS[correct.n] || [];
+  var picked = [];
+  var used = new Set([correct.n]);
+  // First try to include confuser countries
+  for (var i = 0; i < confusers.length && picked.length < 3; i++) {
+    var c = pool.find(function(p) { return p.n === confusers[i] && !used.has(p.n); });
+    if (c) { picked.push(c); used.add(c.n); }
+  }
+  // Fill remaining with random countries
+  var remaining = shuffle(pool.filter(function(c) { return !used.has(c.n); }));
+  for (var j = 0; j < remaining.length && picked.length < 3; j++) {
+    picked.push(remaining[j]);
+  }
+  return picked;
 }
 
 function flgRound(){
@@ -2774,10 +2801,11 @@ function flgRound(){
     var skipLbl={en:'⏭ Skip',de:'⏭ Überspringen',fr:'⏭ Passer',es:'⏭ Saltar'}[curLang]||'⏭ Skip';
     skipBtn.textContent=skipLbl;
   }
-  var wrongs=shuffle(fS.allPool.filter(function(c){ return c.n!==q.n; })).slice(0,3);
+  // Pick confusing wrong answers — prefer similar-looking flags
+  var wrongs=pickConfuserFlags(q, fS.allPool);
   var opts=shuffle([q].concat(wrongs));
   if(fS.mode==='ftc'){
-    document.getElementById('flg-display').innerHTML=flagImg(q.f,'9rem');
+    document.getElementById('flg-display').innerHTML=flagImg(q.f,'10rem');
     document.getElementById('flg-display').style.display='block';
     document.getElementById('flg-q').textContent=T.flgQFTC||'Which country does this flag belong to?';
     if(isType){
@@ -2876,7 +2904,7 @@ function flgTypeSubmit(){
   fbEl.textContent=ok?correctMsg:wrongPfx+countryName(q.n);
   fbEl.style.color=ok?'var(--lime)':'var(--rose)';
   var skipBtn=document.getElementById('flg-skip'); if(skipBtn) skipBtn.style.display='none';
-  setTimeout(function(){ flgNext(); }, ok?1200:2200);
+  setTimeout(function(){ flgNext(); }, ok?500:1200);
 }
 
 function flgSkip(){
@@ -2899,7 +2927,7 @@ function flgAnswer(ok,btn,correctCountry){
     if(fBonus2>0) showToast('🔥 Streak '+fS.streak+'! +'+fBonus2+' bonus XP');
   } else { fS.streak=0; }
   flgComboHUD();
-  setTimeout(function(){ flgNext(); }, ok?1200:2200);
+  setTimeout(function(){ flgNext(); }, ok?500:1200);
 }
 
 function flgComboHUD(){
@@ -3491,9 +3519,6 @@ const ACH_DEFS=[
   {id:'hl_streak10',cat:'hl',icon:'💥',name:'Unaufhaltsam',desc:'10er Streak im Higher or Lower',xp:50,check:()=>(achStore().hlBestStreak||0)>=10},
   {id:'hl_streak20',cat:'hl',icon:'🏆',name:'Legende',desc:'20er Streak im Higher or Lower',xp:100,check:()=>(achStore().hlBestStreak||0)>=20},
   {id:'hl_allcats',cat:'hl',icon:'📊',name:'Statistik-Nerd',desc:'Jede Kategorie mind. einmal gespielt',xp:30,check:()=>{const s=achStore();return(s.hlCats||[]).length>=8;}},
-  {id:'sort_perfect',cat:'sort',icon:'✨',name:'Perfektionist',desc:'Perfekte Reihenfolge (4/4)',xp:20,check:()=>(achStore().sortPerfects||0)>=1},
-  {id:'sort_streak3',cat:'sort',icon:'🎯',name:'Seriensieger',desc:'3 perfekte Runden hintereinander',xp:40,check:()=>(achStore().sortPerfectStreak||0)>=3},
-  {id:'sort_50',cat:'sort',icon:'🔢',name:'Sortierkönig',desc:'50 Sort-Runden gespielt',xp:50,check:()=>(achStore().sortRounds||0)>=50},
   {id:'daily_first',cat:'daily',icon:'📅',name:'Tägliche Pflicht',desc:'Erste Daily Challenge abgeschlossen',xp:15,check:()=>(achStore().dailyDone||0)>=1},
   {id:'daily_streak7',cat:'daily',icon:'🔥',name:'Feuerteufel',desc:'7-Tage-Streak',xp:50,check:()=>{const s=loadStreak();return s.count>=7;}},
   {id:'daily_streak30',cat:'daily',icon:'🏃',name:'Marathonläufer',desc:'30-Tage-Streak',xp:150,check:()=>{const s=loadStreak();return s.count>=30;}},
@@ -3520,7 +3545,6 @@ const ACH_CATS=[
   {id:'all',label:'Alle'},
   {id:'general',label:'Allgemein'},
   {id:'hl',label:'H/L'},
-  {id:'sort',label:'Sort'},
   {id:'daily',label:'Daily'},
   {id:'cap',label:'Capitals'},
   {id:'flg',label:'Flags'},

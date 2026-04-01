@@ -124,14 +124,27 @@ const _EG=(function(){
   };
 })();
 
+function _getTierColors(lvl){
+  const ld=LEVELS[(lvl||1)-1]||LEVELS[0];
+  return TIERS[ld.tier]||TIERS.wanderer;
+}
 function drawEmblem(lvl,sz){
   const s=sz||1;
-  // viewBox is 150×112 → aspect ratio 0.747
   const w=Math.round(88*s),h=Math.round(66*s);
   let svg=_EG(lvl).replace('<svg ','<svg width="'+w+'" height="'+h+'" ');
   try{
     const p=_profileData||JSON.parse(localStorage.getItem('geovs_p')||'{}');
-    if(p.avatar&&window.AvatarEngine){svg=window.AvatarEngine.injectAvatarIntoEmblem(svg,p.avatar);}
+    if(p.avatar&&window.AvatarEngine){svg=window.AvatarEngine.injectAvatarIntoEmblem(svg,p.avatar,_getTierColors(lvl));}
+  }catch(e){}
+  return`<div style="width:${w}px;height:${h}px;display:flex;align-items:center;justify-content:center;pointer-events:none">${svg}</div>`;
+}
+// Draw emblem for a specific avatar (used in multiplayer to show opponent)
+function drawEmblemFor(lvl,sz,avatar){
+  const s=sz||1;
+  const w=Math.round(88*s),h=Math.round(66*s);
+  let svg=_EG(lvl).replace('<svg ','<svg width="'+w+'" height="'+h+'" ');
+  try{
+    if(avatar&&window.AvatarEngine){svg=window.AvatarEngine.injectAvatarIntoEmblem(svg,avatar,_getTierColors(lvl));}
   }catch(e){}
   return`<div style="width:${w}px;height:${h}px;display:flex;align-items:center;justify-content:center;pointer-events:none">${svg}</div>`;
 }
@@ -157,7 +170,7 @@ function _drawEmblemOld(lvl,sz){
   try{
     const p=_profileData||JSON.parse(localStorage.getItem('geovs_p')||'{}');
     if(p.avatar&&window.AvatarEngine){
-      svg=window.AvatarEngine.injectAvatarIntoEmblem(svg,p.avatar);
+      svg=window.AvatarEngine.injectAvatarIntoEmblem(svg,p.avatar,_getTierColors(lvl));
     }
   }catch(e){}
   return `<div style="width:${w}px;height:${h}px;display:flex;align-items:center;justify-content:center;pointer-events:none">${svg}</div>`;

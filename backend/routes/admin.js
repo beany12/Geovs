@@ -2,10 +2,23 @@ const express = require('express');
 const router = express.Router();
 const { getSnapshot } = require('../services/kpiTracker');
 const { sessionCache, worldBankCache } = require('../services/cache');
+const { verifyToken } = require('../middleware/verifyToken');
+
+// Admin UID whitelist — add your Firebase UID(s) here
+const ADMIN_UIDS = new Set(
+  (process.env.ADMIN_UIDS || '').split(',').map(s => s.trim()).filter(Boolean)
+);
+
+function requireAdmin(req, res, next) {
+  if (!req.user || !ADMIN_UIDS.has(req.user.uid)) {
+    return res.status(403).json({ error: 'Forbidden — admin access required' });
+  }
+  next();
+}
 
 // GET /api/admin/kpis
-// Returns full KPI snapshot. Protected by the standard API key middleware.
-router.get('/kpis', (req, res) => {
+// Requires valid Firebase token + admin UID.
+router.get('/kpis', verifyToken, requireAdmin, (req, res) => {
   const kpis = getSnapshot();
 
   // Add live cache stats
@@ -24,7 +37,7 @@ router.get('/kpis', (req, res) => {
 });
 
 // GET /api/admin/kpis/dashboard  — simple HTML dashboard
-router.get('/kpis/dashboard', (req, res) => {
+router.get('/kpis/dashboard', verifyToken, requireAdmin, (req, res) => {
   const d = getSnapshot();
 
   const row = (label, value) =>

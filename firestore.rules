@@ -1,0 +1,40 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Users collection — each user can only read/write their own document
+    match /users/{userId} {
+      // Anyone authenticated can read (needed for leaderboard)
+      allow read: if request.auth != null;
+
+      // Only the document owner can write
+      allow write: if request.auth != null
+                   && request.auth.uid == userId
+                   && isValidUserData(request.resource.data);
+    }
+
+    // Block all other collections by default
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Validate user document shape to prevent abuse
+    function isValidUserData(data) {
+      return data.keys().hasOnly([
+               'username', 'xp', 'games', 'avatar', 'onboardingDone',
+               'highscores', 'achievements', 'streak', 'updatedAt'
+             ])
+          // Username: string, max 30 chars
+          && data.username is string
+          && data.username.size() <= 30
+          // XP: non-negative integer, max 10M (prevents overflow abuse)
+          && data.xp is int
+          && data.xp >= 0
+          && data.xp <= 10000000
+          // Games: non-negative integer
+          && data.games is int
+          && data.games >= 0;
+    }
+  }
+}
