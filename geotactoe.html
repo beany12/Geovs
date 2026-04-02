@@ -219,25 +219,44 @@ body.timer-danger{box-shadow:inset 0 0 80px rgba(255,45,94,.08)}
 
 <!-- ═══ LOBBY ═══ -->
 <div class="screen active" id="screen-lobby">
-  <div class="gtt-header">
-    <div class="gtt-logo">
-      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-      <div>GeoTacToe<span>Best of 3 · 2 Players</span></div>
+  <!-- Full Page Hero -->
+  <div style="width:100%;min-height:200px;border-radius:20px;background:linear-gradient(180deg,#0a1e35,#061525);position:relative;overflow:hidden;padding:24px 20px;display:flex;flex-direction:column;align-items:center;gap:10px;border:1px solid rgba(0,255,213,.06);margin-bottom:14px">
+    <!-- Grid background -->
+    <svg viewBox="0 0 500 300" style="position:absolute;inset:0;width:100%;height:100%;opacity:.04"><line x1="0" y1="150" x2="500" y2="150" stroke="#fff" stroke-width=".5"/><line x1="0" y1="75" x2="500" y2="75" stroke="#fff" stroke-width=".3"/><line x1="0" y1="225" x2="500" y2="225" stroke="#fff" stroke-width=".3"/><line x1="125" y1="0" x2="125" y2="300" stroke="#fff" stroke-width=".3"/><line x1="250" y1="0" x2="250" y2="300" stroke="#fff" stroke-width=".3"/><line x1="375" y1="0" x2="375" y2="300" stroke="#fff" stroke-width=".3"/></svg>
+    <div style="position:absolute;inset:0;background:radial-gradient(circle at 50% 30%,rgba(0,255,213,.05),transparent 60%)"></div>
+    <!-- Back link -->
+    <a class="back-link" href="index.html" style="position:absolute;top:10px;right:10px;font-size:.7rem;padding:5px 10px;z-index:2">← Back</a>
+    <!-- Badge -->
+    <div style="font-family:var(--font-m);font-size:.5rem;letter-spacing:.2em;color:var(--teal,#00ffd5);padding:3px 12px;border-radius:100px;border:1px solid rgba(0,255,213,.2);background:rgba(0,255,213,.06);z-index:1">BEST OF 3 · 2 PLAYERS</div>
+    <!-- Title + Globe -->
+    <div style="position:relative;z-index:1;display:flex;align-items:center;gap:14px">
+      <div class="gtt-globe" style="font-size:2.4rem">🌍</div>
+      <div>
+        <div style="font-family:var(--font-d);font-size:2.4rem;line-height:.9">Geo<span style="color:var(--teal,#00ffd5)">TacToe</span></div>
+        <div style="font-size:.72rem;color:var(--muted2);margin-top:4px">Name countries matching both criteria</div>
+      </div>
     </div>
-    <a class="back-link" href="index.html">← Back</a>
-  </div>
-
-  <!-- Hero -->
-  <div class="gtt-hero">
-    <div class="gtt-globe">🌍</div>
-    <div class="gtt-hero-grid">
+    <!-- Mini board -->
+    <div class="gtt-hero-grid" style="z-index:1;margin:4px 0">
       <div class="gtt-hero-cell p1">🇫🇷</div><div class="gtt-hero-cell"></div><div class="gtt-hero-cell p2">🇧🇷</div>
       <div class="gtt-hero-cell"></div><div class="gtt-hero-cell p1">🇩🇪</div><div class="gtt-hero-cell"></div>
       <div class="gtt-hero-cell p2">🇯🇵</div><div class="gtt-hero-cell"></div><div class="gtt-hero-cell p1">🇬🇧</div>
     </div>
+    <!-- Player legend -->
+    <div style="display:flex;gap:16px;z-index:1">
+      <div style="display:flex;align-items:center;gap:5px"><div style="width:8px;height:8px;border-radius:50%;background:#3da0ff"></div><span style="font-size:.6rem;color:var(--muted2)">Player 1</span></div>
+      <div style="display:flex;align-items:center;gap:5px"><div style="width:8px;height:8px;border-radius:50%;background:var(--rose,#ff2d5e)"></div><span style="font-size:.6rem;color:var(--muted2)">Player 2</span></div>
+    </div>
   </div>
 
-  <!-- Tabbed Create / Join -->
+  <!-- Steps -->
+  <div class="gtt-how" style="margin-bottom:12px">
+    <div class="gtt-step"><div class="gtt-step-num">1</div><div class="gtt-step-text" id="step1-text">Pick a cell on the board</div></div>
+    <div class="gtt-step"><div class="gtt-step-num">2</div><div class="gtt-step-text" id="step2-text">Name a matching country</div></div>
+    <div class="gtt-step"><div class="gtt-step-num">3</div><div class="gtt-step-text" id="step3-text">Get 3 in a row to win!</div></div>
+  </div>
+
+  <!-- Create / Join -->
   <div class="gtt-lobby-card">
     <div class="gtt-tabs">
       <button class="gtt-tab active" id="tab-create-label" onclick="switchLobbyTab('create')">Create Match</button>
@@ -251,34 +270,6 @@ body.timer-danger{box-shadow:inset 0 0 80px rgba(255,45,94,.08)}
       <p style="font-size:.78rem;color:var(--muted2);margin-bottom:10px" id="join-desc">Enter the 6-letter room code to join.</p>
       <input class="gtt-input" id="join-code" maxlength="6" placeholder="ENTER CODE" autocomplete="off">
       <button class="btn-lime" id="btn-join" onclick="joinRoom()">Join Room</button>
-    </div>
-  </div>
-
-  <!-- Stats strip -->
-  <div style="display:flex;justify-content:center;gap:24px;margin-bottom:18px;width:100%">
-    <div style="text-align:center"><div style="font-family:var(--font-d);font-size:1.2rem;color:var(--teal,#00ffd5)">2</div><div style="font-family:var(--font-m);font-size:.5rem;color:var(--muted);letter-spacing:.1em">PLAYERS</div></div>
-    <div style="width:1px;background:rgba(255,255,255,.06)"></div>
-    <div style="text-align:center"><div style="font-family:var(--font-d);font-size:1.2rem;color:var(--teal,#00ffd5)">Bo3</div><div style="font-family:var(--font-m);font-size:.5rem;color:var(--muted);letter-spacing:.1em">FORMAT</div></div>
-    <div style="width:1px;background:rgba(255,255,255,.06)"></div>
-    <div style="text-align:center"><div style="font-family:var(--font-d);font-size:1.2rem;color:var(--teal,#00ffd5)">LIVE</div><div style="font-family:var(--font-m);font-size:.5rem;color:var(--muted);letter-spacing:.1em">REALTIME</div></div>
-  </div>
-
-  <!-- How to play -->
-  <div class="gtt-how">
-    <div class="gtt-step">
-      <div class="gtt-step-num">STEP 1</div>
-      <div class="gtt-step-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--teal,#00ffd5)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></div>
-      <div class="gtt-step-text" id="step1-text">Pick a cell on the board</div>
-    </div>
-    <div class="gtt-step">
-      <div class="gtt-step-num">STEP 2</div>
-      <div class="gtt-step-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--teal,#00ffd5)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg></div>
-      <div class="gtt-step-text" id="step2-text">Name a country matching both criteria</div>
-    </div>
-    <div class="gtt-step">
-      <div class="gtt-step-num">STEP 3</div>
-      <div class="gtt-step-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--teal,#00ffd5)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5C7 4 7 7 7 7"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5C17 4 17 7 17 7"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg></div>
-      <div class="gtt-step-text" id="step3-text">Get 3 in a row to win!</div>
     </div>
   </div>
 </div>
