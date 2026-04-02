@@ -73,14 +73,9 @@ router.post('/signup', signupLimiter, async (req, res) => {
     });
   } catch (err) {
     // Firebase-Fehlercodes in lesbare Meldungen übersetzen
-    const errorMap = {
-      'auth/email-already-exists': 'Diese E-Mail ist bereits registriert',
-      'auth/invalid-email':        'Ungültige E-Mail-Adresse',
-      'auth/weak-password':        'Passwort ist zu schwach',
-    };
-    const msg = errorMap[err.code] || 'Registrierung fehlgeschlagen';
+    // Unified error message — don't reveal if email exists
     console.error('[Auth/signup]', err.code);
-    res.status(400).json({ error: msg });
+    res.status(400).json({ error: 'Registration failed. Please check your input and try again.' });
   }
 });
 
