@@ -4483,7 +4483,7 @@ function msStartGame(){
   msState={
     pool:shuffle([...filtered]).slice(0,10),
     round:0,total:10,score:0,correct:0,lastMode:'gtc',
-    clicked:false
+    clicked:false,rounds:[]
   };
   msRenderMap();
   msRound();
@@ -4758,6 +4758,9 @@ function msClick(e){
   else pts=0;
   msState.score+=pts;
   if(clickedOnCountry) msState.correct++;
+  // Save round data for game over recap
+  if(!msState.rounds) msState.rounds=[];
+  msState.rounds.push({country:target,displayName:document.getElementById('ms-country-name').textContent,pts:pts,dist:dist,hit:clickedOnCountry,clickX:svgX,clickY:svgY,centerX:center.x,centerY:center.y});
   // Achievement tracking
   try{if(clickedOnCountry)achTrack('msBullseye',1);achTrackMax('msBestScore',msState.score);if(msDifficulty==='hard'&&msState.score>=400)achTrack('msHard400',1);}catch(e){}
 
@@ -4817,7 +4820,7 @@ function msClick(e){
 
 function msRound(){
   if(msState.round>=msState.total){
-    showOver({score:msState.score,correct:msState.correct,total_q:msState.total,bestStreak:0,total:msState.total,lastMode:'gtc'});
+    msShowGameOver();
     return;
   }
   var target=msState.pool[msState.round];
@@ -4844,6 +4847,61 @@ function msRound(){
   // Reset zoom and re-render clean map
   msZoomReset();
   msRenderMap();
+}
+
+function msShowGameOver(){
+  showScreen('ms-over');
+  var rounds=msState.rounds||[];
+  var score=msState.score;
+  var total=msState.total;
+  var correct=msState.correct;
+  var acc=total>0?Math.round(correct/total*100):0;
+  var avgDist=rounds.length>0?Math.round(rounds.reduce(function(s,r){return s+r.dist;},0)/rounds.length*40):0;
+
+  // Score + ring animation
+  document.getElementById('mso-score').textContent=score;
+  var maxScore=total*100;
+  var pct=maxScore>0?score/maxScore:0;
+  var offset=283-(283*pct);
+  setTimeout(function(){document.getElementById('mso-ring').setAttribute('stroke-dashoffset',offset);},100);
+
+  // Stats
+  document.getElementById('mso-hit').textContent=correct+'/'+total;
+  document.getElementById('mso-acc').textContent=acc+'%';
+  document.getElementById('mso-avgdist').textContent='~'+avgDist.toLocaleString()+' km';
+
+  // Mini map with dots
+  var svg=document.getElementById('mso-map-svg');
+  var html='<rect width="1000" height="500" fill="#061525"/>'+
+    '<g opacity=".04" stroke="#9fcee8" stroke-width=".3" fill="none">'+
+    '<line x1="0" y1="247" x2="1000" y2="247"/><line x1="0" y1="197" x2="1000" y2="197"/>'+
+    '<line x1="0" y1="297" x2="1000" y2="297"/>'+
+    '<line x1="174" y1="0" x2="174" y2="500"/><line x1="501" y1="0" x2="501" y2="500"/>'+
+    '<line x1="828" y1="0" x2="828" y2="500"/></g>';
+  // Draw country outlines faintly
+  for(var name in MAP_PATHS){
+    html+='<path d="'+MAP_PATHS[name]+'" fill="#1a3050" stroke="#0a1a2a" stroke-width=".3" opacity=".5"/>';
+  }
+  // Draw click dots
+  rounds.forEach(function(r){
+    var col=r.hit?'var(--lime)':r.pts>=50?'var(--amber)':'var(--rose)';
+    html+='<circle cx="'+r.clickX+'" cy="'+r.clickY+'" r="5" fill="'+col+'" stroke="#fff" stroke-width="1" opacity=".85"/>';
+  });
+  svg.innerHTML=html;
+
+  // Best/Worst
+  if(rounds.length>0){
+    var best=rounds.slice().sort(function(a,b){return b.pts-a.pts;})[0];
+    var worst=rounds.slice().sort(function(a,b){return a.pts-b.pts;})[0];
+    document.getElementById('mso-bestworst').innerHTML=
+      'Best: <span style="color:var(--lime)">'+best.displayName+'</span> ('+best.pts+') · '+
+      'Worst: <span style="color:var(--rose)">'+worst.displayName+'</span> ('+worst.pts+')';
+  }
+
+  // XP + achievements
+  try{flushXP();}catch(e){}
+  try{incGames();}catch(e){}
+  setTimeout(function(){try{checkAchievements();}catch(e){}},600);
 }
 
 function msNext(){
