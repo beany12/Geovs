@@ -1452,7 +1452,17 @@ function hl67Escalation(){
 
 function replayGame(){
   if(!_lastState) return goHome();
-  if(_lastState.lastMode==='hl') launchHL();
+  if(_lastState.lastMode==='hl'){
+    // Keep category + continent selection, only reset score
+    var savedCats=hlS.selectedCats||[0];
+    var savedCatIdx=hlS.catIdx||0;
+    var savedContIdx=hlS.contIdx||0;
+    hlS={score:0,streak:0,bestStreak:0,round:0,correct:0,total_q:0,catIdx:savedCatIdx,selectedCats:savedCats,contIdx:savedContIdx,lastMode:'hl',prevB:null,prevMKey:null,_newRecordShown:false};
+    buildCatBar('hl-cats',hlS,()=>{hlS.score=0;hlS.streak=0;hlS.bestStreak=0;hlS.round=0;hlS.correct=0;hlS.total_q=0;hlS.prevB=null;hlS.prevMKey=null;hlS._newRecordShown=false;var _cs=document.getElementById('hl-cur-score');if(_cs)_cs.textContent='0';hlRound();});
+    buildContBar('hl-conts',hlS,()=>{hlS.score=0;hlS.streak=0;hlS.bestStreak=0;hlS.round=0;hlS.correct=0;hlS.total_q=0;hlS.prevB=null;hlS.prevMKey=null;hlS._newRecordShown=false;var _cs=document.getElementById('hl-cur-score');if(_cs)_cs.textContent='0';hlRound();});
+    hlHUD(); hlRound(); showScreen('hl');
+    return;
+  }
   else if(_lastState.lastMode==='border') launchBorderSetup();
   else if(_lastState.lastMode==='capitals') launchCapitals();
   else if(_lastState.lastMode==='flags') launchFlags();
