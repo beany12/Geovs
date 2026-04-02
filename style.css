@@ -941,6 +941,90 @@ body.hl67-chaos .btn-primary,body.hl67-chaos .btn-ghost{animation:hl67btnBounce 
 
   .xp-gain-badge{font-size:.88rem;letter-spacing:.03em}
   #pp-xp-bar{height:6px!important;border-radius:3px!important}
+
+  /* Setup screens */
+  .setup-body{padding:16px 12px}
+  .setup-hero-title{font-size:1.3rem}
+  .setup-hero-icon svg{width:32px;height:32px}
+  .setup-card{padding:16px}
+  .setup-mode-grid{flex-direction:column;gap:8px}
+  .setup-mode-btn{padding:12px 10px}
+  .setup-region-grid{grid-template-columns:1fr 1fr;gap:6px}
+  .setup-region-btn{padding:10px 6px;font-size:.72rem}
+  .setup-diff-grid{flex-direction:row;gap:6px}
+  .setup-diff-btn{padding:10px 6px}
+  .setup-diff-btn .diff-name{font-size:.75rem}
+  .setup-start{padding:16px;font-size:.95rem}
+  .setup-count{font-size:2.6rem}
+  .setup-slider{height:8px}
+  .setup-slider::-webkit-slider-thumb{width:28px;height:28px}
+
+  /* Map Sniper */
+  #ms-map-wrap{padding:0 4px}
+  #ms-prompt{padding:10px 12px 4px}
+  #ms-prompt [id="ms-country-name"]{font-size:1.5rem}
+  #ms-prompt [id="ms-find-lbl"]{font-size:.52rem}
+
+  /* Party games — side by side on mobile */
+  .quick-play-wrap{padding:0 4px}
+
+  /* Over screen GIF */
+  #over-gif{max-width:220px}
+
+  /* Feedback text */
+  #ms-feedback,#mparty-feedback{padding:8px 10px}
+
+  /* GeoSpy card */
+  .spy-card{width:220px;height:300px}
+  .spy-card-back,.spy-card-front{padding:20px 16px}
+
+  /* Vote buttons */
+  .spy-vote-btn{padding:12px 14px;font-size:.82rem}
+
+  /* Map Party scores */
+  #mparty-scores{gap:6px}
+  #mparty-scores>div{min-width:50px;padding:6px 10px}
+
+  /* Daily banner */
+  .db-how{font-size:.6rem}
+
+  /* Party grid single column on mobile */
+  .party-grid{grid-template-columns:1fr!important}
+
+  /* Hide crosshair on touch */
+  #ms-crosshair{display:none!important}
+
+  /* Map zoom buttons bigger for touch */
+  #ms-zoom-ctrl button,#mparty-map-wrap button{width:36px!important;height:36px!important;font-size:1.2rem!important}
+
+  /* Chain/Party name inputs */
+  #spy-name-inputs input,#mparty-name-inputs input{padding:8px 12px;font-size:.8rem}
+
+  /* Home party section */
+  .mode-name{font-size:1rem}
+  .mode-desc{font-size:.72rem}
+}
+
+/* ═══ SMALL PHONES (≤375px) ═══ */
+@media(max-width:375px){
+  .home-title{font-size:clamp(44px,16vw,80px)}
+  .modes-layout{gap:16px}
+  .mode-card{padding:12px 10px}
+  .mode-icon{width:32px;height:32px;border-radius:8px}
+  .mode-icon svg{width:18px;height:18px}
+  .mode-name{font-size:.9rem}
+  .mode-desc{font-size:.65rem}
+  .daily-banner{padding:10px 10px;gap:8px}
+  .db-title{font-size:.88rem}
+  .strip-val{font-size:1.4rem}
+  .strip-lbl{font-size:.5rem}
+  .setup-region-grid{grid-template-columns:1fr 1fr}
+  .hl-qlabel{font-size:.65rem;padding:6px 14px}
+  .over-card{padding:20px 12px}
+  .over-title{font-size:2.2rem}
+  .over-score{font-size:3.2rem}
+  .spy-card{width:200px;height:280px}
+  #ms-prompt [id="ms-country-name"]{font-size:1.2rem}
 }
 
 /* ═══ JOKERS ═══ */
@@ -1528,6 +1612,22 @@ body.hl67-chaos .btn-primary,body.hl67-chaos .btn-ghost{animation:hl67btnBounce 
 
   .xp-gain-badge{font-size:.8rem}
   #pp-xp-bar{height:5px!important;border-radius:2.5px!important}
+
+  /* Tablet: setup screens */
+  .setup-body{max-width:480px}
+  .setup-mode-grid{flex-direction:row}
+  .setup-region-grid{grid-template-columns:1fr 1fr 1fr}
+
+  /* Tablet: Map Sniper */
+  #ms-map-wrap{max-width:750px}
+
+  /* Tablet: Party games */
+  .spy-card{width:260px;height:340px}
+  #mparty-map-wrap{max-width:750px}
+
+  /* Tablet: game over */
+  .over-card{max-width:420px}
+  #over-gif{max-width:250px}
 }
 
 /* ═══ REDUCED MOTION ═══ */
