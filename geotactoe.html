@@ -1097,6 +1097,11 @@ function updateTimerUI() {
   fill.className = 'gtt-timer-fill' + (secs <= 10 ? ' danger' : secs <= 20 ? ' warn' : '');
   num.className = 'gtt-timer-num' + (secs <= 10 ? ' danger' : secs <= 20 ? ' warn' : '');
   document.body.classList.toggle('timer-danger', secs <= 10 && currentState?.isMyTurn);
+  // Vibrate on danger (mobile)
+  if(secs <= 10 && secs > 0 && currentState?.isMyTurn && navigator.vibrate){
+    if(secs <= 5) navigator.vibrate(100);
+    else if(secs === 10) navigator.vibrate(200);
+  }
 }
 
 function stopTimerDanger() {

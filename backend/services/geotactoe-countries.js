@@ -196,4 +196,5 @@ module.exports = [
   {n:"Tonga",f:"🇹🇴",pop:100651,gdp:519,area:747,lifeExp:71.0,literacy:99.4,coast:419,co2:1.7,hdi:0.74,internet:44.0,unemp:1.2},
   {n:"Tuvalu",f:"🇹🇻",pop:11792,gdp:63,area:26,lifeExp:67.0,literacy:99.0,coast:24,co2:1.5,hdi:0.641,internet:49.0,unemp:4.5},
   {n:"Vanuatu",f:"🇻🇺",pop:334506,gdp:1059,area:12189,lifeExp:70.5,literacy:87.5,coast:2528,co2:0.7,hdi:0.607,internet:30.0,unemp:5.2},
-];;
+  {n:"Seychelles",f:"🇸🇨",pop:107660,gdp:1632,area:459,lifeExp:73.0,literacy:95.9,coast:491,co2:5.3,hdi:0.785,internet:79.0,unemp:3.0},
+];

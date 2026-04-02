@@ -8,7 +8,7 @@ const COUNTRIES = require('./geotactoe-countries.js');
 // ── Continent lookup ────────────────────────────────────────────────────────
 const CONTINENTS = {
   'Europe':["Albania","Andorra","Austria","Belarus","Belgium","Bosnia & Herz.","Bulgaria","Croatia","Czech Republic","Denmark","Estonia","Finland","France","Germany","Greece","Hungary","Iceland","Ireland","Italy","Kosovo","Latvia","Liechtenstein","Lithuania","Luxembourg","Malta","Moldova","Monaco","Montenegro","Netherlands","North Macedonia","Norway","Poland","Portugal","Romania","Russia","San Marino","Serbia","Slovakia","Slovenia","Spain","Sweden","Switzerland","UK","Ukraine","Vatican City"],
-  'Africa':["Algeria","Angola","Benin","Botswana","Burkina Faso","Burundi","Cameroon","Cape Verde","Central African Rep.","Chad","Comoros","DR Congo","Congo","Djibouti","Egypt","Equatorial Guinea","Eritrea","Eswatini","Ethiopia","Gabon","Gambia","Ghana","Guinea","Guinea-Bissau","Ivory Coast","Kenya","Lesotho","Liberia","Libya","Madagascar","Malawi","Mali","Mauritania","Mauritius","Morocco","Mozambique","Namibia","Niger","Nigeria","Rwanda","São Tomé & Príncipe","Senegal","Sierra Leone","Somalia","South Africa","South Sudan","Sudan","Tanzania","Togo","Tunisia","Uganda","Zambia","Zimbabwe"],
+  'Africa':["Algeria","Angola","Benin","Botswana","Burkina Faso","Burundi","Cameroon","Cape Verde","Central African Rep.","Chad","Comoros","DR Congo","Congo","Djibouti","Egypt","Equatorial Guinea","Eritrea","Eswatini","Ethiopia","Gabon","Gambia","Ghana","Guinea","Guinea-Bissau","Ivory Coast","Kenya","Lesotho","Liberia","Libya","Madagascar","Malawi","Mali","Mauritania","Mauritius","Morocco","Mozambique","Namibia","Niger","Nigeria","Rwanda","São Tomé & Príncipe","Senegal","Seychelles","Sierra Leone","Somalia","South Africa","South Sudan","Sudan","Tanzania","Togo","Tunisia","Uganda","Zambia","Zimbabwe"],
   'Asia':["Afghanistan","Armenia","Azerbaijan","Bahrain","Bangladesh","Bhutan","Brunei","Cambodia","China","Cyprus","Georgia","India","Indonesia","Iran","Iraq","Israel","Japan","Jordan","Kazakhstan","Kuwait","Kyrgyzstan","Laos","Lebanon","Malaysia","Maldives","Mongolia","Myanmar","Nepal","North Korea","Oman","Pakistan","Palestine","Philippines","Qatar","Saudi Arabia","Singapore","South Korea","Sri Lanka","Syria","Taiwan","Tajikistan","Thailand","Timor-Leste","Turkey","Turkmenistan","UAE","Uzbekistan","Vietnam","Yemen"],
   'Americas':["Antigua & Barbuda","Argentina","Bahamas","Barbados","Belize","Bolivia","Brazil","Canada","Chile","Colombia","Costa Rica","Cuba","Dominica","Dominican Rep.","Ecuador","El Salvador","Grenada","Guatemala","Guyana","Haiti","Honduras","Jamaica","Mexico","Nicaragua","Panama","Paraguay","Peru","Saint Kitts & Nevis","Saint Lucia","St. Vincent & Gren.","Suriname","Trinidad & Tobago","Uruguay","USA","Venezuela"],
   'Oceania':["Australia","Fiji","Kiribati","Marshall Islands","Micronesia","Nauru","New Zealand","Palau","Papua New Guinea","Samoa","Solomon Islands","Tonga","Tuvalu","Vanuatu"],
@@ -22,7 +22,7 @@ function getContinent(name) {
 }
 
 // ── Hardcoded trivia sets ───────────────────────────────────────────────────
-const ISLAND_NATIONS = new Set(["Australia","Bahamas","Bahrain","Barbados","Brunei","Cape Verde","Comoros","Cuba","Cyprus","Dominica","Dominican Rep.","Fiji","Grenada","Haiti","Iceland","Indonesia","Ireland","Jamaica","Japan","Kiribati","Madagascar","Maldives","Malta","Marshall Islands","Mauritius","Micronesia","Nauru","New Zealand","Palau","Papua New Guinea","Philippines","Saint Kitts & Nevis","Saint Lucia","Samoa","São Tomé & Príncipe","Singapore","Solomon Islands","Sri Lanka","St. Vincent & Gren.","Taiwan","Timor-Leste","Tonga","Trinidad & Tobago","Tuvalu","UK","Vanuatu"]);
+const ISLAND_NATIONS = new Set(["Australia","Bahamas","Bahrain","Barbados","Brunei","Cape Verde","Comoros","Cuba","Cyprus","Dominica","Dominican Rep.","Fiji","Grenada","Haiti","Iceland","Indonesia","Ireland","Jamaica","Japan","Kiribati","Madagascar","Maldives","Malta","Marshall Islands","Mauritius","Micronesia","Nauru","New Zealand","Palau","Papua New Guinea","Philippines","Saint Kitts & Nevis","Saint Lucia","Samoa","São Tomé & Príncipe","Seychelles","Singapore","Solomon Islands","Sri Lanka","St. Vincent & Gren.","Taiwan","Timor-Leste","Tonga","Trinidad & Tobago","Tuvalu","UK","Vanuatu"]);
 
 const HAS_DESERT = new Set(["Algeria","Australia","Bahrain","Botswana","Chad","China","Egypt","Eritrea","India","Iran","Iraq","Israel","Jordan","Kazakhstan","Kuwait","Libya","Mali","Mauritania","Mexico","Mongolia","Morocco","Namibia","Niger","Oman","Pakistan","Peru","Qatar","Saudi Arabia","Somalia","South Africa","Sudan","Syria","Tunisia","Turkmenistan","UAE","USA","Uzbekistan","Yemen"]);
 
@@ -58,16 +58,23 @@ const HOSTED_WORLD_CUP = new Set(["Argentina","Brazil","Canada","Chile","France"
 
 // ── Criteria definitions ────────────────────────────────────────────────────
 const ALL_CRITERIA = [
-  // ── Name-based ──
-  { id: 'startsS',    label: 'Starts with "S"',      icon: '🔤', cat: 'nameS',  test: c => c.n.startsWith('S') },
-  { id: 'startsC',    label: 'Starts with "C"',      icon: '🔤', cat: 'nameC',  test: c => c.n.startsWith('C') },
-  { id: 'startsVowel',label: 'Starts with a vowel',  icon: '🅰️', cat: 'nameV',  test: c => 'AEIOU'.includes(c.n[0]) },
-  { id: 'endsStan',   label: 'Ends in "-stan"',      icon: '🏔️', cat: 'nameSt', test: c => c.n.toLowerCase().endsWith('stan') },
-  { id: 'endsIA',     label: 'Ends in "-ia"',        icon: '✏️', cat: 'nameIA', test: c => c.n.toLowerCase().endsWith('ia') },
-  { id: 'name4',      label: '4-letter name',        icon: '🔡', cat: 'name4',  test: c => c.n.replace(/[^a-zA-Z]/g,'').length === 4 },
-  { id: 'name10',     label: '10+ letter name',      icon: '📏', cat: 'name10', test: c => c.n.replace(/[^a-zA-Z]/g,'').length >= 10 },
-  { id: 'hasZ',       label: 'Contains "Z"',         icon: '💤', cat: 'nameZ',  test: c => c.n.toUpperCase().includes('Z') },
-  { id: 'twoWord',    label: 'Two-word name',        icon: '📝', cat: 'name2w', test: c => c.n.includes(' ') },
+  // ── Name-based (all share cat 'letter' so max 1 letter criterion per board) ──
+  { id: 'startsS',    label: 'Starts with "S"',      icon: '🔤', cat: 'letter', test: c => c.n.startsWith('S') },
+  { id: 'startsC',    label: 'Starts with "C"',      icon: '🔤', cat: 'letter', test: c => c.n.startsWith('C') },
+  { id: 'startsM',    label: 'Starts with "M"',      icon: '🔤', cat: 'letter', test: c => c.n.startsWith('M') },
+  { id: 'startsB',    label: 'Starts with "B"',      icon: '🔤', cat: 'letter', test: c => c.n.startsWith('B') },
+  { id: 'startsA',    label: 'Starts with "A"',      icon: '🔤', cat: 'letter', test: c => c.n.startsWith('A') },
+  { id: 'startsG',    label: 'Starts with "G"',      icon: '🔤', cat: 'letter', test: c => c.n.startsWith('G') },
+  { id: 'startsN',    label: 'Starts with "N"',      icon: '🔤', cat: 'letter', test: c => c.n.startsWith('N') },
+  { id: 'startsT',    label: 'Starts with "T"',      icon: '🔤', cat: 'letter', test: c => c.n.startsWith('T') },
+  { id: 'startsVowel',label: 'Starts with a vowel',  icon: '🅰️', cat: 'vowel',  test: c => 'AEIOU'.includes(c.n[0]) },
+  { id: 'endsStan',   label: 'Ends in "-stan"',      icon: '🏔️', cat: 'ending', test: c => c.n.toLowerCase().endsWith('stan') },
+  { id: 'endsIA',     label: 'Ends in "-ia"',        icon: '✏️', cat: 'ending', test: c => c.n.toLowerCase().endsWith('ia') },
+  { id: 'endsLand',   label: 'Ends in "-land"',      icon: '🏞️', cat: 'ending', test: c => c.n.toLowerCase().endsWith('land') },
+  { id: 'name4',      label: '4-letter name',        icon: '🔡', cat: 'namelen',test: c => c.n.replace(/[^a-zA-Z]/g,'').length === 4 },
+  { id: 'name10',     label: '10+ letter name',      icon: '📏', cat: 'namelen',test: c => c.n.replace(/[^a-zA-Z]/g,'').length >= 10 },
+  { id: 'hasZ',       label: 'Contains "Z"',         icon: '💤', cat: 'namehas',test: c => c.n.toUpperCase().includes('Z') },
+  { id: 'twoWord',    label: 'Two-word name',        icon: '📝', cat: 'namehas',test: c => c.n.includes(' ') },
 
   // ── Geography ──
   { id: 'island',     label: 'Island nation',        icon: '🏝️', cat: 'island',  test: c => ISLAND_NATIONS.has(c.n) },
@@ -215,7 +222,7 @@ function createRoom(socketId, profile) {
     board,
     cells: Array(9).fill(null),
     usedCountries: new Set(),
-    turn: 0,
+    turn: Math.random() < 0.5 ? 0 : 1,
     scores: [0, 0],
     round: 1,
     consecutiveSkips: 0,
