@@ -172,35 +172,32 @@
 
 <!-- ══════════════ SCREEN: LOBBY ══════════════ -->
 <div id="screen-lobby" class="screen active">
-  <div class="br-header">
-    <div class="br-logo">
-      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-      <div>BorderRun<span id="t-subtitle">2-Player Race</span></div>
+  <!-- Immersive Hero -->
+  <div style="width:100%;border-radius:20px;overflow:hidden;border:1px solid rgba(0,255,213,.08);margin-bottom:14px;position:relative">
+    <!-- Background with grid + route -->
+    <div style="width:100%;aspect-ratio:2.2/1;background:linear-gradient(135deg,#061525,#0a2a48,#061525);position:relative">
+      <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 30% 60%,rgba(0,255,213,.06),transparent 50%),radial-gradient(ellipse at 70% 40%,rgba(255,192,32,.04),transparent 50%)"></div>
+      <svg viewBox="0 0 400 200" style="width:100%;height:100%;position:absolute;inset:0;opacity:.06"><line x1="0" y1="100" x2="400" y2="100" stroke="#fff" stroke-width=".5"/><line x1="0" y1="60" x2="400" y2="60" stroke="#fff" stroke-width=".3"/><line x1="0" y1="140" x2="400" y2="140" stroke="#fff" stroke-width=".3"/><line x1="100" y1="0" x2="100" y2="200" stroke="#fff" stroke-width=".3"/><line x1="200" y1="0" x2="200" y2="200" stroke="#fff" stroke-width=".3"/><line x1="300" y1="0" x2="300" y2="200" stroke="#fff" stroke-width=".3"/></svg>
+      <!-- Route dots -->
+      <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;gap:12px">
+        <div style="width:14px;height:14px;border-radius:50%;background:var(--teal,#00ffd5);box-shadow:0 0 14px rgba(0,255,213,.5);border:2px solid #fff"></div>
+        <div style="width:50px;height:1.5px;background:repeating-linear-gradient(90deg,rgba(0,255,213,.4) 0 5px,transparent 5px 10px)"></div>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.25)" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+        <div style="width:50px;height:1.5px;background:repeating-linear-gradient(90deg,rgba(255,192,32,.4) 0 5px,transparent 5px 10px)"></div>
+        <div style="width:14px;height:14px;border-radius:50%;background:var(--amber,#ffc020);box-shadow:0 0 14px rgba(255,192,32,.5);border:2px solid #fff"></div>
+      </div>
+      <!-- Title overlay -->
+      <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:16px">
+        <div style="font-family:var(--font-m);font-size:.5rem;letter-spacing:.2em;color:var(--teal,#00ffd5);padding:3px 12px;border-radius:100px;border:1px solid rgba(0,255,213,.2);background:rgba(0,255,213,.06)" id="t-subtitle">MULTIPLAYER</div>
+        <div style="font-family:var(--font-d);font-size:2.2rem;line-height:1;text-shadow:0 2px 16px rgba(0,0,0,.5)">Border<span style="color:var(--teal,#00ffd5)">Run</span></div>
+        <div style="font-size:.72rem;color:var(--muted2);text-align:center;max-width:280px" id="t-game-desc">Race through neighboring countries. First to the target wins.</div>
+      </div>
+      <!-- Home link -->
+      <a class="back-link" href="index.html" style="position:absolute;top:10px;right:10px;font-size:.7rem;padding:5px 10px">← Home</a>
     </div>
-    <a class="back-link" href="index.html">← Home</a>
-  </div>
-
-  <!-- Hero -->
-  <div style="text-align:center;margin-bottom:24px;position:relative">
-    <div style="display:flex;align-items:center;justify-content:center;margin-bottom:12px">
-      <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="var(--teal,#00ffd5)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="filter:drop-shadow(0 0 8px rgba(0,255,213,.3))"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>
-    </div>
-    <div style="font-family:var(--font-d);font-size:1.6rem;color:var(--text);margin-bottom:8px" id="t-game-title">Race Across Borders</div>
-    <div style="font-size:.82rem;color:var(--muted2);line-height:1.6;max-width:380px;margin:0 auto" id="t-game-desc">
-      Both players start at the same country and race to the target — moving only through land borders. First to arrive wins!
-    </div>
-    <div style="display:flex;justify-content:center;gap:24px;margin-top:16px">
-      <div style="text-align:center"><div style="font-family:var(--font-d);font-size:1.3rem;color:var(--teal,#00ffd5)">2</div><div style="font-family:var(--font-m);font-size:.55rem;color:var(--muted);letter-spacing:.1em">PLAYERS</div></div>
-      <div style="width:1px;background:rgba(255,255,255,.06)"></div>
-      <div style="text-align:center"><div style="font-family:var(--font-d);font-size:1.3rem;color:var(--teal,#00ffd5)">195</div><div style="font-family:var(--font-m);font-size:.55rem;color:var(--muted);letter-spacing:.1em">COUNTRIES</div></div>
-      <div style="width:1px;background:rgba(255,255,255,.06)"></div>
-      <div style="text-align:center"><div style="font-family:var(--font-d);font-size:1.3rem;color:var(--teal,#00ffd5)">LIVE</div><div style="font-family:var(--font-m);font-size:.55rem;color:var(--muted);letter-spacing:.1em">REALTIME</div></div>
-    </div>
-  </div>
-
-  <!-- Difficulty -->
-  <div class="br-card" id="diff-card">
-    <div class="br-card-title" id="t-diff-lbl">Difficulty</div>
+    <!-- Lower section -->
+    <div style="padding:18px 20px;display:flex;flex-direction:column;gap:12px;background:rgba(14,14,26,.7);backdrop-filter:blur(8px)">
+      <div style="font-family:var(--font-m);font-size:.55rem;letter-spacing:.15em;color:var(--muted)" id="t-diff-lbl">DIFFICULTY</div>
     <div class="br-diff-btns">
       <button class="br-diff-btn" data-diff="easy" onclick="setDifficulty('easy')">
         <div class="br-diff-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9 12l2 2 4-4"/></svg></div>
@@ -218,21 +215,20 @@
         <div class="br-diff-desc" id="t-diff-hard-desc">Global · 7-11 hops</div>
       </button>
     </div>
-    <div style="font-size:.68rem;color:var(--muted2);margin-top:8px;text-align:center" id="t-diff-note">Only the room creator's choice applies</div>
-  </div>
-
-  <!-- Tabbed Create / Join -->
-  <div class="br-lobby-card">
-    <div class="br-tabs">
-      <button class="br-tab active" onclick="switchBrTab('create')" id="t-create-title">Create Match</button>
-      <button class="br-tab" onclick="switchBrTab('join')" id="t-join-title">Join Match</button>
-    </div>
-    <div class="br-tab-body active" id="br-tab-create">
-      <button class="btn-lime" onclick="createMatch()" id="t-create-btn">Create Match →</button>
-    </div>
-    <div class="br-tab-body" id="br-tab-join">
-      <input class="br-input" id="join-code-input" maxlength="6" placeholder="XXXXXX" oninput="this.value=this.value.toUpperCase()">
-      <button class="btn-lime" onclick="joinMatch()" id="t-join-btn">Join →</button>
+    <div style="font-size:.6rem;color:var(--muted2);margin-top:6px;text-align:center" id="t-diff-note">Only the room creator's choice applies</div>
+      <div style="width:100%;height:1px;background:rgba(255,255,255,.04);margin:4px 0"></div>
+      <!-- Tabs inside the immersive card -->
+      <div class="br-tabs" style="border-radius:10px;overflow:hidden;border:1.5px solid rgba(255,255,255,.06)">
+        <button class="br-tab active" onclick="switchBrTab('create')" id="t-create-title">Create Match</button>
+        <button class="br-tab" onclick="switchBrTab('join')" id="t-join-title">Join Match</button>
+      </div>
+      <div class="br-tab-body active" id="br-tab-create" style="padding:8px 0 0">
+        <button class="btn-lime" onclick="createMatch()" id="t-create-btn">Create Match →</button>
+      </div>
+      <div class="br-tab-body" id="br-tab-join" style="padding:8px 0 0">
+        <input class="br-input" id="join-code-input" maxlength="6" placeholder="XXXXXX" oninput="this.value=this.value.toUpperCase()">
+        <button class="btn-lime" onclick="joinMatch()" id="t-join-btn">Join →</button>
+      </div>
     </div>
   </div>
 </div>
