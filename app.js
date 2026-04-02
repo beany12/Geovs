@@ -1450,6 +1450,56 @@ function hl67Escalation(){
   },8000);
 }
 
+function quizShowGameOver(mode, state){
+  showScreen('quiz-over');
+  var correct=state.score||0;
+  var total=state.total||1;
+  var wrong=total-correct;
+  var pct=Math.round(correct/total*100);
+  var streak=state.bestStreak||state.streak||0;
+
+  // Mode label + ring color
+  var isFlg=mode==='flg';
+  var color=isFlg?'var(--orange)':'var(--blue)';
+  var modeLabel=isFlg?({en:'FLAGS QUIZ',de:'FLAGGEN QUIZ',fr:'QUIZ DRAPEAUX',es:'QUIZ BANDERAS'}[curLang]||'FLAGS QUIZ'):({en:'CAPITALS QUIZ',de:'HAUPTSTÄDTE QUIZ',fr:'QUIZ CAPITALES',es:'QUIZ CAPITALES'}[curLang]||'CAPITALS QUIZ');
+  document.getElementById('qo-mode-lbl').textContent=modeLabel;
+  document.getElementById('qo-mode-lbl').style.color=color;
+  document.getElementById('qo-ring').setAttribute('stroke',color);
+
+  // Ring animation
+  var offset=345-(345*pct/100);
+  document.getElementById('qo-ring').setAttribute('stroke-dashoffset','345');
+  setTimeout(function(){document.getElementById('qo-ring').setAttribute('stroke-dashoffset',String(offset));},100);
+
+  // Percentage
+  document.getElementById('qo-pct').textContent=pct+'%';
+  document.getElementById('qo-pct').style.color=color;
+
+  // Message
+  var msgs={
+    en:pct===100?'Perfect score!':pct>=80?'Solid knowledge!':pct>=60?'Above average.':pct>=40?'Room to improve.':'Keep practicing!',
+    de:pct===100?'Perfekt!':pct>=80?'Solides Wissen!':pct>=60?'Überdurchschnittlich.':pct>=40?'Da geht noch mehr.':'Weiter üben!',
+    fr:pct===100?'Parfait!':pct>=80?'Solide!':pct>=60?'Au-dessus de la moyenne.':pct>=40?'Peut mieux faire.':'Continuez!',
+    es:pct===100?'¡Perfecto!':pct>=80?'¡Sólido!':pct>=60?'Por encima del promedio.':pct>=40?'Hay margen.':'¡Sigue practicando!'
+  };
+  document.getElementById('qo-msg').textContent=msgs[curLang]||msgs.en;
+
+  // Stats
+  document.getElementById('qo-correct').textContent=correct;
+  document.getElementById('qo-wrong').textContent=wrong;
+  document.getElementById('qo-streak').textContent=streak;
+
+  // Replay button
+  var replayBtn=document.getElementById('qo-replay');
+  replayBtn.onclick=function(){isFlg?launchFlags():launchCapitals();};
+
+  // XP + achievements
+  _lastState={lastMode:mode};
+  try{flushXP();}catch(e){}
+  try{incGames();}catch(e){}
+  setTimeout(function(){try{checkAchievements();}catch(e){}},600);
+}
+
 function replayGame(){
   if(!_lastState) return goHome();
   if(_lastState.lastMode==='hl'){
@@ -2693,7 +2743,7 @@ function capStart(){
 }
 
 function capRound(){
-  if(cS.round>=cS.total){ showOver({score:cS.score,correct:cS.score,total_q:cS.total,bestStreak:0,total:cS.total,lastMode:'cap'}); return; }
+  if(cS.round>=cS.total){ quizShowGameOver('cap',cS); return; }
   var q=cS.pool[cS.round]; cS.current=q; cS.answer=CAPITALS[q.n];
   document.getElementById('cap-prog-lbl').textContent=(cS.round+1)+'/'+cS.total;
   document.getElementById('cap-prog').style.width=(cS.round/cS.total*100)+'%';
@@ -3002,7 +3052,7 @@ function pickConfuserFlags(correct, pool) {
 }
 
 function flgRound(){
-  if(fS.round>=fS.total){ showOver({score:fS.score,correct:fS.score,total_q:fS.total,bestStreak:0,total:fS.total,lastMode:'flg'}); return; }
+  if(fS.round>=fS.total){ quizShowGameOver('flg',fS); return; }
   var q=fS.pool[fS.round]; fS.current=q;
   document.getElementById('flg-prog-lbl').textContent=(fS.round+1)+'/'+fS.total;
   document.getElementById('flg-prog').style.width=(fS.round/fS.total*100)+'%';

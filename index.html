@@ -922,6 +922,50 @@
 </div>
 
 <!-- ══════════════════════════════════════
+     QUIZ GAME OVER (Capitals + Flags)
+══════════════════════════════════════ -->
+<div class="screen" id="squiz-over">
+  <div class="hl-body" style="gap:14px;padding:20px 16px;justify-content:center;min-height:100vh">
+    <div class="over-card" style="gap:14px;max-width:460px;animation:fadeUp .5s ease both">
+      <div id="qo-mode-lbl" style="font-family:var(--font-m);font-size:.6rem;letter-spacing:.18em;color:var(--blue)">CAPITALS QUIZ</div>
+      <!-- Ring -->
+      <div style="position:relative;width:130px;height:130px">
+        <svg width="130" height="130" viewBox="0 0 130 130" style="transform:rotate(-90deg)">
+          <circle cx="65" cy="65" r="55" fill="none" stroke="rgba(255,255,255,.06)" stroke-width="7"/>
+          <circle id="qo-ring" cx="65" cy="65" r="55" fill="none" stroke="var(--blue)" stroke-width="7" stroke-linecap="round" stroke-dasharray="345" stroke-dashoffset="345" style="transition:stroke-dashoffset 1s ease;filter:drop-shadow(0 0 4px rgba(61,160,255,.4))"/>
+        </svg>
+        <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center">
+          <div id="qo-pct" style="font-family:var(--font-d);font-size:2.8rem;color:var(--blue);line-height:1">0%</div>
+          <div style="font-family:var(--font-m);font-size:.45rem;color:var(--muted);letter-spacing:.1em">ACCURACY</div>
+        </div>
+      </div>
+      <!-- Message -->
+      <div id="qo-msg" style="font-size:1rem;font-weight:700;color:var(--muted2)"></div>
+      <!-- Stats -->
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;width:100%">
+        <div style="padding:10px 6px;border-radius:10px;background:rgba(255,255,255,.03);text-align:center">
+          <div id="qo-correct" style="font-family:var(--font-d);font-size:1.4rem;color:var(--lime);line-height:1">0</div>
+          <div style="font-family:var(--font-m);font-size:.45rem;color:var(--muted);letter-spacing:.1em;margin-top:3px">CORRECT</div>
+        </div>
+        <div style="padding:10px 6px;border-radius:10px;background:rgba(255,255,255,.03);text-align:center">
+          <div id="qo-wrong" style="font-family:var(--font-d);font-size:1.4rem;color:var(--rose);line-height:1">0</div>
+          <div style="font-family:var(--font-m);font-size:.45rem;color:var(--muted);letter-spacing:.1em;margin-top:3px">WRONG</div>
+        </div>
+        <div style="padding:10px 6px;border-radius:10px;background:rgba(255,255,255,.03);text-align:center">
+          <div id="qo-streak" style="font-family:var(--font-d);font-size:1.4rem;color:var(--amber);line-height:1">0</div>
+          <div style="font-family:var(--font-m);font-size:.45rem;color:var(--muted);letter-spacing:.1em;margin-top:3px">BEST STREAK</div>
+        </div>
+      </div>
+      <!-- Buttons -->
+      <div class="over-actions" style="width:100%">
+        <button class="btn-primary" id="qo-replay" style="flex:2">Play Again</button>
+        <button class="btn-ghost" onclick="goHome()" style="flex:1">← Home</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
      MAP SNIPER — GAME OVER
 ══════════════════════════════════════ -->
 <div class="screen" id="sms-over">
