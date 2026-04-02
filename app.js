@@ -725,7 +725,7 @@ function hlRound(){
     cA=hlS.prevB;
     const mKeys=getMetricKeys(hlS.selectedCats||[0]);
     const isSingle=hlS.selectedCats&&!hlS.selectedCats.includes(0)&&hlS.selectedCats.length===1&&mKeys.length===1;
-    mKey=isSingle&&hlS.prevMKey?hlS.prevMKey:rand(mKeys);
+    mKey=isSingle?mKeys[0]:(hlS.prevMKey||rand(mKeys));
     m=T.metrics[mKey];
     const candidates=pool.filter(c=>c.n!==cA.n);
     cB=rand(candidates.length>0?candidates:pool);
@@ -4648,7 +4648,7 @@ function msRenderMap(){
   if(!svg) return;
   var html='<defs>'+
     '<linearGradient id="ms-og" gradientUnits="userSpaceOnUse" x1="500" y1="0" x2="500" y2="500">'+
-    '<stop offset="0%" stop-color="#0b1d35"/><stop offset="50%" stop-color="#1a6fa3"/><stop offset="100%" stop-color="#0a1b30"/>'+
+    '<stop offset="0%" stop-color="#061525"/><stop offset="50%" stop-color="#0d3560"/><stop offset="100%" stop-color="#051220"/>'+
     '</linearGradient></defs>'+
     '<rect width="1000" height="500" fill="url(#ms-og)"/>'+
     '<g opacity=".06" stroke="#9fcee8" stroke-width=".3" fill="none">'+
@@ -4660,7 +4660,7 @@ function msRenderMap(){
     '<line x1="828" y1="0" x2="828" y2="500"/></g>';
   // Draw all countries
   for(var name in MAP_PATHS){
-    html+='<path d="'+MAP_PATHS[name]+'" fill="#1a3a5c" stroke="#2a5f82" stroke-width=".4" stroke-linejoin="round" opacity=".6" data-country="'+name.replace(/'/g,'&#39;')+'"/>';
+    html+='<path d="'+MAP_PATHS[name]+'" fill="#2a4a6a" stroke="#000" stroke-width=".5" stroke-linejoin="round" opacity=".85" data-country="'+name.replace(/'/g,'&#39;')+'"/>';
   }
   // Click target layer (transparent, on top)
   // Micro-state markers
@@ -4775,12 +4775,7 @@ function msClick(e){
     '</circle>'+
     '<circle cx="'+svgX+'" cy="'+svgY+'" r="3" fill="'+(pts>=50?'var(--lime)':'var(--rose)')+'"/>';
 
-  // Show correct location
-  markerHtml+='<circle cx="'+center.x+'" cy="'+center.y+'" r="4" fill="var(--violet)" stroke="#fff" stroke-width="1.5"/>'+
-    '<circle cx="'+center.x+'" cy="'+center.y+'" r="12" fill="none" stroke="var(--violet)" stroke-width="1" opacity=".4">'+
-    '<animate attributeName="r" from="4" to="20" dur="0.8s" fill="freeze"/>'+
-    '<animate attributeName="opacity" from=".4" to="0" dur="0.8s" fill="freeze"/>'+
-    '</circle>';
+  // Country highlight only (no dot)
 
   // Draw line between click and correct
   if(dist>15){
@@ -5431,7 +5426,7 @@ function mpartyRenderMap(){
   var svg=document.getElementById('mparty-map-svg');
   if(!svg) return;
   var html='<defs><linearGradient id="mp-og" gradientUnits="userSpaceOnUse" x1="500" y1="0" x2="500" y2="500">'+
-    '<stop offset="0%" stop-color="#0b1d35"/><stop offset="50%" stop-color="#1a6fa3"/><stop offset="100%" stop-color="#0a1b30"/>'+
+    '<stop offset="0%" stop-color="#061525"/><stop offset="50%" stop-color="#0d3560"/><stop offset="100%" stop-color="#051220"/>'+
     '</linearGradient></defs><rect width="1000" height="500" fill="url(#mp-og)"/>'+
     '<g opacity=".06" stroke="#9fcee8" stroke-width=".3" fill="none">'+
     '<line x1="0" y1="247" x2="1000" y2="247"/><line x1="0" y1="197" x2="1000" y2="197"/>'+
@@ -5439,7 +5434,7 @@ function mpartyRenderMap(){
     '<line x1="174" y1="0" x2="174" y2="500"/><line x1="501" y1="0" x2="501" y2="500"/>'+
     '<line x1="828" y1="0" x2="828" y2="500"/></g>';
   for(var name in MAP_PATHS){
-    html+='<path d="'+MAP_PATHS[name]+'" fill="#1a3a5c" stroke="#2a5f82" stroke-width=".4" stroke-linejoin="round" opacity=".6"/>';
+    html+='<path d="'+MAP_PATHS[name]+'" fill="#2a4a6a" stroke="#000" stroke-width=".5" stroke-linejoin="round" opacity=".85"/>';
   }
   html+='<g id="mp-markers"></g>';
   html+=msRenderMicrostateMarkers();

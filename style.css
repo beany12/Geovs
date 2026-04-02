@@ -644,53 +644,19 @@ body.hl67-chaos .btn-primary,body.hl67-chaos .btn-ghost{animation:hl67btnBounce 
   100%{transform:translateY(-6px) rotate(1deg)}
 }
 
-/* ═══ NEW HIGHSCORE CELEBRATION ═══ */
+/* ═══ NEW HIGHSCORE — simple, clean ═══ */
 .hl-newhs-badge{
   flex-direction:column;align-items:center;gap:4px;
-  position:relative;padding:12px 24px;margin-top:2px;
+  position:relative;padding:8px 20px;margin-top:2px;
 }
-
-/* Background glow pulse */
-.hl-newhs-glow{
-  position:absolute;inset:-20px;border-radius:50%;
-  background:radial-gradient(circle,rgba(184,255,16,.12),transparent 70%);
-  pointer-events:none;opacity:0;
-}
-.hl-newhs-animate .hl-newhs-glow{
-  animation:nhsGlow 2s .6s ease-in-out infinite alternate;
-}
-@keyframes nhsGlow{0%{opacity:0;transform:scale(.8)}100%{opacity:1;transform:scale(1.1)}}
-
-/* Three stars row */
-.hl-newhs-stars{
-  display:flex;align-items:flex-end;gap:6px;position:relative;z-index:1;
-}
-.hl-newhs-star{opacity:0;filter:drop-shadow(0 0 6px rgba(184,255,16,.5))}
-.hl-newhs-animate .hl-newhs-star.s1{animation:nhsStar .5s .8s cubic-bezier(.34,1.56,.64,1) both}
-.hl-newhs-animate .hl-newhs-star.s2{animation:nhsStarCenter .6s 1s cubic-bezier(.34,1.56,.64,1) both}
-.hl-newhs-animate .hl-newhs-star.s3{animation:nhsStar .5s 1.2s cubic-bezier(.34,1.56,.64,1) both}
-@keyframes nhsStar{
-  0%{opacity:0;transform:scale(0) rotate(-40deg)}
-  100%{opacity:1;transform:scale(1) rotate(0deg)}
-}
-@keyframes nhsStarCenter{
-  0%{opacity:0;transform:scale(0) translateY(10px) rotate(-30deg)}
-  100%{opacity:1;transform:scale(1) translateY(-2px) rotate(0deg)}
-}
-
-/* Text with shimmer */
+.hl-newhs-glow{display:none}
+.hl-newhs-stars{display:flex;align-items:center;gap:4px}
+.hl-newhs-star{filter:drop-shadow(0 0 4px rgba(184,255,16,.3))}
+.hl-newhs-star.s1,.hl-newhs-star.s3{opacity:.6}
+.hl-newhs-star.s2{opacity:.8}
 .hl-newhs-text{
-  font-family:var(--font-d);font-size:1.3rem;letter-spacing:.12em;
-  color:var(--lime);position:relative;z-index:1;
-  text-shadow:0 0 12px rgba(184,255,16,.4);
-  opacity:0;
-}
-.hl-newhs-animate .hl-newhs-text{
-  animation:nhsTextIn .5s 1.4s ease both;
-}
-@keyframes nhsTextIn{
-  0%{opacity:0;transform:translateY(8px);letter-spacing:.3em}
-  100%{opacity:1;transform:translateY(0);letter-spacing:.12em}
+  font-family:var(--font-m);font-size:.8rem;letter-spacing:.1em;
+  color:var(--lime);
 }
 
 /* Shimmer sweep on text */
@@ -1479,15 +1445,15 @@ body.hl67-chaos .btn-primary,body.hl67-chaos .btn-ghost{animation:hl67btnBounce 
 .ach-row.locked .ach-row-xp{color:var(--muted)}
 
 .ach-toast{
-  position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);
+  position:fixed;bottom:24px;left:16px;transform:translateY(80px);
   z-index:9999;display:flex;align-items:center;gap:10px;
   background:rgba(14,14,26,.95);border:1px solid rgba(184,255,16,.25);
-  border-radius:100px;padding:10px 18px 10px 12px;opacity:0;
+  border-radius:14px;padding:10px 16px 10px 12px;opacity:0;
   transition:all .4s cubic-bezier(.34,1.56,.64,1);pointer-events:none;
-  max-width:90vw;backdrop-filter:blur(6px);
-  box-shadow:0 8px 32px rgba(0,0,0,.4),var(--glow-sm) rgba(184,255,16,.1);
+  max-width:320px;backdrop-filter:blur(6px);
+  box-shadow:0 8px 32px rgba(0,0,0,.4);
 }
-.ach-toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.ach-toast.show{opacity:1;transform:translateY(0)}
 .ach-toast-ico{font-size:1.2rem;flex-shrink:0}
 .ach-toast-body{flex:1;min-width:0}
 .ach-toast-title{font-size:.7rem;font-weight:800;color:var(--lime);letter-spacing:.03em}
