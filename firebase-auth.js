@@ -64,9 +64,9 @@ function syncFirebaseProfile(user) {
   if (window.pSave) window.pSave();
   if (window.profileRender) window.profileRender();
 
-  // Token im sessionStorage für Backend-Calls
+  // Token in memory (not accessible from DevTools like sessionStorage)
   user.getIdToken().then(token => {
-    sessionStorage.setItem('geo_token', token);
+    window._geoAuthToken = token;
   });
 }
 
@@ -78,7 +78,7 @@ window.geoAuth = {
   async logout() {
     try {
       await signOut(auth);
-      sessionStorage.removeItem('geo_token');
+      window._geoAuthToken = null;
       if (window.showToast) window.showToast('Abgemeldet');
     } catch (err) {
       console.error('[Auth] Logout failed:', err);

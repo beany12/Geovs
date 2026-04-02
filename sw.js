@@ -1,10 +1,12 @@
-const CACHE = 'geovs-v5';
+const CACHE = 'geovs-v6';
 const ASSETS = [
   '/',
   '/index.html',
   '/style.css',
   '/app-profile.js',
   '/app.js',
+  '/avatar.js',
+  '/earth.jpg',
   '/manifest.json'
 ];
 
@@ -23,14 +25,42 @@ self.addEventListener('activate', e => {
 });
 
 self.addEventListener('fetch', e => {
-  // Only cache same-origin GET requests
   if (e.request.method !== 'GET' || !e.request.url.startsWith(self.location.origin)) return;
 
-  // Never cache API, auth, or health endpoints
   const url = new URL(e.request.url);
   if (url.pathname.startsWith('/api/') || url.pathname.startsWith('/health') ||
-      url.pathname.startsWith('/auth') || url.pathname.includes('token')) return;
+      url.pathname.startsWith('/auth') || url.pathname.includes('token') ||
+      url.pathname.startsWith('/socket.io')) return;
 
+  // GIFs: cache-first with long TTL
+  if (url.pathname.endsWith('.gif')) {
+    e.respondWith(
+      caches.match(e.request).then(cached => cached || fetch(e.request).then(res => {
+        if (res && res.status === 200) {
+          const clone = res.clone();
+          caches.open(CACHE).then(c => c.put(e.request, clone));
+        }
+        return res;
+      }))
+    );
+    return;
+  }
+
+  // HTML: network-first (so updates propagate)
+  if (url.pathname.endsWith('.html') || url.pathname === '/') {
+    e.respondWith(
+      fetch(e.request).then(res => {
+        if (res && res.status === 200) {
+          const clone = res.clone();
+          caches.open(CACHE).then(c => c.put(e.request, clone));
+        }
+        return res;
+      }).catch(() => caches.match(e.request))
+    );
+    return;
+  }
+
+  // Everything else: cache-first
   e.respondWith(
     caches.match(e.request).then(cached => cached || fetch(e.request).then(res => {
       if (res && res.status === 200 && res.type === 'basic') {

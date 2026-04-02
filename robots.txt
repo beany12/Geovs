@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /backend/
+Disallow: /gifs/
+Disallow: /.claude/
+
+Sitemap: https://beany12.github.io/geovs/sitemap.xml

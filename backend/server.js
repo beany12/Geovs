@@ -3,6 +3,7 @@ const http    = require('http');
 const express = require('express');
 const cors    = require('cors');
 const helmet  = require('helmet');
+const compression = require('compression');
 const { Server } = require('socket.io');
 
 const path = require('path');
@@ -120,7 +121,9 @@ io.on('connection', (socket) => {
     if (typeof cellIdx !== 'number' || typeof country !== 'string') {
       socket.emit('gtt:error', 'INVALID_INPUT'); return;
     }
-    const result = GTT.makeMove(gttCode, socket.id, cellIdx, country.slice(0, 100));
+    if (cellIdx < 0 || cellIdx > 8) { socket.emit('gtt:error', 'INVALID_CELL'); return; }
+    const cleanCountry = country.replace(/[<>"'&]/g, '').slice(0, 100);
+    const result = GTT.makeMove(gttCode, socket.id, cellIdx, cleanCountry);
     if (result.error && !result.switchedTurn) {
       socket.emit('gtt:move_error', result.error); return;
     }
@@ -223,15 +226,25 @@ io.on('connection', (socket) => {
   });
 });
 
+// ── HTTPS redirect in production ──────────────────────────────────────────────
+if (process.env.NODE_ENV === 'production') {
+  app.use((req, res, next) => {
+    if (req.header('x-forwarded-proto') !== 'https') {
+      return res.redirect(301, `https://${req.header('host')}${req.url}`);
+    }
+    next();
+  });
+}
+
 // ── Express middleware ─────────────────────────────────────────────────────────
 app.use(helmet({
   contentSecurityPolicy: {
     directives: {
       defaultSrc:  ["'self'"],
-      scriptSrc:   ["'self'", "'unsafe-inline'", "https://www.gstatic.com", "https://cdnjs.cloudflare.com"],
+      scriptSrc:   ["'self'", "'unsafe-inline'", "https://www.gstatic.com", "https://cdnjs.cloudflare.com", "https://apis.google.com"],
       imgSrc:      ["'self'", "data:", "https://flagcdn.com", "https://cdn.jsdelivr.net", "https:"],
       connectSrc:  ["'self'", "ws:", "wss:", "https://firestore.googleapis.com", "https://www.googleapis.com", "https://*.firebaseio.com", "https://identitytoolkit.googleapis.com", "https://securetoken.googleapis.com"],
-      scriptSrcAttr: ["'unsafe-inline'"],
+      scriptSrcAttr: ["'unsafe-inline'"], // Required: app uses onclick handlers extensively
       styleSrc:    ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
       fontSrc:     ["'self'", "data:", "https://fonts.gstatic.com"],
       frameSrc:    ["'none'"],
@@ -240,8 +253,11 @@ app.use(helmet({
       formAction:  ["'self'"],
     },
   },
-  crossOriginEmbedderPolicy: false, // needed for CDN resources
+  crossOriginEmbedderPolicy: false,
   referrerPolicy: { policy: 'strict-origin-when-cross-origin' },
+  hsts: { maxAge: 31536000, includeSubDomains: true, preload: true },
+  xssFilter: true,
+  noSniff: true,
   permissionsPolicy: {
     features: {
       camera:       ["()"],
@@ -255,7 +271,9 @@ app.use(cors({
   origin: ALLOWED.length ? ALLOWED : false,
   methods: ['GET', 'POST'],
   allowedHeaders: ['Content-Type', 'x-api-key', 'Authorization'],
+  credentials: true,
 }));
+app.use(compression({ level: 6, threshold: 1024 }));
 app.use(express.json({ limit: '10kb' }));
 app.use(generalLimiter);
 
@@ -273,8 +291,29 @@ app.use('/api/session', sessionRouter);
 app.use('/api/game',    gameRouter);
 app.use('/api/admin',   adminRouter);
 
-// Serve frontend files
-app.use(express.static(path.join(__dirname, '..')));
+// Serve frontend files with caching
+app.use(express.static(path.join(__dirname, '..'), {
+  maxAge: '1h',
+  etag: true,
+  lastModified: true,
+  setHeaders: function(res, filePath) {
+    // Long cache for static assets
+    if (filePath.endsWith('.js') || filePath.endsWith('.css')) {
+      res.setHeader('Cache-Control', 'public, max-age=3600');
+    }
+    // Short cache for HTML (so updates propagate)
+    if (filePath.endsWith('.html')) {
+      res.setHeader('Cache-Control', 'public, max-age=300');
+    }
+    // Long cache for images/gifs
+    if (filePath.match(/\.(jpg|jpeg|png|gif|svg|ico|webp)$/)) {
+      res.setHeader('Cache-Control', 'public, max-age=86400');
+    }
+    // Security headers
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+    res.setHeader('X-Frame-Options', 'DENY');
+  }
+}));
 
 app.get('/health', (req, res) => res.json({ ok: true, ts: Date.now() }));
 app.use((req, res) => res.status(404).json({ error: 'Not found' }));

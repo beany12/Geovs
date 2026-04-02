@@ -17,11 +17,11 @@ const questionLimiter = rateLimit({
   message: { error: 'Question rate limit exceeded — max 60/min' },
 });
 
-// Answers: 1 per 1.5 seconds per session (anti-automation)
+// Answers: 1 per 1.5 seconds per IP (anti-automation)
 const answerLimiter = rateLimit({
   windowMs: 1500,
   max: 1,
-  keyGenerator: (req) => req.body?.sessionId || req.ip,
+  keyGenerator: (req) => req.ip,
   skipFailedRequests: false,
   message: { error: 'Answer submitted too fast — slow down' },
 });

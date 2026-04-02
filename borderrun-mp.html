@@ -3,7 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
-<title>BorderRun 2P — GeoGenius</title>
+<title>BorderRun 2P — GeoGenius | Race Through Borders</title>
+<meta name="description" content="BorderRun — 2-player race across the world map. Move through land borders to reach the target first. Real-time multiplayer!">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="canonical" href="https://beany12.github.io/geovs/borderrun-mp.html">
 <link rel="stylesheet" href="style.css">
 <!-- Socket.io client (served by backend automatically) -->
 <script src="/socket.io/socket.io.js"></script>
@@ -12,7 +15,13 @@
 <style>
   /* ── Page reset ── */
   *{box-sizing:border-box;margin:0;padding:0}
-  body{background:var(--ink);color:var(--text);font-family:inherit;min-height:100dvh;display:flex;flex-direction:column;align-items:center}
+  body{background:var(--ink);color:var(--text);font-family:inherit;min-height:100dvh;display:flex;flex-direction:column;align-items:center;position:relative}
+
+  /* CRT Scanline overlay */
+  body::before{content:'';position:fixed;inset:0;z-index:9999;pointer-events:none;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.03) 2px,rgba(0,0,0,.03) 4px);mix-blend-mode:multiply}
+
+  /* Subtle ambient glow background */
+  body::after{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;background:radial-gradient(ellipse at 20% 50%,rgba(184,255,16,.03) 0%,transparent 50%),radial-gradient(ellipse at 80% 20%,rgba(180,77,255,.03) 0%,transparent 50%),radial-gradient(ellipse at 50% 80%,rgba(0,255,213,.02) 0%,transparent 50%)}
 
   /* ── Screens ── */
   .screen{display:none;flex-direction:column;align-items:center;width:100%;max-width:500px;padding:20px 16px;min-height:100dvh}
@@ -20,39 +29,43 @@
 
   /* ── Header ── */
   .br-header{width:100%;display:flex;align-items:center;justify-content:space-between;margin-bottom:24px}
-  .br-logo{font-family:var(--font-d);font-size:1.7rem;color:var(--lime);letter-spacing:.03em}
-  .br-logo span{color:var(--muted2);font-size:.68rem;display:block;font-family:var(--font-m);letter-spacing:.12em}
-  .back-link{color:var(--muted2);font-size:.78rem;text-decoration:none;padding:7px 12px;border-radius:10px;border:1px solid var(--border);cursor:pointer;background:var(--ink2);transition:border-color .15s}
-  .back-link:hover{border-color:var(--muted)}
+  .br-logo{font-family:var(--font-d);font-size:1.7rem;color:var(--teal,#00ffd5);letter-spacing:.03em;text-shadow:0 0 12px rgba(0,255,213,.2);display:flex;align-items:center;gap:10px}
+  .br-logo svg{flex-shrink:0;filter:drop-shadow(0 0 6px rgba(0,255,213,.3))}
+  .br-logo span{color:var(--muted2);font-size:.68rem;display:block;font-family:var(--font-m);letter-spacing:.12em;text-shadow:none}
+  .back-link{color:var(--muted2);font-size:.78rem;text-decoration:none;padding:7px 12px;border-radius:10px;border:1px solid rgba(255,255,255,.06);cursor:pointer;background:rgba(14,14,26,.7);backdrop-filter:blur(12px);transition:all .15s}
+  .back-link:hover{border-color:rgba(255,255,255,.12);color:var(--text)}
 
   /* ── Tabbed card ── */
-  .br-lobby-card{background:var(--ink2);border:1.5px solid var(--border);border-radius:18px;width:100%;margin-bottom:14px;overflow:hidden}
-  .br-tabs{display:flex;border-bottom:1.5px solid var(--border)}
+  .br-lobby-card{background:rgba(14,14,26,.7);border:1.5px solid rgba(255,255,255,.06);border-radius:18px;width:100%;margin-bottom:14px;overflow:hidden;backdrop-filter:blur(16px);box-shadow:0 8px 32px rgba(0,0,0,.4)}
+  .br-tabs{display:flex;border-bottom:1.5px solid rgba(255,255,255,.06)}
   .br-tab{flex:1;padding:14px;text-align:center;font-family:var(--font-d);font-size:1rem;letter-spacing:.03em;color:var(--muted);cursor:pointer;transition:all .15s;background:transparent;border:none;border-bottom:2px solid transparent}
-  .br-tab.active{color:var(--lime);border-bottom-color:var(--lime);background:rgba(200,241,53,.03)}
+  .br-tab.active{color:var(--teal,#00ffd5);border-bottom-color:var(--teal,#00ffd5);background:rgba(0,255,213,.03);text-shadow:0 0 8px rgba(0,255,213,.2)}
   .br-tab:hover:not(.active){color:var(--text);background:rgba(255,255,255,.02)}
   .br-tab-body{padding:22px;display:none}
   .br-tab-body.active{display:block}
 
   /* ── Cards ── */
-  .br-card{background:var(--ink2);border:1.5px solid var(--border);border-radius:18px;padding:22px;width:100%;margin-bottom:14px;transition:border-color .2s}
-  .br-card:hover{border-color:rgba(200,241,53,.15)}
+  .br-card{background:rgba(14,14,26,.7);border:1.5px solid rgba(255,255,255,.06);border-radius:18px;padding:22px;width:100%;margin-bottom:14px;transition:all .2s;backdrop-filter:blur(16px);box-shadow:0 8px 32px rgba(0,0,0,.4)}
+  .br-card:hover{border-color:rgba(0,255,213,.12)}
   .br-card-title{font-family:var(--font-d);font-size:1.15rem;color:var(--text);margin-bottom:12px;letter-spacing:.02em}
 
   /* ── Buttons ── */
-  .btn-lime{width:100%;padding:14px;border-radius:12px;background:var(--lime);color:#000;font-weight:700;font-size:1rem;border:none;cursor:pointer;font-family:inherit;transition:all .15s}
-  .btn-lime:hover{opacity:.88;transform:translateY(-1px)}
-  .btn-outline{width:100%;padding:12px;border-radius:12px;background:transparent;color:var(--lime);font-weight:700;font-size:.9rem;border:2px solid var(--lime);cursor:pointer;font-family:inherit;margin-top:8px}
-  .btn-muted{width:100%;padding:10px;border-radius:10px;background:var(--ink3);color:var(--muted2);font-size:.85rem;border:1px solid var(--border);cursor:pointer;font-family:inherit;margin-top:8px;transition:all .15s}
-  .btn-muted:hover{border-color:var(--muted);color:var(--text)}
+  .btn-lime{width:100%;padding:16px;border-radius:14px;background:linear-gradient(135deg,var(--teal,#00ffd5),#00c4a4);color:#000;font-weight:800;font-size:1.05rem;border:none;cursor:pointer;font-family:inherit;transition:all .2s;box-shadow:0 4px 20px rgba(0,255,213,.2),0 0 32px rgba(0,255,213,.06);letter-spacing:.02em;position:relative;overflow:hidden}
+  .btn-lime::after{content:'';position:absolute;top:0;left:-100%;width:50%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.15),transparent);animation:btnShimmer 3s ease-in-out infinite}
+  @keyframes btnShimmer{0%,100%{left:-50%}50%{left:100%}}
+  .btn-lime:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(0,255,213,.3),0 0 48px rgba(0,255,213,.1)}
+  .btn-outline{width:100%;padding:12px;border-radius:12px;background:transparent;color:var(--teal,#00ffd5);font-weight:700;font-size:.9rem;border:2px solid var(--teal,#00ffd5);cursor:pointer;font-family:inherit;margin-top:8px;text-shadow:0 0 6px rgba(0,255,213,.2);transition:all .15s}
+  .btn-outline:hover{box-shadow:0 0 12px rgba(0,255,213,.2);background:rgba(0,255,213,.04)}
+  .btn-muted{width:100%;padding:10px;border-radius:10px;background:rgba(14,14,26,.8);color:var(--muted2);font-size:.85rem;border:1px solid rgba(255,255,255,.06);cursor:pointer;font-family:inherit;margin-top:8px;transition:all .15s;backdrop-filter:blur(8px)}
+  .btn-muted:hover{border-color:rgba(255,255,255,.12);color:var(--text)}
 
   /* ── Code input ── */
-  .br-input{width:100%;padding:14px;border-radius:12px;border:1.5px solid var(--border);background:var(--ink3);color:var(--text);font-family:var(--font-m);font-size:1.2rem;letter-spacing:.2em;text-transform:uppercase;outline:none;text-align:center;margin-bottom:10px;transition:border-color .15s}
-  .br-input:focus{border-color:var(--lime);box-shadow:0 0 20px rgba(200,241,53,.08)}
+  .br-input{width:100%;padding:14px;border-radius:12px;border:1.5px solid rgba(255,255,255,.06);background:var(--ink3);color:var(--text);font-family:var(--font-m);font-size:1.2rem;letter-spacing:.2em;text-transform:uppercase;outline:none;text-align:center;margin-bottom:10px;transition:all .15s}
+  .br-input:focus{border-color:var(--lime);box-shadow:0 0 16px rgba(184,255,16,.15),0 0 32px rgba(184,255,16,.06)}
 
   /* ── Code display ── */
-  .br-code{font-family:var(--font-m);font-size:2.4rem;letter-spacing:.3em;color:var(--lime);text-align:center;padding:20px;background:var(--ink3);border-radius:14px;border:1.5px solid rgba(200,241,53,.25);margin-bottom:14px;text-shadow:0 0 20px rgba(200,241,53,.3);cursor:pointer;transition:all .15s}
-  .br-code:hover{border-color:var(--lime);transform:scale(1.02)}
+  .br-code{font-family:var(--font-m);font-size:2.4rem;letter-spacing:.3em;color:var(--lime);text-align:center;padding:20px;background:var(--ink3);border-radius:14px;border:1.5px solid rgba(184,255,16,.25);margin-bottom:14px;text-shadow:0 0 16px rgba(184,255,16,.4),0 0 32px rgba(184,255,16,.15);cursor:pointer;transition:all .15s;box-shadow:0 0 16px rgba(184,255,16,.08)}
+  .br-code:hover{border-color:var(--lime);transform:scale(1.02);box-shadow:0 0 24px rgba(184,255,16,.15)}
   .br-code:active{transform:scale(.98)}
   .br-code-label{font-size:.62rem;letter-spacing:.18em;color:var(--muted2);text-align:center;margin-bottom:8px;text-transform:uppercase}
 
@@ -60,7 +73,7 @@
   .br-wait-players{display:flex;align-items:center;justify-content:center;gap:24px;margin-bottom:20px}
   .br-wait-player{display:flex;flex-direction:column;align-items:center;gap:6px}
   .br-wait-avatar{width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.4rem}
-  .br-wait-avatar.you{background:rgba(200,241,53,.12);border:2px solid var(--lime)}
+  .br-wait-avatar.you{background:rgba(184,255,16,.1);border:2px solid var(--lime);box-shadow:0 0 16px rgba(184,255,16,.15)}
   .br-wait-avatar.opp{background:var(--ink3);border:2px dashed var(--muted);animation:pulse 1.5s ease-in-out infinite}
   .br-wait-label{font-family:var(--font-m);font-size:.6rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted2)}
   .br-wait-vs{font-family:var(--font-d);font-size:1.2rem;color:var(--muted)}
@@ -68,60 +81,61 @@
   .br-share-row button{flex:1}
 
   /* ── Waiting pulse ── */
-  .waiting-dot{width:8px;height:8px;border-radius:50%;background:var(--amber);display:inline-block;animation:pulse 1.2s ease-in-out infinite}
+  .waiting-dot{width:8px;height:8px;border-radius:50%;background:var(--amber);display:inline-block;animation:pulse 1.2s ease-in-out infinite;box-shadow:0 0 8px rgba(255,192,32,.4)}
   @keyframes pulse{0%,100%{opacity:.3;transform:scale(.8)}50%{opacity:1;transform:scale(1.2)}}
 
   /* ── Route display (start → target) ── */
-  .br-route{display:flex;align-items:center;justify-content:center;gap:10px;padding:16px;background:var(--ink2);border:1.5px solid var(--border);border-radius:14px;margin-bottom:14px;width:100%}
+  .br-route{display:flex;align-items:center;justify-content:center;gap:10px;padding:16px;background:rgba(14,14,26,.7);border:1.5px solid rgba(255,255,255,.06);border-radius:14px;margin-bottom:14px;width:100%;backdrop-filter:blur(12px);box-shadow:0 8px 32px rgba(0,0,0,.4)}
   .br-route-country{display:flex;flex-direction:column;align-items:center;gap:5px;min-width:80px}
-  .br-route-flag{width:48px;height:34px;border-radius:5px;object-fit:cover;box-shadow:0 2px 8px rgba(0,0,0,.3)}
+  .br-route-flag{width:48px;height:34px;border-radius:5px;object-fit:cover;box-shadow:0 2px 8px rgba(0,0,0,.4)}
   .br-route-name{font-size:.7rem;color:var(--muted2);text-align:center;font-weight:700}
   .br-route-arrow{font-size:1.4rem;color:var(--muted);flex:1;text-align:center}
 
   /* ── Player positions ── */
   .br-players{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%;margin-bottom:14px}
-  .br-player{background:var(--ink2);border-radius:14px;padding:14px;border:1.5px solid var(--border)}
-  .br-player.me{border-color:rgba(200,241,53,.35);box-shadow:inset 0 0 20px rgba(200,241,53,.04)}
-  .br-player.opp{border-color:rgba(255,184,48,.2);box-shadow:inset 0 0 20px rgba(255,184,48,.03)}
+  .br-player{background:rgba(14,14,26,.7);border-radius:14px;padding:14px;border:1.5px solid rgba(255,255,255,.06);backdrop-filter:blur(12px)}
+  .br-player.me{border-color:rgba(184,255,16,.3);box-shadow:inset 0 0 20px rgba(184,255,16,.04),0 0 8px rgba(184,255,16,.06)}
+  .br-player.opp{border-color:rgba(255,192,32,.2);box-shadow:inset 0 0 20px rgba(255,192,32,.03),0 0 8px rgba(255,192,32,.04)}
   .br-player-label{font-size:.6rem;letter-spacing:.14em;color:var(--muted);margin-bottom:6px;text-transform:uppercase;font-weight:700}
-  .br-player-flag{width:36px;height:24px;border-radius:4px;object-fit:cover;margin-bottom:4px;box-shadow:0 2px 6px rgba(0,0,0,.3)}
+  .br-player-flag{width:36px;height:24px;border-radius:4px;object-fit:cover;margin-bottom:4px;box-shadow:0 2px 6px rgba(0,0,0,.4)}
   .br-player-name{font-size:.82rem;font-weight:800;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .br-player-moves{font-size:.65rem;color:var(--muted2);margin-top:3px;font-family:var(--font-m)}
   .br-player-path{font-size:.58rem;color:var(--muted);margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
   /* ── World map ── */
-  .br-map-wrap{width:100%;position:relative;border-radius:12px;overflow:hidden;border:1px solid var(--border);margin-bottom:10px;cursor:grab;touch-action:none;background:#0b1d35}
+  .br-map-wrap{width:100%;position:relative;border-radius:12px;overflow:hidden;border:1px solid rgba(255,255,255,.06);margin-bottom:10px;cursor:grab;touch-action:none;background:#0b1d35;box-shadow:0 8px 32px rgba(0,0,0,.4)}
   .br-map-wrap:active{cursor:grabbing}
   .br-map-wrap svg{display:block;width:100%;height:auto;aspect-ratio:2/1}
   .br-map-zoom{position:absolute;bottom:6px;right:6px;display:flex;gap:4px}
-  .br-map-zoom button{width:26px;height:26px;border-radius:6px;background:rgba(0,0,0,.5);color:#fff;border:1px solid rgba(255,255,255,.2);font-size:1rem;cursor:pointer;line-height:1;display:flex;align-items:center;justify-content:center}
+  .br-map-zoom button{width:26px;height:26px;border-radius:6px;background:rgba(0,0,0,.6);color:#fff;border:1px solid rgba(255,255,255,.12);font-size:1rem;cursor:pointer;line-height:1;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(8px);transition:all .15s}
+  .br-map-zoom button:hover{border-color:rgba(255,255,255,.25);background:rgba(0,0,0,.8)}
   /* ── Country input + suggestions ── */
   .br-suggest{position:relative;width:100%;margin-bottom:8px}
-  .br-country-input{width:100%;padding:13px 16px;border-radius:12px;border:1.5px solid var(--border);background:var(--ink2);color:var(--text);font-family:inherit;font-size:.95rem;outline:none;transition:all .15s}
-  .br-country-input:focus{border-color:var(--lime);box-shadow:0 0 20px rgba(200,241,53,.06)}
-  .br-suggest-list{position:absolute;top:100%;left:0;right:0;z-index:50;background:var(--ink2);border:1.5px solid var(--border);border-top:none;border-radius:0 0 12px 12px;overflow:hidden;display:none}
+  .br-country-input{width:100%;padding:13px 16px;border-radius:12px;border:1.5px solid rgba(255,255,255,.06);background:rgba(14,14,26,.8);color:var(--text);font-family:inherit;font-size:.95rem;outline:none;transition:all .15s;backdrop-filter:blur(8px)}
+  .br-country-input:focus{border-color:var(--lime);box-shadow:0 0 16px rgba(184,255,16,.12),0 0 32px rgba(184,255,16,.05)}
+  .br-suggest-list{position:absolute;top:100%;left:0;right:0;z-index:50;background:rgba(14,14,26,.95);border:1.5px solid rgba(255,255,255,.06);border-top:none;border-radius:0 0 12px 12px;overflow:hidden;display:none;backdrop-filter:blur(16px);box-shadow:0 8px 32px rgba(0,0,0,.4)}
   .br-suggest-list.show{display:block}
-  .br-suggest-item{padding:10px 16px;cursor:pointer;font-size:.88rem;display:flex;align-items:center;gap:10px;border-bottom:1px solid rgba(255,255,255,.04);transition:background .1s}
-  .br-suggest-item:hover{background:rgba(200,241,53,.06);color:var(--lime)}
+  .br-suggest-item{padding:10px 16px;cursor:pointer;font-size:.88rem;display:flex;align-items:center;gap:10px;border-bottom:1px solid rgba(255,255,255,.04);transition:all .1s}
+  .br-suggest-item:hover{background:rgba(184,255,16,.06);color:var(--lime)}
   .br-suggest-not-nb{opacity:.35}
   /* ── Countdown overlay ── */
-  .br-countdown{position:fixed;inset:0;z-index:999;display:flex;align-items:center;justify-content:center;pointer-events:all;background:rgba(0,0,0,.55);backdrop-filter:blur(2px)}
+  .br-countdown{position:fixed;inset:0;z-index:999;display:flex;align-items:center;justify-content:center;pointer-events:all;background:rgba(8,8,15,.7);backdrop-filter:blur(12px)}
   .br-countdown.hidden{display:none}
-  .br-countdown-num{font-size:clamp(5rem,20vw,9rem);font-weight:900;color:#fff;text-shadow:0 0 40px rgba(200,241,53,.8),0 4px 24px rgba(0,0,0,.6);animation:br-pop .7s ease-out forwards;line-height:1}
+  .br-countdown-num{font-size:clamp(5rem,20vw,9rem);font-weight:900;color:#fff;text-shadow:0 0 40px rgba(184,255,16,.8),0 0 80px rgba(184,255,16,.3),0 4px 24px rgba(0,0,0,.6);animation:br-pop .7s ease-out forwards;line-height:1}
   @keyframes br-pop{0%{transform:scale(2.2);opacity:0}30%{opacity:1;transform:scale(1)}85%{opacity:1;transform:scale(.9)}100%{opacity:0;transform:scale(.75)}}
-  .br-countdown-go{font-size:clamp(3rem,14vw,6rem);font-weight:900;color:var(--lime);text-shadow:0 0 50px rgba(200,241,53,1);animation:br-go .8s ease-out forwards}
+  .br-countdown-go{font-size:clamp(3rem,14vw,6rem);font-weight:900;color:var(--lime);text-shadow:0 0 50px rgba(184,255,16,1),0 0 100px rgba(184,255,16,.4);animation:br-go .8s ease-out forwards}
   @keyframes br-go{0%{transform:scale(.5);opacity:0}20%{opacity:1;transform:scale(1.15)}50%{transform:scale(1)}90%{opacity:1}100%{opacity:0;transform:scale(1.3)}}
   /* ── Feedback ── */
   .br-fb{height:24px;font-size:.85rem;font-weight:700;text-align:center;margin-bottom:6px;transition:opacity .3s}
-  .br-fb.ok{color:var(--lime)}
-  .br-fb.bad{color:var(--rose)}
+  .br-fb.ok{color:var(--lime);text-shadow:0 0 8px rgba(184,255,16,.3)}
+  .br-fb.bad{color:var(--rose);text-shadow:0 0 8px rgba(255,45,94,.3)}
 
   /* ── Victory screen ── */
   .br-victory-icon{font-size:4rem;margin-bottom:8px;animation:br-pop-in .5s cubic-bezier(.175,.885,.32,1.275)}
   @keyframes br-pop-in{0%{transform:scale(0);opacity:0}100%{transform:scale(1);opacity:1}}
-  .br-victory-title{font-family:var(--font-d);font-size:2rem;margin-bottom:6px;letter-spacing:.03em}
+  .br-victory-title{font-family:var(--font-d);font-size:2rem;margin-bottom:6px;letter-spacing:.03em;text-shadow:0 0 16px rgba(184,255,16,.3),0 0 32px rgba(184,255,16,.1)}
   .br-victory-sub{font-size:.88rem;color:var(--muted2);margin-bottom:20px;text-align:center}
-  .br-path-display{background:var(--ink3);border:1px solid var(--border);border-radius:12px;padding:14px;width:100%;margin-bottom:8px;font-size:.78rem;line-height:1.7;color:var(--muted2)}
+  .br-path-display{background:rgba(21,21,37,.8);border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:14px;width:100%;margin-bottom:8px;font-size:.78rem;line-height:1.7;color:var(--muted2);backdrop-filter:blur(8px)}
   .br-path-display b{color:var(--text)}
 
   /* ── Confetti ── */
@@ -130,22 +144,26 @@
   @keyframes br-confettiFall{0%{transform:translateY(-20px) rotate(0deg);opacity:1}100%{transform:translateY(100vh) rotate(720deg);opacity:0}}
 
   /* ── Toast ── */
-  .br-toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(60px);background:var(--ink2);border:1.5px solid var(--border);border-radius:12px;padding:10px 22px;font-size:.82rem;color:var(--text);z-index:999;transition:transform .3s;pointer-events:none;white-space:nowrap;backdrop-filter:blur(8px)}
+  .br-toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(60px);background:rgba(14,14,26,.9);border:1.5px solid rgba(255,255,255,.06);border-radius:12px;padding:10px 22px;font-size:.82rem;color:var(--text);z-index:999;transition:transform .3s;pointer-events:none;white-space:nowrap;backdrop-filter:blur(16px);box-shadow:0 8px 32px rgba(0,0,0,.4)}
   .br-toast.show{transform:translateX(-50%) translateY(0)}
 
   /* ── Misc ── */
-  .br-divider{width:100%;border:none;border-top:1px solid var(--border);margin:12px 0}
+  .br-divider{width:100%;border:none;border-top:1px solid rgba(255,255,255,.06);margin:12px 0}
   .text-center{text-align:center}
   .gap-top{margin-top:12px}
-  .color-lime{color:var(--lime)}
-  .color-amber{color:var(--amber)}
+  .color-lime{color:var(--lime);text-shadow:0 0 8px rgba(184,255,16,.3)}
+  .color-amber{color:var(--amber);text-shadow:0 0 8px rgba(255,192,32,.3)}
 
   /* ── Difficulty selector ── */
   .br-diff-btns{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
-  .br-diff-btn{padding:12px 8px;border-radius:12px;border:1.5px solid var(--border);background:var(--ink3);cursor:pointer;text-align:center;transition:all .15s;font-family:inherit}
-  .br-diff-btn:hover{border-color:var(--muted)}
-  .br-diff-btn.active{border-color:var(--lime);background:rgba(200,241,53,.06)}
-  .br-diff-btn.active .br-diff-name{color:var(--lime)}
+  .br-diff-btn{padding:12px 8px;border-radius:12px;border:1.5px solid rgba(255,255,255,.06);background:rgba(21,21,37,.8);cursor:pointer;text-align:center;transition:all .15s;font-family:inherit;backdrop-filter:blur(8px)}
+  .br-diff-btn:hover{border-color:rgba(255,255,255,.12)}
+  .br-diff-btn.active{border-color:var(--teal,#00ffd5);background:rgba(0,255,213,.04);box-shadow:0 0 8px rgba(0,255,213,.08)}
+  .br-diff-btn.active .br-diff-name{color:var(--teal,#00ffd5)}
+  .br-diff-btn .br-diff-icon{display:flex;align-items:center;justify-content:center;margin-bottom:4px}
+  .br-diff-btn .br-diff-icon svg{opacity:.5;transition:all .2s}
+  .br-diff-btn.active .br-diff-icon svg{opacity:1;filter:drop-shadow(0 0 6px currentColor)}
+  .br-diff-btn:hover{border-color:rgba(255,255,255,.15);transform:translateY(-2px)}
   .br-diff-name{font-weight:700;font-size:.85rem;color:var(--text);margin-bottom:3px}
   .br-diff-desc{font-size:.63rem;color:var(--muted2)}
 </style>
@@ -156,18 +174,27 @@
 <div id="screen-lobby" class="screen active">
   <div class="br-header">
     <div class="br-logo">
-      🗺️ BorderRun
-      <span id="t-subtitle">2-Player Race</span>
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+      <div>BorderRun<span id="t-subtitle">2-Player Race</span></div>
     </div>
     <a class="back-link" href="index.html">← Home</a>
   </div>
 
   <!-- Hero -->
-  <div style="text-align:center;margin-bottom:20px">
-    <div style="font-size:2.8rem;margin-bottom:6px">🏁</div>
-    <div style="font-family:var(--font-d);font-size:1.5rem;color:var(--lime);margin-bottom:6px" id="t-game-title">Race Across Borders</div>
-    <div style="font-size:.8rem;color:var(--muted2);line-height:1.5;max-width:360px;margin:0 auto" id="t-game-desc">
+  <div style="text-align:center;margin-bottom:24px;position:relative">
+    <div style="display:flex;align-items:center;justify-content:center;margin-bottom:12px">
+      <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="var(--teal,#00ffd5)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="filter:drop-shadow(0 0 8px rgba(0,255,213,.3))"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>
+    </div>
+    <div style="font-family:var(--font-d);font-size:1.6rem;color:var(--text);margin-bottom:8px" id="t-game-title">Race Across Borders</div>
+    <div style="font-size:.82rem;color:var(--muted2);line-height:1.6;max-width:380px;margin:0 auto" id="t-game-desc">
       Both players start at the same country and race to the target — moving only through land borders. First to arrive wins!
+    </div>
+    <div style="display:flex;justify-content:center;gap:24px;margin-top:16px">
+      <div style="text-align:center"><div style="font-family:var(--font-d);font-size:1.3rem;color:var(--teal,#00ffd5)">2</div><div style="font-family:var(--font-m);font-size:.55rem;color:var(--muted);letter-spacing:.1em">PLAYERS</div></div>
+      <div style="width:1px;background:rgba(255,255,255,.06)"></div>
+      <div style="text-align:center"><div style="font-family:var(--font-d);font-size:1.3rem;color:var(--teal,#00ffd5)">195</div><div style="font-family:var(--font-m);font-size:.55rem;color:var(--muted);letter-spacing:.1em">COUNTRIES</div></div>
+      <div style="width:1px;background:rgba(255,255,255,.06)"></div>
+      <div style="text-align:center"><div style="font-family:var(--font-d);font-size:1.3rem;color:var(--teal,#00ffd5)">LIVE</div><div style="font-family:var(--font-m);font-size:.55rem;color:var(--muted);letter-spacing:.1em">REALTIME</div></div>
     </div>
   </div>
 
@@ -176,14 +203,17 @@
     <div class="br-card-title" id="t-diff-lbl">Difficulty</div>
     <div class="br-diff-btns">
       <button class="br-diff-btn" data-diff="easy" onclick="setDifficulty('easy')">
+        <div class="br-diff-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9 12l2 2 4-4"/></svg></div>
         <div class="br-diff-name" id="t-diff-easy">Easy</div>
         <div class="br-diff-desc" id="t-diff-easy-desc">Europe · 4-6 hops</div>
       </button>
       <button class="br-diff-btn active" data-diff="medium" onclick="setDifficulty('medium')">
+        <div class="br-diff-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg></div>
         <div class="br-diff-name" id="t-diff-medium">Medium</div>
         <div class="br-diff-desc" id="t-diff-medium-desc">Global · 5-8 hops</div>
       </button>
       <button class="br-diff-btn" data-diff="hard" onclick="setDifficulty('hard')">
+        <div class="br-diff-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M15 9l-6 6"/><path d="M9 9l6 6"/></svg></div>
         <div class="br-diff-name" id="t-diff-hard">Hard</div>
         <div class="br-diff-desc" id="t-diff-hard-desc">Global · 7-11 hops</div>
       </button>
@@ -210,19 +240,19 @@
 <!-- ══════════════ SCREEN: WAITING ══════════════ -->
 <div id="screen-waiting" class="screen">
   <div class="br-header">
-    <div class="br-logo">🗺️ BorderRun <span id="t-subtitle-w">2-Player Race</span></div>
+    <div class="br-logo"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:4px"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>BorderRun <span id="t-subtitle-w">2-Player Race</span></div>
     <button class="back-link" onclick="goLobby()" id="t-cancel">Cancel</button>
   </div>
 
   <!-- Player silhouettes -->
   <div class="br-wait-players">
     <div class="br-wait-player">
-      <div class="br-wait-avatar you">🏃</div>
+      <div class="br-wait-avatar you"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="3"/><path d="M6.5 17l3.5-7 4 4 4.5-8"/></svg></div>
       <div class="br-wait-label" id="t-wait-you">You</div>
     </div>
     <div class="br-wait-vs">VS</div>
     <div class="br-wait-player">
-      <div class="br-wait-avatar opp">❓</div>
+      <div class="br-wait-avatar opp"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg></div>
       <div class="br-wait-label" id="t-wait-opp"><span class="waiting-dot"></span> Waiting...</div>
     </div>
   </div>
@@ -245,7 +275,7 @@
 <!-- ══════════════ SCREEN: GAME ══════════════ -->
 <div id="screen-game" class="screen">
   <div class="br-header" style="margin-bottom:10px">
-    <div class="br-logo" style="font-size:1.1rem">🗺️ BorderRun</div>
+    <div class="br-logo" style="font-size:1.1rem"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:4px"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>BorderRun</div>
     <div style="text-align:right">
       <div style="font-size:.72rem;color:var(--muted2)">
         <span id="g-my-moves">0</span> <span id="t-moves-lbl">moves</span>
@@ -308,7 +338,7 @@
 <!-- ══════════════ SCREEN: VICTORY ══════════════ -->
 <div id="screen-victory" class="screen">
   <div class="br-header">
-    <div class="br-logo">🗺️ BorderRun</div>
+    <div class="br-logo"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:4px"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>BorderRun</div>
     <button class="back-link" onclick="goLobby()" id="t-home-btn">Home</button>
   </div>
 

@@ -2,16 +2,16 @@
    PROFILE / LEVEL / XP SYSTEM
 ══════════════════════════════════════════ */
 const LEVELS=[
-  {lvl:1, name:'Wanderer',          color:'#a09080',tier:'wanderer',    xp:0},
-  {lvl:2, name:'Explorer',          color:'#cd7f32',tier:'explorer',    xp:500},
-  {lvl:3, name:'Pathfinder',        color:'#9abed8',tier:'pathfinder',  xp:1500},
-  {lvl:4, name:'Cartographer',      color:'#ffd700',tier:'cartographer',xp:3500},
-  {lvl:5, name:'Navigator',         color:'#40d8c4',tier:'navigator',   xp:7000},
-  {lvl:6, name:'Globetrotter',      color:'#28c860',tier:'globetrotter',xp:12000},
-  {lvl:7, name:'Atlas',             color:'#70b8ff',tier:'atlas',       xp:20000},
-  {lvl:8, name:'World Scholar',     color:'#c840f0',tier:'worldscholar',xp:32000},
-  {lvl:9, name:'Oracle of Nations', color:'#e82848',tier:'oracle',      xp:50000},
-  {lvl:10,name:'Sovereign of Earth',color:'#70e8ff',tier:'sovereign',   xp:75000},
+  {lvl:1, name:'Wanderer',          color:'#a09080',tier:'wanderer',    xp:0},      // Start
+  {lvl:2, name:'Explorer',          color:'#cd7f32',tier:'explorer',    xp:300},     // ~3-4 games
+  {lvl:3, name:'Pathfinder',        color:'#9abed8',tier:'pathfinder',  xp:900},     // ~10-12 games
+  {lvl:4, name:'Cartographer',      color:'#ffd700',tier:'cartographer',xp:2000},    // ~22-28 games
+  {lvl:5, name:'Navigator',         color:'#40d8c4',tier:'navigator',   xp:4000},    // ~45-55 games
+  {lvl:6, name:'Globetrotter',      color:'#28c860',tier:'globetrotter',xp:7500},    // ~85-100 games
+  {lvl:7, name:'Atlas',             color:'#70b8ff',tier:'atlas',       xp:12500},   // ~140-170 games
+  {lvl:8, name:'World Scholar',     color:'#c840f0',tier:'worldscholar',xp:20000},   // ~220-270 games
+  {lvl:9, name:'Oracle of Nations', color:'#e82848',tier:'oracle',      xp:30000},   // ~330-400 games
+  {lvl:10,name:'Sovereign of Earth',color:'#70e8ff',tier:'sovereign',   xp:45000},   // ~500-600 games
 ];
 const TIERS={
   wanderer:    {label:'Wanderer',      color:'#a09080',c1:'#2e2622',c2:'#7a6a60',c3:'#a89080',c4:'#d8c8be',glow:'rgba(122,106,96,0.6)'  },
