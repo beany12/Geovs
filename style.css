@@ -824,8 +824,15 @@ body.hl67-chaos .btn-primary,body.hl67-chaos .btn-ghost{animation:hl67btnBounce 
 
 /* ═══ MOBILE (<=640px) ═══ */
 @media(max-width:640px){
-  #profile-badge{position:fixed;top:12px;right:12px;z-index:200;width:80px}
-  #profile-panel{top:82px;right:10px;width:calc(100vw - 20px);max-width:320px}
+  #profile-badge{position:fixed;top:10px;right:10px;z-index:200;width:64px;min-height:auto;gap:3px}
+  #pb-emblem svg{max-height:26px!important}
+  #pb-lvl-text{font-size:.7rem!important}
+  #pb-name-text{font-size:.42rem!important}
+  #profile-panel{top:72px;right:10px;width:calc(100vw - 20px);max-width:320px}
+
+  /* Audio button mobile */
+  #audio-btn{top:10px!important;left:10px!important;width:32px!important;height:32px!important;font-size:.85rem!important}
+  #audio-panel{top:48px!important;left:10px!important;width:calc(100vw - 20px)!important;max-width:280px!important}
 
   .game-header{padding:0 12px;height:54px}
   .gh-left{gap:10px}
@@ -834,11 +841,14 @@ body.hl67-chaos .btn-primary,body.hl67-chaos .btn-ghost{animation:hl67btnBounce 
   .hud-pill{padding:4px 10px;font-size:.72rem;gap:4px}
   .gh-hud .hud-pill:last-child{display:none}
 
-  .home-hero{min-height:180px;padding:12px 16px 20px}
-  .earth-img{width:240px;height:240px}
-  .home-title{font-size:clamp(56px,18vw,160px)}
-  .home-sub{font-size:.9rem;margin:12px 0 28px}
-  .stats-strip{gap:16px;margin-top:24px}
+  .home-hero{min-height:160px;padding:12px 16px 20px;padding-top:8px}
+  .earth-img{width:220px;height:220px}
+  .eyebrow{font-size:.55rem;letter-spacing:.2em;margin-bottom:10px}
+  .home-title{font-size:clamp(48px,16vw,120px)}
+  .home-sub{font-size:.82rem;margin:8px 0 20px;max-width:300px}
+  .lang-bar{gap:6px;margin-bottom:10px}
+  .lang-btn{padding:5px 12px;font-size:.72rem}
+  .stats-strip{gap:12px;margin-top:16px}
   .strip-val{font-size:1.8rem}
   .daily-banner{padding:12px 14px;gap:10px;border-radius:var(--r-lg)}
   .db-icon{font-size:1.6rem}
@@ -973,7 +983,11 @@ body.hl67-chaos .btn-primary,body.hl67-chaos .btn-ghost{animation:hl67btnBounce 
 
 /* ═══ SMALL PHONES (≤375px) ═══ */
 @media(max-width:375px){
-  .home-title{font-size:clamp(44px,16vw,80px)}
+  #profile-badge{width:52px!important}
+  #pb-emblem svg{max-height:22px!important}
+  #pb-lvl-text{font-size:.6rem!important}
+  #pb-name-text{display:none!important}
+  .home-title{font-size:clamp(40px,15vw,70px)}
   .modes-layout{gap:16px}
   .mode-card{padding:12px 10px}
   .mode-icon{width:32px;height:32px;border-radius:8px}
