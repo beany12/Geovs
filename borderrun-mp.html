@@ -28,22 +28,23 @@
   /* ── Screens ── */
   .screen{display:none;flex-direction:column;align-items:center;width:100%;max-width:900px;padding:20px 24px;min-height:100dvh}
   .screen.active{display:flex}
+  .screen#screen-lobby{justify-content:center}
 
   /* ── Header ── */
-  .br-header{width:100%;display:flex;align-items:center;justify-content:space-between;margin-bottom:24px}
-  .br-logo{font-family:var(--font-d);font-size:1.7rem;color:var(--teal,#00ffd5);letter-spacing:.03em;text-shadow:0 0 12px rgba(0,255,213,.2);display:flex;align-items:center;gap:10px}
-  .br-logo svg{flex-shrink:0;filter:drop-shadow(0 0 6px rgba(0,255,213,.3))}
-  .br-logo span{color:var(--muted2);font-size:.68rem;display:block;font-family:var(--font-m);letter-spacing:.12em;text-shadow:none}
-  .back-link{color:var(--muted2);font-size:.78rem;text-decoration:none;padding:7px 12px;border-radius:10px;border:1px solid rgba(255,255,255,.06);cursor:pointer;background:rgba(14,14,26,.7);backdrop-filter:blur(12px);transition:all .15s}
+  .br-header{width:100%;display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+  .br-logo{font-family:var(--font-d);font-size:2.4rem;color:var(--teal,#00ffd5);letter-spacing:.03em;text-shadow:0 0 12px rgba(0,255,213,.2);display:flex;align-items:center;gap:12px}
+  .br-logo svg{flex-shrink:0;filter:drop-shadow(0 0 6px rgba(0,255,213,.3));width:44px;height:44px}
+  .br-logo span{color:var(--muted2);font-size:.72rem;display:block;font-family:var(--font-m);letter-spacing:.12em;text-shadow:none}
+  .back-link{color:var(--muted2);font-size:.82rem;text-decoration:none;padding:9px 16px;border-radius:10px;border:1px solid rgba(255,255,255,.06);cursor:pointer;background:rgba(14,14,26,.7);backdrop-filter:blur(12px);transition:all .15s}
   .back-link:hover{border-color:rgba(255,255,255,.12);color:var(--text)}
 
   /* ── Tabbed card ── */
-  .br-lobby-card{background:rgba(14,14,26,.7);border:1.5px solid rgba(255,255,255,.06);border-radius:18px;width:100%;margin-bottom:14px;overflow:hidden;backdrop-filter:blur(16px);box-shadow:0 8px 32px rgba(0,0,0,.4)}
+  .br-lobby-card{background:rgba(14,14,26,.7);border:1.5px solid rgba(255,255,255,.06);border-radius:20px;width:100%;margin-bottom:20px;overflow:hidden;backdrop-filter:blur(16px);box-shadow:0 8px 32px rgba(0,0,0,.4)}
   .br-tabs{display:flex;border-bottom:1.5px solid rgba(255,255,255,.06)}
-  .br-tab{flex:1;padding:14px;text-align:center;font-family:var(--font-d);font-size:1rem;letter-spacing:.03em;color:var(--muted);cursor:pointer;transition:all .15s;background:transparent;border:none;border-bottom:2px solid transparent}
+  .br-tab{flex:1;padding:18px;text-align:center;font-family:var(--font-d);font-size:1.15rem;letter-spacing:.03em;color:var(--muted);cursor:pointer;transition:all .15s;background:transparent;border:none;border-bottom:2px solid transparent}
   .br-tab.active{color:var(--teal,#00ffd5);border-bottom-color:var(--teal,#00ffd5);background:rgba(0,255,213,.03);text-shadow:0 0 8px rgba(0,255,213,.2)}
   .br-tab:hover:not(.active){color:var(--text);background:rgba(255,255,255,.02)}
-  .br-tab-body{padding:22px;display:none}
+  .br-tab-body{padding:28px;display:none}
   .br-tab-body.active{display:block}
 
   /* ── Cards ── */
@@ -192,7 +193,7 @@
       <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:16px">
         <div style="font-family:var(--font-m);font-size:.5rem;letter-spacing:.2em;color:var(--teal,#00ffd5);padding:3px 12px;border-radius:100px;border:1px solid rgba(0,255,213,.2);background:rgba(0,255,213,.06)" id="t-subtitle">MULTIPLAYER</div>
         <div style="font-family:var(--font-d);font-size:2.2rem;line-height:1;text-shadow:0 2px 16px rgba(0,0,0,.5)">Border<span style="color:var(--teal,#00ffd5)">Run</span></div>
-        <div style="font-size:.72rem;color:var(--muted2);text-align:center;max-width:280px" id="t-game-desc">Race through neighboring countries. First to the target wins.</div>
+        <div style="font-size:.78rem;color:var(--muted2);text-align:center;max-width:400px" id="t-game-desc">Race through neighboring countries. First to the target wins.</div>
       </div>
       <!-- Home link -->
       <a class="back-link" href="index.html" style="position:absolute;top:10px;right:10px;font-size:.7rem;padding:5px 10px">← Home</a>
