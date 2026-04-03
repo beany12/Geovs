@@ -186,15 +186,6 @@
     <input type="range" min="0" max="100" value="70" id="audio-sfx-vol" class="setup-slider" style="accent-color:var(--lime);flex:1" oninput="GeoAudio.setSFXVolume(this.value/100);_audioSyncIcon()">
     <span id="audio-sfx-icon" style="font-size:.85rem;cursor:pointer;min-width:20px;text-align:center" onclick="GeoAudio.toggleSFX();_audioSyncIcon()">🔊</span>
   </div>
-  <div style="height:1px;background:rgba(255,255,255,.06);margin:2px 0"></div>
-  <div style="display:flex;align-items:center;gap:8px">
-    <span style="font-size:.6rem;color:var(--muted2);min-width:48px">Menü</span>
-    <select id="audio-menu-track" onchange="GeoAudio.setMenuTrack(+this.value)" style="flex:1;padding:5px 8px;border-radius:8px;border:1px solid rgba(255,255,255,.08);background:rgba(20,20,40,.8);color:var(--text);font-family:inherit;font-size:.65rem;cursor:pointer;outline:none"></select>
-  </div>
-  <div style="display:flex;align-items:center;gap:8px">
-    <span style="font-size:.6rem;color:var(--muted2);min-width:48px">Spiel</span>
-    <select id="audio-game-track" onchange="GeoAudio.setGameTrack(+this.value)" style="flex:1;padding:5px 8px;border-radius:8px;border:1px solid rgba(255,255,255,.08);background:rgba(20,20,40,.8);color:var(--text);font-family:inherit;font-size:.65rem;cursor:pointer;outline:none"></select>
-  </div>
 </div>
 <script>
 var _audioPanelOpen=false;
@@ -220,25 +211,8 @@ document.addEventListener('click',function(e){
   _audioPanelOpen=false;
   document.getElementById('audio-panel').style.display='none';
 });
-// Populate track selectors and sync icon on load
-(function p(){
-  if(typeof GeoAudio==='undefined')return setTimeout(p,100);
-  var mt=document.getElementById('audio-menu-track');
-  var gt=document.getElementById('audio-game-track');
-  if(mt&&!mt.children.length){
-    GeoAudio.MENU_TRACKS.forEach(function(t,i){
-      var o=document.createElement('option');o.value=i;o.textContent=t.label;mt.appendChild(o);
-    });
-    mt.value=GeoAudio.settings.menuTrack||0;
-  }
-  if(gt&&!gt.children.length){
-    GeoAudio.GAME_TRACKS.forEach(function(t,i){
-      var o=document.createElement('option');o.value=i;o.textContent=t.label;gt.appendChild(o);
-    });
-    gt.value=GeoAudio.settings.gameTrack||0;
-  }
-  _audioSyncIcon();GeoAudio.updateSettingsUI();
-})();
+// Sync icon on load
+(function p(){if(typeof GeoAudio==='undefined')return setTimeout(p,100);_audioSyncIcon();GeoAudio.updateSettingsUI();})();
 </script>
 
 <div class="screen active" id="sh">
