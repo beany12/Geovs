@@ -824,11 +824,14 @@ body.hl67-chaos .btn-primary,body.hl67-chaos .btn-ghost{animation:hl67btnBounce 
 
 /* ═══ MOBILE (<=640px) ═══ */
 @media(max-width:640px){
-  #profile-badge{position:fixed;top:10px;right:10px;z-index:200;width:64px;min-height:auto;gap:3px}
-  #pb-emblem svg{max-height:26px!important}
-  #pb-lvl-text{font-size:.7rem!important}
-  #pb-name-text{font-size:.42rem!important}
-  #profile-panel{top:72px;right:10px;width:calc(100vw - 20px);max-width:320px}
+  #profile-badge{position:fixed;top:8px;right:8px;z-index:200;width:56px;min-height:auto;gap:2px;padding:2px}
+  #pb-emblem{width:100%}
+  #pb-emblem svg{max-height:36px!important;width:auto!important}
+  #pb-emblem>div{width:auto!important;height:36px!important}
+  #pb-lvl-text{font-size:.55rem!important;line-height:1!important}
+  #pb-name-text{font-size:.38rem!important;line-height:1!important}
+  #xp-bar-wrap{height:2px!important}
+  #profile-panel{top:68px;right:8px;width:calc(100vw - 16px);max-width:320px}
 
   /* Audio button mobile */
   #audio-btn{top:10px!important;left:10px!important;width:32px!important;height:32px!important;font-size:.85rem!important}
@@ -983,10 +986,12 @@ body.hl67-chaos .btn-primary,body.hl67-chaos .btn-ghost{animation:hl67btnBounce 
 
 /* ═══ SMALL PHONES (≤375px) ═══ */
 @media(max-width:375px){
-  #profile-badge{width:52px!important}
-  #pb-emblem svg{max-height:22px!important}
-  #pb-lvl-text{font-size:.6rem!important}
+  #profile-badge{width:48px!important}
+  #pb-emblem svg{max-height:30px!important}
+  #pb-emblem>div{height:30px!important}
+  #pb-lvl-text{font-size:.5rem!important}
   #pb-name-text{display:none!important}
+  #xp-bar-wrap{display:none!important}
   .home-title{font-size:clamp(40px,15vw,70px)}
   .modes-layout{gap:16px}
   .mode-card{padding:12px 10px}
