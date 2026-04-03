@@ -3,12 +3,13 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Users collection — each user can only read/write their own document
+    // Users collection
     match /users/{userId} {
-      // Anyone authenticated can read (needed for leaderboard)
+      // Authenticated users can read (needed for leaderboard queries)
+      // Note: only public-safe fields are stored (username, xp, avatar, games)
       allow read: if request.auth != null;
 
-      // Only the document owner can write
+      // Only the document owner can write, with strict validation
       allow write: if request.auth != null
                    && request.auth.uid == userId
                    && isValidUserData(request.resource.data);
@@ -25,16 +26,26 @@ service cloud.firestore {
                'username', 'xp', 'games', 'avatar', 'onboardingDone',
                'highscores', 'achievements', 'streak', 'updatedAt'
              ])
-          // Username: string, max 30 chars
+          // Username: string, max 30 chars, no HTML injection
           && data.username is string
           && data.username.size() <= 30
-          // XP: non-negative integer, max 10M (prevents overflow abuse)
+          && !data.username.matches('.*[<>].*')
+          // XP: non-negative integer, max 10M
           && data.xp is int
           && data.xp >= 0
           && data.xp <= 10000000
-          // Games: non-negative integer
+          // XP delta: max +200 per write (prevents jumping to max)
+          && (
+            !exists(resource) ||
+            data.xp <= resource.data.xp + 200
+          )
+          // Games: non-negative integer, max +5 per write
           && data.games is int
-          && data.games >= 0;
+          && data.games >= 0
+          && (
+            !exists(resource) ||
+            data.games <= resource.data.games + 5
+          );
     }
   }
 }

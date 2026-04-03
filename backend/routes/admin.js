@@ -40,8 +40,9 @@ router.get('/kpis', verifyToken, requireAdmin, (req, res) => {
 router.get('/kpis/dashboard', verifyToken, requireAdmin, (req, res) => {
   const d = getSnapshot();
 
+  const esc = (v) => String(v ?? '—').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
   const row = (label, value) =>
-    `<tr><td>${label}</td><td><strong>${value ?? '—'}</strong></td></tr>`;
+    `<tr><td>${esc(label)}</td><td><strong>${esc(value)}</strong></td></tr>`;
 
   const tableSection = (title, rows) => `
     <h2>${title}</h2>

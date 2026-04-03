@@ -886,9 +886,9 @@ function buildQuestion(metricKeys, randFn){
     for(let j=allVals.length-1;j>0;j--){const k=Math.floor(R()*(j+1));[allVals[j],allVals[k]]=[allVals[k],allVals[j]];}
     const correct=allVals.indexOf(realVal);
     return {typeLabel:'?',
-      question:`${T.whatsIs} ${flagImg(country.f,'1.2rem')} <strong>${country.n}</strong>'s <strong>${m.label.toLowerCase()}</strong>?`,
+      question:`${T.whatsIs} ${flagImg(country.f,'1.2rem')} <strong>${sanitize(country.n)}</strong>'s <strong>${sanitize(m.label.toLowerCase())}</strong>?`,
       options:allVals.map(v=>({text:m.fmt(v)})),
-      correct,explanation:`${country.n}: ${m.fmt(realVal)}`};
+      correct,explanation:`${sanitize(country.n)}: ${m.fmt(realVal)}`};
   }
 }
 
@@ -2763,7 +2763,7 @@ function capRound(){
   document.getElementById('cap-next').style.display='none';
   var skipBtn=document.getElementById('cap-skip'); if(skipBtn){ if(cS.mode==='mc'){ skipBtn.style.display='none'; } else { skipBtn.disabled=false; skipBtn.style.display=''; var skipLbl={en:'⏭ Skip',de:'⏭ Überspringen',fr:'⏭ Passer',es:'⏭ Saltar'}[curLang]||'⏭ Skip'; skipBtn.textContent=skipLbl; } }
   var capQ={en:'What is the capital of',de:'Was ist die Hauptstadt von',fr:'Quelle est la capitale de',es:'¿Cuál es la capital de'}[curLang]||'What is the capital of';
-  document.getElementById('cap-q').innerHTML=capQ+' <strong>'+countryName(q.n)+'</strong> '+flagImg(q.f,'1.3rem')+'?';
+  document.getElementById('cap-q').innerHTML=capQ+' <strong>'+sanitize(countryName(q.n))+'</strong> '+flagImg(q.f,'1.3rem')+'?';
   var mcEl=document.getElementById('cap-mc-opts');
   var typeEl=document.getElementById('cap-type-wrap');
   if(cS.mode==='mc'){

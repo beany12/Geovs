@@ -29,16 +29,75 @@ const io = new Server(server, {
   },
 });
 
+// ── Socket.io authentication ─────────────────────────────────────────────────
+const admin = require('./services/firebase');
+io.use(async (socket, next) => {
+  const token = socket.handshake.auth?.token;
+  if (token) {
+    try {
+      const decoded = await admin.auth().verifyIdToken(token);
+      socket.user = decoded;
+    } catch(e) {
+      // Invalid token — allow anonymous but mark as unverified
+      socket.user = null;
+    }
+  } else {
+    socket.user = null; // Anonymous connection (allowed but tracked)
+  }
+  next();
+});
+
+// ── Socket.io per-socket rate limiting ───────────────────────────────────────
+function socketRateLimit(socket) {
+  const WINDOW = 10000; // 10 seconds
+  const MAX_EVENTS = 30; // max 30 events per window
+  let events = [];
+  return function() {
+    const now = Date.now();
+    events = events.filter(t => now - t < WINDOW);
+    if (events.length >= MAX_EVENTS) {
+      socket.emit('br:error', 'RATE_LIMITED');
+      return false;
+    }
+    events.push(now);
+    return true;
+  };
+}
+
+// ── Join attempt rate limiting (brute-force protection) ──────────────────────
+const joinAttempts = new Map(); // ip -> {count, resetAt}
+function checkJoinRate(socket) {
+  const ip = socket.handshake.address || 'unknown';
+  const now = Date.now();
+  let entry = joinAttempts.get(ip);
+  if (!entry || now > entry.resetAt) {
+    entry = { count: 0, resetAt: now + 60000 }; // 1 minute window
+    joinAttempts.set(ip, entry);
+  }
+  entry.count++;
+  if (entry.count > 10) return false; // max 10 join attempts per minute
+  return true;
+}
+// Cleanup old entries every 5 minutes
+setInterval(() => {
+  const now = Date.now();
+  for (const [ip, entry] of joinAttempts) {
+    if (now > entry.resetAt) joinAttempts.delete(ip);
+  }
+}, 300000);
+
 // Input validators for Socket.io
 const VALID_DIFFICULTIES = new Set(['easy', 'medium', 'hard']);
 const ROOM_CODE_RE = /^[A-Z0-9]{4,8}$/;
 const ISO3_RE = /^[A-Z]{3}$/;
 
 io.on('connection', (socket) => {
+  const rateOk = socketRateLimit(socket);
   let myCode = null;
 
   // Create a new room
   socket.on('br:create', ({ difficulty } = {}) => {
+    if (!rateOk()) return;
     const diff = VALID_DIFFICULTIES.has(difficulty) ? difficulty : 'medium';
     const room = BR.createRoom(socket.id, diff);
     myCode = room.code;
@@ -48,6 +107,8 @@ io.on('connection', (socket) => {
 
   // Join existing room
   socket.on('br:join', ({ code }) => {
+    if (!rateOk()) return;
+    if (!checkJoinRate(socket)) { socket.emit('br:error', 'RATE_LIMITED'); return; }
     const clean = (code || '').toUpperCase().trim();
     if (!ROOM_CODE_RE.test(clean)) { socket.emit('br:error', 'INVALID_CODE'); return; }
     const result = BR.joinRoom(clean, socket.id);
@@ -63,6 +124,7 @@ io.on('connection', (socket) => {
 
   // Player moves to a neighboring country
   socket.on('br:move', (iso) => {
+    if (!rateOk()) return;
     if (!myCode) return;
     if (typeof iso !== 'string' || !ISO3_RE.test(iso)) { socket.emit('br:error', 'INVALID_ISO'); return; }
     const result = BR.makeMove(myCode, socket.id, iso);
@@ -97,6 +159,7 @@ io.on('connection', (socket) => {
   let gttCode = null;
 
   socket.on('gtt:create', ({ profile } = {}) => {
+    if (!rateOk()) return;
     const room = GTT.createRoom(socket.id, profile);
     gttCode = room.code;
     socket.join('gtt_' + gttCode);
@@ -104,6 +167,8 @@ io.on('connection', (socket) => {
   });
 
   socket.on('gtt:join', ({ code, profile }) => {
+    if (!rateOk()) return;
+    if (!checkJoinRate(socket)) { socket.emit('gtt:error', 'RATE_LIMITED'); return; }
     const clean = (code || '').toUpperCase().trim();
     if (!/^[A-Z0-9]{4,8}$/.test(clean)) { socket.emit('gtt:error', 'INVALID_CODE'); return; }
     const result = GTT.joinRoom(clean, socket.id, profile);
@@ -118,6 +183,7 @@ io.on('connection', (socket) => {
   });
 
   socket.on('gtt:move', ({ cellIdx, country }) => {
+    if (!rateOk()) return;
     if (!gttCode) return;
     if (typeof cellIdx !== 'number' || typeof country !== 'string') {
       socket.emit('gtt:error', 'INVALID_INPUT'); return;
@@ -152,8 +218,8 @@ io.on('connection', (socket) => {
   socket.on('gtt:timeout', () => {
     if (!gttCode) return;
     // Validate that the turn deadline has actually passed (prevent client-side manipulation)
-    const room = GTT.getRoom(gttCode);
-    if (room && room.turnDeadline && Date.now() < room.turnDeadline - 2000) return; // 2s grace
+    const currentRoom = GTT.getRoom(gttCode);
+    if (currentRoom && currentRoom.turnDeadline && Date.now() < currentRoom.turnDeadline - 2000) return; // 2s grace
     const result = GTT.timeoutTurn(gttCode);
     if (!result) return;
     const room = result.room;

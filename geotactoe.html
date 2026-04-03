@@ -910,10 +910,19 @@ document.getElementById('country-search').addEventListener('input', function() {
 
   if (matches.length === 0) { list.classList.remove('open'); return; }
 
-  list.innerHTML = matches.map((c, i) =>
-    `<div class="gtt-suggest-item" data-i="${i}" onclick="pickCountry('${esc(c.n)}','${c.f}')">`+
-    `<span class="gtt-suggest-flag">${c.f}</span>${esc(c.n)}</div>`
-  ).join('');
+  list.innerHTML = '';
+  matches.forEach((c, i) => {
+    const item = document.createElement('div');
+    item.className = 'gtt-suggest-item';
+    item.dataset.i = i;
+    item.onclick = () => pickCountry(c.n, c.f);
+    const flag = document.createElement('span');
+    flag.className = 'gtt-suggest-flag';
+    flag.textContent = c.f;
+    item.appendChild(flag);
+    item.appendChild(document.createTextNode(c.n));
+    list.appendChild(item);
+  });
   list.classList.add('open');
 });
 
