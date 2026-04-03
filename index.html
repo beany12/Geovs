@@ -184,6 +184,54 @@
 <!-- ══════════════════════════════════════
      HOME
 ══════════════════════════════════════ -->
+<!-- Audio toggle (top-left, always visible) -->
+<div id="audio-toggle" onclick="GeoAudio.toggleMusic(); GeoAudio.toggleSFX();" style="position:fixed;top:14px;left:14px;z-index:200;width:36px;height:36px;border-radius:10px;background:rgba(14,14,26,.7);border:1px solid rgba(255,255,255,.08);display:flex;align-items:center;justify-content:center;cursor:pointer;backdrop-filter:blur(12px);transition:all .15s;font-size:1rem;user-select:none;-webkit-tap-highlight-color:transparent" title="Sound an/aus">
+  <span id="audio-toggle-icon">🔊</span>
+</div>
+<script>
+(function(){
+  function syncIcon(){
+    var el=document.getElementById('audio-toggle-icon');
+    if(!el||typeof GeoAudio==='undefined')return;
+    var s=GeoAudio.settings;
+    el.textContent=(s.musicEnabled||s.sfxEnabled)?'🔊':'🔇';
+    var wrap=document.getElementById('audio-toggle');
+    if(wrap) wrap.style.borderColor=(s.musicEnabled||s.sfxEnabled)?'rgba(255,255,255,.08)':'rgba(255,45,94,.3)';
+  }
+  // Override toggles to sync icon
+  var origTM,origTS;
+  function patch(){
+    if(typeof GeoAudio==='undefined')return setTimeout(patch,100);
+    origTM=GeoAudio.toggleMusic;origTS=GeoAudio.toggleSFX;
+    GeoAudio.toggleMusic=function(){origTM.call(GeoAudio);syncIcon();};
+    GeoAudio.toggleSFX=function(){origTS.call(GeoAudio);syncIcon();};
+    // Also patch volume setters
+    var origMV=GeoAudio.setMusicVolume,origSV=GeoAudio.setSFXVolume;
+    GeoAudio.setMusicVolume=function(v){origMV.call(GeoAudio,v);syncIcon();};
+    GeoAudio.setSFXVolume=function(v){origSV.call(GeoAudio,v);syncIcon();};
+    syncIcon();
+  }
+  patch();
+  // Make toggle button smarter: single click mutes/unmutes everything
+  document.getElementById('audio-toggle').onclick=function(){
+    if(typeof GeoAudio==='undefined')return;
+    var s=GeoAudio.settings;
+    var isOn=s.musicEnabled||s.sfxEnabled;
+    if(isOn){
+      // Mute all
+      if(s.musicEnabled)origTM.call(GeoAudio);
+      if(s.sfxEnabled)origTS.call(GeoAudio);
+    } else {
+      // Unmute all
+      if(!s.musicEnabled)origTM.call(GeoAudio);
+      if(!s.sfxEnabled)origTS.call(GeoAudio);
+    }
+    syncIcon();
+    GeoAudio.updateSettingsUI();
+  };
+})();
+</script>
+
 <div class="screen active" id="sh">
 <div id="profile-badge" onclick="toggleProfilePanel()">
   <div id="pb-emblem"></div>
