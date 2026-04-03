@@ -5683,9 +5683,9 @@ function mpartyRoundResult(){
   var hitLbl=hitLabels[curLang]||hitLabels.en;
   var missLbl=missLabels[curLang]||missLabels.en;
 
-  // Highlight correct country
+  // Highlight correct country (color only, no dot)
   var cp=MAP_PATHS[target];
-  if(cp) html+='<path d="'+cp+'" fill="rgba(255,192,32,.15)" stroke="var(--amber)" stroke-width="1"/>';
+  if(cp) html+='<path d="'+cp+'" fill="rgba(255,192,32,.25)" stroke="var(--amber)" stroke-width="1.5"/>';
 
   // Draw all pins + lines
   mpartyState.roundClicks.forEach(function(c){
@@ -5698,10 +5698,6 @@ function mpartyRoundResult(){
     var label=c.hitCountry?hitLbl:(km+'km');
     html+='<text x="'+(c.x+8)+'" y="'+(c.y-6)+'" font-family="var(--font-m)" font-size="5" fill="'+p.color+'" opacity=".7">'+label+'</text>';
   });
-
-  // Correct location marker
-  html+='<circle cx="'+center.x+'" cy="'+center.y+'" r="6" fill="var(--amber)" stroke="#fff" stroke-width="2"/>'+
-    '<circle cx="'+center.x+'" cy="'+center.y+'" r="16" fill="none" stroke="var(--amber)" stroke-width="1" opacity=".4"><animate attributeName="r" from="6" to="28" dur="0.8s" fill="freeze"/><animate attributeName="opacity" from=".4" to="0" dur="0.8s" fill="freeze"/></circle>';
   markers.innerHTML=html;
 
   // Scoring logic
