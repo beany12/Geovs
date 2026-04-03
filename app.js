@@ -4791,21 +4791,17 @@ function msClick(e){
   if(e.clientX!==undefined){clickX=e.clientX;clickY=e.clientY;}
   else{clickX=e.pageX;clickY=e.pageY;}
 
-  // Convert screen coordinates to SVG coordinates using the SVG's own matrix
-  var svg = document.getElementById('ms-map-svg');
-  var pt = svg.createSVGPoint();
-  pt.x = clickX;
-  pt.y = clickY;
-  var ctm = svg.getScreenCTM();
-  if(ctm) {
-    var svgPt = pt.matrixTransform(ctm.inverse());
-    var svgX = svgPt.x;
-    var svgY = svgPt.y;
-  } else {
-    // Fallback
-    var svgX = (clickX - wrapRect.left - msPanX) / (wrapRect.width * msZoomLevel) * 1000;
-    var svgY = (clickY - wrapRect.top - msPanY) / (wrapRect.width * 0.5 * msZoomLevel) * 500;
-  }
+  // Convert screen coordinates to SVG coordinates accounting for zoom/pan transform
+  // The zoom is CSS transform on ms-map-inner, not on the SVG itself,
+  // so getScreenCTM() doesn't account for it — we must do it manually.
+  var relX = clickX - wrapRect.left;
+  var relY = clickY - wrapRect.top;
+  // Undo CSS transform: translate(msPanX, msPanY) scale(msZoomLevel)
+  var unzoomedX = (relX - msPanX) / msZoomLevel;
+  var unzoomedY = (relY - msPanY) / msZoomLevel;
+  // Map from wrapper pixel coords to SVG viewBox (0-1000 x 0-500)
+  var svgX = unzoomedX / wrapRect.width * 1000;
+  var svgY = unzoomedY / (wrapRect.width * 0.5) * 500;
 
   var target=msState.pool[msState.round-1];
   var center=msCenters[target];
@@ -5625,10 +5621,12 @@ function mpartyClick(e){
   var wrap=document.getElementById('mparty-map-wrap');
   var wrapRect=wrap.getBoundingClientRect();
   var clickX=e.clientX,clickY=e.clientY;
-  // Use same zoom-aware coordinate conversion as Map Sniper
-  var pt=svg.createSVGPoint();pt.x=clickX;pt.y=clickY;
-  var ctm=svg.getScreenCTM();
-  var svgPt=ctm?pt.matrixTransform(ctm.inverse()):{x:0,y:0};
+  // Convert screen coords to SVG coords accounting for CSS zoom/pan transform
+  var relX=clickX-wrapRect.left;
+  var relY=clickY-wrapRect.top;
+  var unzoomedX=(relX-mpPanX)/mpZoomLevel;
+  var unzoomedY=(relY-mpPanY)/mpZoomLevel;
+  var svgPt={x:unzoomedX/wrapRect.width*1000, y:unzoomedY/(wrapRect.width*0.5)*500};
   var target=mpartyState.currentTarget;
   msComputeCenters();
   var center=msCenters[target];
