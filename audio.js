@@ -292,159 +292,209 @@ const GeoAudio = (function() {
     if (synthMusicTimer) { clearInterval(synthMusicTimer); synthMusicTimer = null; }
   }
 
-  function synthMusicMenu() {
-    const c = getCtx(); if (!c) return;
-    stopSynthMusic();
-    const vol = settings.musicVolume * 0.18;
-
-    // Chord progressions: Am - F - C - G (dreamy ambient)
-    const CHORDS = [
-      [220, 261.6, 329.6],  // Am
-      [174.6, 220, 261.6],  // F
-      [261.6, 329.6, 392],  // C
-      [196, 246.9, 293.7],  // G
-    ];
-    let chordIdx = 0;
-
-    function playChord() {
-      const c = getCtx(); if (!c) return;
-      const chord = CHORDS[chordIdx % CHORDS.length];
-      chordIdx++;
-      chord.forEach((freq, i) => {
-        const o = c.createOscillator();
-        const g = c.createGain();
-        o.type = 'sine';
-        o.frequency.value = freq;
-        // Slow swell in, sustain, slow fade
-        const t = c.currentTime;
-        g.gain.setValueAtTime(0, t);
-        g.gain.linearRampToValueAtTime(vol, t + 1.5);
-        g.gain.setValueAtTime(vol, t + 2.5);
-        g.gain.linearRampToValueAtTime(0, t + 4);
-        o.connect(g); g.connect(c.destination);
-        o.start(t); o.stop(t + 4.2);
-        synthMusicNodes.push(o, g);
-      });
-      // Add a soft high shimmer
-      const o2 = c.createOscillator(), g2 = c.createGain();
-      o2.type = 'triangle';
-      o2.frequency.value = chord[2] * 2;
-      const t = c.currentTime;
-      g2.gain.setValueAtTime(0, t + 0.5);
-      g2.gain.linearRampToValueAtTime(vol * 0.3, t + 2);
-      g2.gain.linearRampToValueAtTime(0, t + 3.8);
-      o2.connect(g2); g2.connect(c.destination);
-      o2.start(t + 0.5); o2.stop(t + 4);
-      synthMusicNodes.push(o2, g2);
-    }
-
-    playChord();
+  // Helper: loop a pattern function on interval, auto-cleanup nodes
+  function synthLoop(fn, ms) {
+    fn();
     synthMusicTimer = setInterval(() => {
       if (!settings.musicEnabled) { stopSynthMusic(); return; }
-      // Clean up finished nodes
-      synthMusicNodes = synthMusicNodes.filter(n => {
-        try { if (n.context && n.context.currentTime) return true; } catch(e) {} return false;
-      });
-      playChord();
+      synthMusicNodes = synthMusicNodes.filter(n => { try { return n.context; } catch(e) { return false; } });
+      fn();
+    }, ms);
+  }
+
+  // Helper: play a note
+  function note(freq, type, vol, start, dur, attack, release) {
+    const c = getCtx(); if (!c) return;
+    const o = c.createOscillator(), g = c.createGain();
+    o.type = type; o.frequency.value = freq;
+    const t = c.currentTime + (start || 0);
+    const a = attack || 0.02, r = release || dur;
+    g.gain.setValueAtTime(0, t);
+    g.gain.linearRampToValueAtTime(vol, t + a);
+    g.gain.setValueAtTime(vol * 0.8, t + dur - r * 0.5);
+    g.gain.linearRampToValueAtTime(0.001, t + dur);
+    o.connect(g); g.connect(c.destination);
+    o.start(t); o.stop(t + dur + 0.05);
+    synthMusicNodes.push(o, g);
+  }
+
+  // ═══ MENU TRACKS ═══
+
+  // Menu 1: Dreamy Pads (Am-F-C-G)
+  function synthMenuDreamy() {
+    stopSynthMusic();
+    const v = settings.musicVolume * 0.16;
+    const CHORDS = [[220,261.6,329.6],[174.6,220,261.6],[261.6,329.6,392],[196,246.9,293.7]];
+    let i = 0;
+    synthLoop(() => {
+      const ch = CHORDS[i++ % 4];
+      ch.forEach(f => note(f, 'sine', v, 0, 4, 1.5, 1.5));
+      note(ch[2]*2, 'triangle', v*0.3, 0.5, 3.5, 1, 1.5);
     }, 4000);
   }
 
-  function synthMusicGameplay() {
-    const c = getCtx(); if (!c) return;
+  // Menu 2: Lo-fi Chill (Dm7-G7-Cmaj7-Am7)
+  function synthMenuLofi() {
     stopSynthMusic();
-    const vol = settings.musicVolume * 0.14;
+    const v = settings.musicVolume * 0.13;
+    const CHORDS = [[146.8,174.6,220,261.6],[196,246.9,293.7,349.2],[261.6,329.6,392,493.9],[220,261.6,329.6,392]];
+    let i = 0;
+    synthLoop(() => {
+      const ch = CHORDS[i++ % 4];
+      ch.forEach((f,j) => note(f, 'sine', v, j*0.12, 3.5, 0.8, 1.2));
+      // Soft Rhodes-like shimmer
+      note(ch[3]*2, 'sine', v*0.15, 0.3, 2.5, 0.5, 1);
+      // Sub bass
+      note(ch[0]/2, 'sine', v*0.5, 0, 3.2, 0.3, 1);
+    }, 3500);
+  }
 
-    // Energetic arpeggio patterns: Em - G - D - C
-    const NOTES = [
-      [329.6, 392, 493.9, 659.3],  // Em arp
-      [392, 493.9, 587.3, 784],    // G arp
-      [293.7, 370, 440, 587.3],    // D arp
-      [261.6, 329.6, 392, 523.3],  // C arp
-    ];
-    let patIdx = 0;
+  // Menu 3: Space Ambient (wide ethereal intervals)
+  function synthMenuSpace() {
+    stopSynthMusic();
+    const v = settings.musicVolume * 0.12;
+    const PADS = [[130.8,196,329.6],[146.8,220,370],[164.8,261.6,392],[146.8,233,349.2]];
+    let i = 0;
+    synthLoop(() => {
+      const p = PADS[i++ % 4];
+      p.forEach(f => note(f, 'sine', v, 0, 5.5, 2, 2));
+      note(p[2]*2, 'sine', v*0.08, 1, 4, 1.5, 1.5);
+      // Random sparkle
+      note(800 + Math.random()*600, 'sine', v*0.06, 2+Math.random()*2, 0.8, 0.1, 0.5);
+    }, 5500);
+  }
 
-    function playPattern() {
-      const c = getCtx(); if (!c) return;
-      const notes = NOTES[patIdx % NOTES.length];
-      patIdx++;
-      notes.forEach((freq, i) => {
-        const o = c.createOscillator(), g = c.createGain();
-        o.type = i % 2 === 0 ? 'triangle' : 'sine';
-        o.frequency.value = freq;
-        const t = c.currentTime + i * 0.22;
-        g.gain.setValueAtTime(0, t);
-        g.gain.linearRampToValueAtTime(vol, t + 0.04);
-        g.gain.setValueAtTime(vol * 0.8, t + 0.15);
-        g.gain.linearRampToValueAtTime(0, t + 0.5);
-        o.connect(g); g.connect(c.destination);
-        o.start(t); o.stop(t + 0.55);
-        synthMusicNodes.push(o, g);
-      });
-      // Bass note
-      const ob = c.createOscillator(), gb = c.createGain();
-      ob.type = 'sine';
-      ob.frequency.value = notes[0] / 2;
-      const t = c.currentTime;
-      gb.gain.setValueAtTime(vol * 0.6, t);
-      gb.gain.linearRampToValueAtTime(0, t + 0.9);
-      ob.connect(gb); gb.connect(c.destination);
-      ob.start(t); ob.stop(t + 1);
-      synthMusicNodes.push(ob, gb);
-    }
+  // Menu 4: Minimal Zen (pentatonic)
+  function synthMenuZen() {
+    stopSynthMusic();
+    const v = settings.musicVolume * 0.14;
+    const NOTES = [261.6, 293.7, 329.6, 392, 440, 523.3, 587.3, 659.3];
+    let step = 0;
+    synthLoop(() => {
+      // Single gentle note with long tail
+      const f = NOTES[step % NOTES.length];
+      note(f, 'sine', v, 0, 3, 0.5, 1.5);
+      note(f/2, 'sine', v*0.3, 0.1, 2.5, 0.8, 1);
+      // Occasional harmony
+      if (step % 3 === 0) note(f*1.5, 'triangle', v*0.1, 0.5, 2, 0.5, 1);
+      step++;
+    }, 3000);
+  }
 
-    playPattern();
-    synthMusicTimer = setInterval(() => {
-      if (!settings.musicEnabled) { stopSynthMusic(); return; }
-      synthMusicNodes = synthMusicNodes.filter(n => {
-        try { if (n.context && n.context.currentTime) return true; } catch(e) {} return false;
-      });
-      playPattern();
+  // ═══ GAMEPLAY TRACKS ═══
+
+  // Gameplay 1: Energetic Arpeggios (Em-G-D-C)
+  function synthGameArpeggio() {
+    stopSynthMusic();
+    const v = settings.musicVolume * 0.13;
+    const PAT = [[329.6,392,493.9,659.3],[392,493.9,587.3,784],[293.7,370,440,587.3],[261.6,329.6,392,523.3]];
+    let i = 0;
+    synthLoop(() => {
+      const ns = PAT[i++ % 4];
+      ns.forEach((f,j) => note(f, j%2?'sine':'triangle', v, j*0.2, 0.5, 0.03, 0.3));
+      note(ns[0]/2, 'sine', v*0.5, 0, 0.9, 0.05, 0.4);
     }, 1800);
   }
 
-  function synthMusicTense() {
-    const c = getCtx(); if (!c) return;
+  // Gameplay 2: Retro Chiptune (8-bit bouncy)
+  function synthGameChiptune() {
     stopSynthMusic();
-    const vol = settings.musicVolume * 0.15;
+    const v = settings.musicVolume * 0.1;
+    const MEL = [523.3,587.3,659.3,784,659.3,523.3,440,392,523.3,659.3,784,1047,784,659.3,523.3,440];
+    let i = 0;
+    synthLoop(() => {
+      const f = MEL[i % MEL.length];
+      note(f, 'square', v*0.6, 0, 0.15, 0.01, 0.08);
+      // Bass on every other beat
+      if (i % 2 === 0) note(f/4, 'square', v*0.4, 0, 0.12, 0.01, 0.05);
+      // Hi-hat noise sim
+      note(8000+Math.random()*4000, 'square', v*0.05, 0, 0.03, 0.005, 0.02);
+      i++;
+    }, 180);
+  }
 
-    let tick = 0;
-    function playPulse() {
-      const c = getCtx(); if (!c) return;
-      tick++;
-      // Deep pulsing bass
-      const ob = c.createOscillator(), gb = c.createGain();
-      ob.type = 'sine'; ob.frequency.value = 80 + (tick % 2) * 15;
-      const t = c.currentTime;
-      gb.gain.setValueAtTime(vol, t);
-      gb.gain.exponentialRampToValueAtTime(0.001, t + 0.4);
-      ob.connect(gb); gb.connect(c.destination);
-      ob.start(t); ob.stop(t + 0.45);
-      synthMusicNodes.push(ob, gb);
-      // High tension note every 2 ticks
-      if (tick % 2 === 0) {
-        const o2 = c.createOscillator(), g2 = c.createGain();
-        o2.type = 'sawtooth'; o2.frequency.value = 440 + (tick % 4) * 30;
-        g2.gain.setValueAtTime(vol * 0.25, t);
-        g2.gain.exponentialRampToValueAtTime(0.001, t + 0.3);
-        o2.connect(g2); g2.connect(c.destination);
-        o2.start(t); o2.stop(t + 0.35);
-        synthMusicNodes.push(o2, g2);
+  // Gameplay 3: Driving Pulse (intense, fast)
+  function synthGameDriving() {
+    stopSynthMusic();
+    const v = settings.musicVolume * 0.12;
+    const BASS = [110,110,130.8,110,146.8,146.8,130.8,110];
+    let i = 0;
+    synthLoop(() => {
+      const b = BASS[i % BASS.length];
+      // Pumping bass
+      note(b, 'sawtooth', v*0.5, 0, 0.2, 0.01, 0.15);
+      // Stab chord on every 4th
+      if (i % 4 === 0) {
+        [1,1.25,1.5].forEach(m => note(b*2*m, 'square', v*0.25, 0, 0.08, 0.005, 0.05));
       }
-    }
+      // Offbeat hi
+      note(b*4, 'triangle', v*0.1, 0.12, 0.06, 0.005, 0.04);
+      i++;
+    }, 250);
+  }
 
-    playPulse();
-    synthMusicTimer = setInterval(() => {
-      if (!settings.musicEnabled) { stopSynthMusic(); return; }
-      synthMusicNodes = synthMusicNodes.filter(n => {
-        try { if (n.context && n.context.currentTime) return true; } catch(e) {} return false;
-      });
-      playPulse();
+  // Gameplay 4: Funky Groove
+  function synthGameFunky() {
+    stopSynthMusic();
+    const v = settings.musicVolume * 0.11;
+    const BASS = [130.8,0,130.8,164.8,0,196,0,164.8, 174.6,0,174.6,220,0,196,0,174.6];
+    const STAB = [0,1,0,0,1,0,1,0, 0,1,0,0,1,0,1,0];
+    let i = 0;
+    synthLoop(() => {
+      const b = BASS[i % BASS.length];
+      if (b > 0) note(b, 'sawtooth', v*0.45, 0, 0.15, 0.01, 0.1);
+      if (STAB[i % STAB.length]) {
+        note(392, 'square', v*0.15, 0, 0.06, 0.005, 0.04);
+        note(493.9, 'square', v*0.15, 0, 0.06, 0.005, 0.04);
+      }
+      // Wah-like sweep every 8
+      if (i % 8 === 0) {
+        const o = getCtx().createOscillator(), g = getCtx().createGain();
+        o.type = 'sawtooth'; o.frequency.setValueAtTime(300, getCtx().currentTime);
+        o.frequency.exponentialRampToValueAtTime(800, getCtx().currentTime + 0.3);
+        g.gain.setValueAtTime(v*0.15, getCtx().currentTime);
+        g.gain.exponentialRampToValueAtTime(0.001, getCtx().currentTime + 0.35);
+        o.connect(g); g.connect(getCtx().destination);
+        o.start(); o.stop(getCtx().currentTime + 0.4);
+        synthMusicNodes.push(o, g);
+      }
+      i++;
+    }, 200);
+  }
+
+  // Tense: stays the same (timer situations only)
+  function synthMusicTense() {
+    stopSynthMusic();
+    const v = settings.musicVolume * 0.15;
+    let tick = 0;
+    synthLoop(() => {
+      tick++;
+      note(80 + (tick%2)*15, 'sine', v, 0, 0.4, 0.02, 0.3);
+      if (tick%2===0) note(440+(tick%4)*30, 'sawtooth', v*0.25, 0, 0.3, 0.02, 0.2);
     }, 500);
   }
 
+  // Track registry with labels
+  const MENU_TRACKS = [
+    { id: 'menu_dreamy',  label: '🌙 Dreamy',  fn: synthMenuDreamy },
+    { id: 'menu_lofi',    label: '☕ Lo-fi',    fn: synthMenuLofi },
+    { id: 'menu_space',   label: '🪐 Space',    fn: synthMenuSpace },
+    { id: 'menu_zen',     label: '🧘 Zen',      fn: synthMenuZen },
+  ];
+  const GAME_TRACKS = [
+    { id: 'game_arp',     label: '⚡ Arpeggio', fn: synthGameArpeggio },
+    { id: 'game_chip',    label: '👾 Chiptune', fn: synthGameChiptune },
+    { id: 'game_drive',   label: '🏎️ Driving',  fn: synthGameDriving },
+    { id: 'game_funky',   label: '🎸 Funky',    fn: synthGameFunky },
+  ];
+
+  // Selected track indices (saved in settings)
+  if (settings.menuTrack === undefined) settings.menuTrack = 0;
+  if (settings.gameTrack === undefined) settings.gameTrack = 0;
+
   const SYNTH_MUSIC_MAP = {
-    menu: synthMusicMenu,
-    gameplay: synthMusicGameplay,
+    menu: () => MENU_TRACKS[settings.menuTrack % MENU_TRACKS.length].fn(),
+    gameplay: () => GAME_TRACKS[settings.gameTrack % GAME_TRACKS.length].fn(),
     tense: synthMusicTense,
   };
 
@@ -570,6 +620,27 @@ const GeoAudio = (function() {
     save(); updateSettingsUI();
   }
 
+  function setMenuTrack(idx) {
+    settings.menuTrack = idx % MENU_TRACKS.length;
+    save();
+    if (currentTrack === 'menu' && settings.musicEnabled) {
+      // Force restart with new track
+      currentTrack = null;
+      playMusic('menu');
+    }
+    updateSettingsUI();
+  }
+
+  function setGameTrack(idx) {
+    settings.gameTrack = idx % GAME_TRACKS.length;
+    save();
+    if (currentTrack === 'gameplay' && settings.musicEnabled) {
+      currentTrack = null;
+      playMusic('gameplay');
+    }
+    updateSettingsUI();
+  }
+
   function updateSettingsUI() {
     const ms = document.getElementById('audio-music-vol');
     const ss = document.getElementById('audio-sfx-vol');
@@ -579,6 +650,11 @@ const GeoAudio = (function() {
     if (ss) ss.value = settings.sfxVolume * 100;
     if (mi) mi.textContent = settings.musicEnabled && settings.musicVolume > 0 ? '🔊' : '🔇';
     if (si) si.textContent = settings.sfxEnabled && settings.sfxVolume > 0 ? '🔊' : '🔇';
+    // Update track selectors
+    var mt = document.getElementById('audio-menu-track');
+    var gt = document.getElementById('audio-game-track');
+    if (mt) mt.value = settings.menuTrack || 0;
+    if (gt) gt.value = settings.gameTrack || 0;
   }
 
   // ── Init ───────────────────────────────────────────────────────────────────
@@ -592,7 +668,9 @@ const GeoAudio = (function() {
 
   return {
     playMusic, stopMusic, playSFX,
-    setMusicVolume, setSFXVolume, toggleMusic, toggleSFX, updateSettingsUI,
+    setMusicVolume, setSFXVolume, toggleMusic, toggleSFX,
+    setMenuTrack, setGameTrack, updateSettingsUI,
+    MENU_TRACKS, GAME_TRACKS,
     get settings() { return settings; },
     get currentTrack() { return currentTrack; },
   };
