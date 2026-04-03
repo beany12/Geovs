@@ -1141,8 +1141,8 @@ function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
   try{
-    if(id==='screen-game') GeoAudio.playMusic('gameplay');
-    else GeoAudio.playMusic('menu');
+    if(id==='screen-lobby') GeoAudio.playMusic('menu');
+    else GeoAudio.stopMusic();
   }catch(e){}
 }
 

@@ -629,11 +629,16 @@ function showScreen(id){
   document.getElementById('s'+id).classList.add('active');
   window.scrollTo(0,0);
   if(typeof GeoAudio!=='undefined') GeoAudio.playSFX('navigate');
-  // Switch music based on screen
+  // Music only on home/over screens, stop in games
   if(typeof GeoAudio!=='undefined'){
     if(id==='h'||id==='over'||id==='quiz-over') GeoAudio.playMusic('menu');
-    else GeoAudio.playMusic('gameplay');
+    else GeoAudio.stopMusic();
   }
+  // Audio button: only visible on home/over screens
+  var _ab=document.getElementById('audio-btn');
+  var _ap=document.getElementById('audio-panel');
+  if(_ab){var _show=(id==='h'||id==='over'||id==='quiz-over');_ab.style.display=_show?'flex':'none';if(!_show&&_ap)_ap.style.display='none';}
+
 }
 function goHome(){ showScreen('h'); initHome(); }
 function showToast(msg){

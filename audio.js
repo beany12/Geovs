@@ -271,7 +271,6 @@ const GeoAudio = (function() {
   // ── Music ──────────────────────────────────────────────────────────────────
   const MUSIC_TRACKS = {
     menu:     '/audio/music/menu.mp3',
-    gameplay: '/audio/music/gameplay.mp3',
     tense:    '/audio/music/tense.mp3',
   };
   const musicMp3Failed = {};
@@ -337,38 +336,7 @@ const GeoAudio = (function() {
     }, 3000);
   }
 
-  // ═══ GAMEPLAY MUSIC ═══
-
-  // Funky Groove
-  function synthGameFunky() {
-    stopSynthMusic();
-    const v = settings.musicVolume * 0.11;
-    const BASS = [130.8,0,130.8,164.8,0,196,0,164.8, 174.6,0,174.6,220,0,196,0,174.6];
-    const STAB = [0,1,0,0,1,0,1,0, 0,1,0,0,1,0,1,0];
-    let i = 0;
-    synthLoop(() => {
-      const b = BASS[i % BASS.length];
-      if (b > 0) note(b, 'sawtooth', v*0.45, 0, 0.15, 0.01, 0.1);
-      if (STAB[i % STAB.length]) {
-        note(392, 'square', v*0.15, 0, 0.06, 0.005, 0.04);
-        note(493.9, 'square', v*0.15, 0, 0.06, 0.005, 0.04);
-      }
-      // Wah-like sweep every 8
-      if (i % 8 === 0) {
-        const o = getCtx().createOscillator(), g = getCtx().createGain();
-        o.type = 'sawtooth'; o.frequency.setValueAtTime(300, getCtx().currentTime);
-        o.frequency.exponentialRampToValueAtTime(800, getCtx().currentTime + 0.3);
-        g.gain.setValueAtTime(v*0.15, getCtx().currentTime);
-        g.gain.exponentialRampToValueAtTime(0.001, getCtx().currentTime + 0.35);
-        o.connect(g); g.connect(getCtx().destination);
-        o.start(); o.stop(getCtx().currentTime + 0.4);
-        synthMusicNodes.push(o, g);
-      }
-      i++;
-    }, 200);
-  }
-
-  // Tense: stays the same (timer situations only)
+  // Tense: timer situations only
   function synthMusicTense() {
     stopSynthMusic();
     const v = settings.musicVolume * 0.15;
@@ -380,17 +348,8 @@ const GeoAudio = (function() {
     }, 500);
   }
 
-  // Track registry with labels
-  const MENU_TRACKS = [
-    { id: 'menu_zen',     label: '🧘 Zen',      fn: synthMenuZen },
-  ];
-  const GAME_TRACKS = [
-    { id: 'game_funky',   label: '🎸 Funky',    fn: synthGameFunky },
-  ];
-
   const SYNTH_MUSIC_MAP = {
     menu: synthMenuZen,
-    gameplay: synthGameFunky,
     tense: synthMusicTense,
   };
 
