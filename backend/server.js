@@ -17,6 +17,7 @@ const BR            = require('./services/borderrunMP');
 const GTT           = require('./services/geotactoe');
 
 const app    = express();
+app.set('trust proxy', 1); // Railway reverse proxy — needed for correct req.ip in rate limiters
 const server = http.createServer(app);
 
 // ── Socket.io (BorderRun Multiplayer) ─────────────────────────────────────────
@@ -150,6 +151,9 @@ io.on('connection', (socket) => {
 
   socket.on('gtt:timeout', () => {
     if (!gttCode) return;
+    // Validate that the turn deadline has actually passed (prevent client-side manipulation)
+    const room = GTT.getRoom(gttCode);
+    if (room && room.turnDeadline && Date.now() < room.turnDeadline - 2000) return; // 2s grace
     const result = GTT.timeoutTurn(gttCode);
     if (!result) return;
     const room = result.room;
@@ -290,6 +294,17 @@ app.use('/api', requireApiKey);
 app.use('/api/session', sessionRouter);
 app.use('/api/game',    gameRouter);
 app.use('/api/admin',   adminRouter);
+
+// Block access to backend source files, dotfiles, and sensitive configs
+app.use((req, res, next) => {
+  const p = req.path.toLowerCase();
+  if (p.startsWith('/backend/') || p.startsWith('/.') || p === '/package.json' ||
+      p === '/package-lock.json' || p === '/firebase.json' || p === '/firestore.rules' ||
+      p === '/.env' || p === '/.firebaserc' || p === '/.gitignore') {
+    return res.status(404).end();
+  }
+  next();
+});
 
 // Serve frontend files with caching
 app.use(express.static(path.join(__dirname, '..'), {

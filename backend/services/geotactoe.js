@@ -448,8 +448,10 @@ setInterval(() => {
   }
 }, 30 * 60 * 1000);
 
+function getRoom(code) { return rooms.get(code) || null; }
+
 module.exports = {
   COUNTRIES, TURN_TIME_MS,
   createRoom, joinRoom, makeMove, skipTurn, proposeDraw, cancelDraw, timeoutTurn, nextRound,
-  removePlayer, buildState, generateBoard,
+  removePlayer, buildState, generateBoard, getRoom,
 };

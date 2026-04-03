@@ -628,6 +628,12 @@ function showScreen(id){
   const _b=document.getElementById('profile-badge');if(_b){const _sh=(id==='h'||id==='over');_b.style.opacity=_sh?'1':'0';_b.style.pointerEvents=_sh?'auto':'none';}
   document.getElementById('s'+id).classList.add('active');
   window.scrollTo(0,0);
+  if(typeof GeoAudio!=='undefined') GeoAudio.playSFX('navigate');
+  // Switch music based on screen
+  if(typeof GeoAudio!=='undefined'){
+    if(id==='h'||id==='over'||id==='quiz-over') GeoAudio.playMusic('menu');
+    else GeoAudio.playMusic('gameplay');
+  }
 }
 function goHome(){ showScreen('h'); initHome(); }
 function showToast(msg){
@@ -769,6 +775,7 @@ function hlAnswer(guess){
   const fb=document.getElementById('hl-fb');
   if(ok){
     hlS.streak++; hlS.correct++; hlS.bestStreak=Math.max(hlS.bestStreak,hlS.streak);
+    try{GeoAudio.playSFX(hlS.streak>1?'streak':'correct');}catch(e){}
     const pts=1; hlS.score+=pts;
     var _csEl=document.getElementById('hl-cur-score');if(_csEl)_csEl.textContent=hlS.score;
     // Tiered XP: ×1 base, ×1.5 at 5, ×2 at 10, ×3 at 20
@@ -803,6 +810,7 @@ function hlAnswer(guess){
   } else {
     document.getElementById('hl-cB').className='hl-card wrong shake';
     fb.className='hl-feedback show bad';
+    try{GeoAudio.playSFX('wrong');}catch(e){}
     document.getElementById('hl-fb-main').textContent=T.wrong_msg;
     document.getElementById('hl-fb-det').textContent=`${countryName(cB.n)}: ${m.fmt(vB)} · ${countryName(cA.n)}: ${m.fmt(vA)}`;
     hlHUD();
@@ -998,6 +1006,7 @@ function chGuess(){
     chS.correct=1;
     const pts=Math.max(10,100-(chS.cluesShown-1)*10);
     chS.score=pts;
+    try{GeoAudio.playSFX('correct');}catch(e){}
     try{awardXP(pts+30);}catch(e){} // pts + completion bonus
     // Build emoji grid: 🟩 for unused clues, 🟨 for used clues before solve, ⬜ for remaining
     chAnswers=[];
@@ -1036,6 +1045,7 @@ function chGuess(){
         chS.correct=0;
         chS.score=0;
         chAnswers=Array(8).fill('🟥');
+        try{GeoAudio.playSFX('defeat');}catch(e){}
         chRevealResult(false,0);
       } else if(chS.cluesShown<8){
         chRevealClue();
@@ -1205,6 +1215,7 @@ function waShare(){ window.open('https://wa.me/?text='+encodeURIComponent(_share
 ══════════════════════════════════════════ */
 let _lastState=null;
 function showOver(state){
+  try{GeoAudio.playSFX('victory');}catch(e){}
   _lastState=state; try{flushXP();}catch(e){} try{incGames();achTrackLang();}catch(e){}
   const acc=state.total_q>0?Math.round(state.correct/state.total_q*100):0;
   document.getElementById('over-score').textContent=state.score;
@@ -1451,6 +1462,7 @@ function hl67Escalation(){
 }
 
 function quizShowGameOver(mode, state){
+  try{GeoAudio.playSFX(state.score>0?'victory':'defeat');}catch(e){}
   showScreen('quiz-over');
   var correct=state.score||0;
   var total=state.total||1;
@@ -2749,7 +2761,7 @@ function capRound(){
   document.getElementById('cap-prog').style.width=(cS.round/cS.total*100)+'%';
   document.getElementById('cap-feedback').textContent='';
   document.getElementById('cap-next').style.display='none';
-  var skipBtn=document.getElementById('cap-skip'); if(skipBtn){ skipBtn.disabled=false; skipBtn.style.display=''; var skipLbl={en:'⏭ Skip',de:'⏭ Überspringen',fr:'⏭ Passer',es:'⏭ Saltar'}[curLang]||'⏭ Skip'; skipBtn.textContent=skipLbl; }
+  var skipBtn=document.getElementById('cap-skip'); if(skipBtn){ if(cS.mode==='mc'){ skipBtn.style.display='none'; } else { skipBtn.disabled=false; skipBtn.style.display=''; var skipLbl={en:'⏭ Skip',de:'⏭ Überspringen',fr:'⏭ Passer',es:'⏭ Saltar'}[curLang]||'⏭ Skip'; skipBtn.textContent=skipLbl; } }
   var capQ={en:'What is the capital of',de:'Was ist die Hauptstadt von',fr:'Quelle est la capitale de',es:'¿Cuál es la capital de'}[curLang]||'What is the capital of';
   document.getElementById('cap-q').innerHTML=capQ+' <strong>'+countryName(q.n)+'</strong> '+flagImg(q.f,'1.3rem')+'?';
   var mcEl=document.getElementById('cap-mc-opts');
@@ -2797,7 +2809,8 @@ function capAnswer(ans,btn){
     try{awardXP(Math.round((5+bonus)*diffMult));}catch(e){}
     try{achTrack('capCorrect',1);}catch(e){}
     if(bonus>0) showToast('🔥 Streak '+cS.streak+'! +'+bonus+' bonus XP');
-  } else { cS.streak=0; }
+    try{GeoAudio.playSFX(cS.streak>1?'streak':'correct');}catch(e){}
+  } else { cS.streak=0; try{GeoAudio.playSFX('wrong');}catch(e){} }
   capComboHUD();
   var capCorrectMsg={en:'✓ Correct!',de:'✓ Richtig!',fr:'✓ Correct!',es:'✓ ¡Correcto!'}[curLang]||'✓ Correct!';
   var capWrongPfx={en:'✗ Answer: ',de:'✗ Antwort: ',fr:'✗ Réponse : ',es:'✗ Respuesta: '}[curLang]||'✗ Answer: ';
@@ -2847,7 +2860,8 @@ function capTypeSubmit(){
     try{awardXP(Math.round((5+bonus)*diffMult));}catch(e){}
     try{achTrack('capCorrect',1);}catch(e){}
     if(bonus>0) showToast('🔥 Streak '+cS.streak+'! +'+bonus+' bonus XP');
-  } else { cS.streak=0; }
+    try{GeoAudio.playSFX(cS.streak>1?'streak':'correct');}catch(e){}
+  } else { cS.streak=0; try{GeoAudio.playSFX('wrong');}catch(e){} }
   capComboHUD();
   var capCorrectMsg={en:'✓ Correct!',de:'✓ Richtig!',fr:'✓ Correct!',es:'✓ ¡Correcto!'}[curLang]||'✓ Correct!';
   var capWrongPfx={en:'✗ Answer: ',de:'✗ Antwort: ',fr:'✗ Réponse : ',es:'✗ Respuesta: '}[curLang]||'✗ Answer: ';
@@ -3165,7 +3179,8 @@ function flgTypeSubmit(){
     try{awardXP(Math.round((5+fBonus)*fDiffMult));}catch(e){}
     try{achTrack('flgCorrect',1);achTrack('flgUnique',q.n);}catch(e){}
     if(fBonus>0) showToast('🔥 Streak '+fS.streak+'! +'+fBonus+' bonus XP');
-  } else { fS.streak=0; }
+    try{GeoAudio.playSFX(fS.streak>1?'streak':'correct');}catch(e){}
+  } else { fS.streak=0; try{GeoAudio.playSFX('wrong');}catch(e){} }
   flgComboHUD();
   var correctMsg={en:'✓ Correct!',de:'✓ Richtig!',fr:'✓ Correct!',es:'✓ ¡Correcto!'}[curLang]||'✓ Correct!';
   var wrongPfx={en:'✗ Answer: ',de:'✗ Antwort: ',fr:'✗ Réponse : ',es:'✗ Respuesta: '}[curLang]||'✗ Answer: ';
@@ -3194,7 +3209,8 @@ function flgAnswer(ok,btn,correctCountry){
     try{awardXP(Math.round((5+fBonus2)*fDiffMult2));}catch(e){}
     try{achTrack('flgCorrect',1);achTrack('flgUnique',correctCountry);}catch(e){}
     if(fBonus2>0) showToast('🔥 Streak '+fS.streak+'! +'+fBonus2+' bonus XP');
-  } else { fS.streak=0; }
+    try{GeoAudio.playSFX(fS.streak>1?'streak':'correct');}catch(e){}
+  } else { fS.streak=0; try{GeoAudio.playSFX('wrong');}catch(e){} }
   flgComboHUD();
   setTimeout(function(){ flgNext(); }, ok?500:1200);
 }
@@ -3880,6 +3896,7 @@ function checkAchievements(){
         achSaveUnlocked(unlocked);
         try{awardXP(a.xp);}catch(e){}
         achShowToast(a);
+        try{GeoAudio.playSFX('achievement');}catch(e){}
         newCount++;
       }
     }catch(e){}
@@ -3986,6 +4003,7 @@ function ppCancelRename(){
 }
 
 function showLevelUp(ld){
+  try{GeoAudio.playSFX('levelup');}catch(e){}
   try{
     const ge=id=>document.getElementById(id);
     const td=TIERS[ld.tier]||TIERS.wanderer;
@@ -4008,6 +4026,7 @@ function showLevelUp(ld){
 function closeLevelUp(){const o=document.getElementById('levelup-overlay');if(o)o.classList.remove('show');stopConfetti();}
 let _confAnim=null,_confParts=[];
 function startConfetti(color){
+  try{GeoAudio.playSFX('confetti');}catch(e){}
   const cv=document.getElementById('confetti-canvas');if(!cv)return;
   cv.width=window.innerWidth;cv.height=window.innerHeight;
   const ctx=cv.getContext('2d'),cols=[color,'#fff','#c8f135','#ffd700'];
@@ -5543,13 +5562,17 @@ function mpInitPanZoom(){
 function mpartyRenderMap(){
   var svg=document.getElementById('mparty-map-svg');
   if(!svg) return;
-  var html='<defs><linearGradient id="mp-og" gradientUnits="userSpaceOnUse" x1="500" y1="0" x2="500" y2="500">'+
+  var html='<defs>'+
+    '<linearGradient id="mp-og" gradientUnits="userSpaceOnUse" x1="500" y1="0" x2="500" y2="500">'+
     '<stop offset="0%" stop-color="#061525"/><stop offset="50%" stop-color="#0d3560"/><stop offset="100%" stop-color="#051220"/>'+
-    '</linearGradient></defs><rect width="1000" height="500" fill="url(#mp-og)"/>'+
+    '</linearGradient></defs>'+
+    '<rect width="1000" height="500" fill="url(#mp-og)"/>'+
     '<g opacity=".06" stroke="#9fcee8" stroke-width=".3" fill="none">'+
     '<line x1="0" y1="247" x2="1000" y2="247"/><line x1="0" y1="197" x2="1000" y2="197"/>'+
-    '<line x1="0" y1="297" x2="1000" y2="297"/>'+
-    '<line x1="174" y1="0" x2="174" y2="500"/><line x1="501" y1="0" x2="501" y2="500"/>'+
+    '<line x1="0" y1="127" x2="1000" y2="127"/><line x1="0" y1="297" x2="1000" y2="297"/>'+
+    '<line x1="0" y1="366" x2="1000" y2="366"/>'+
+    '<line x1="174" y1="0" x2="174" y2="500"/><line x1="338" y1="0" x2="338" y2="500"/>'+
+    '<line x1="501" y1="0" x2="501" y2="500"/><line x1="665" y1="0" x2="665" y2="500"/>'+
     '<line x1="828" y1="0" x2="828" y2="500"/></g>';
   for(var name in MAP_PATHS){
     html+='<path d="'+MAP_PATHS[name]+'" fill="#2a4a6a" stroke="#000" stroke-width=".5" stroke-linejoin="round" opacity=".85"/>';
@@ -5899,30 +5922,13 @@ function bdrRenderMap(){
   if(!svg)return;
   let html=`<defs>
 <linearGradient id="og" gradientUnits="userSpaceOnUse" x1="500" y1="0" x2="500" y2="500">
-  <stop offset="0%" stop-color="#0b1d35"/>
-  <stop offset="22%" stop-color="#13487a"/>
-  <stop offset="50%" stop-color="#1a6fa3"/>
-  <stop offset="78%" stop-color="#11568a"/>
-  <stop offset="100%" stop-color="#0a1b30"/>
+  <stop offset="0%" stop-color="#061525"/>
+  <stop offset="50%" stop-color="#0d3560"/>
+  <stop offset="100%" stop-color="#051220"/>
 </linearGradient>
-<radialGradient id="dp1" gradientUnits="userSpaceOnUse" cx="120" cy="235" r="220">
-  <stop offset="0%" stop-color="#040e1e" stop-opacity=".6"/>
-  <stop offset="100%" stop-color="#040e1e" stop-opacity="0"/>
-</radialGradient>
-<radialGradient id="dp2" gradientUnits="userSpaceOnUse" cx="910" cy="215" r="175">
-  <stop offset="0%" stop-color="#040e1e" stop-opacity=".48"/>
-  <stop offset="100%" stop-color="#040e1e" stop-opacity="0"/>
-</radialGradient>
-<radialGradient id="dp3" gradientUnits="userSpaceOnUse" cx="700" cy="315" r="130">
-  <stop offset="0%" stop-color="#040e1e" stop-opacity=".4"/>
-  <stop offset="100%" stop-color="#040e1e" stop-opacity="0"/>
-</radialGradient>
 </defs>
 <rect width="1000" height="500" fill="url(#og)"/>
-<rect width="1000" height="500" fill="url(#dp1)"/>
-<rect width="1000" height="500" fill="url(#dp2)"/>
-<rect width="1000" height="500" fill="url(#dp3)"/>
-<g opacity=".09" stroke="#9fcee8" stroke-width=".35" fill="none">
+<g opacity=".06" stroke="#9fcee8" stroke-width=".3" fill="none">
   <line x1="0" y1="247" x2="1000" y2="247"/>
   <line x1="0" y1="197" x2="1000" y2="197"/>
   <line x1="0" y1="127" x2="1000" y2="127"/>
@@ -5933,13 +5939,7 @@ function bdrRenderMap(){
   <line x1="501" y1="0" x2="501" y2="500"/>
   <line x1="665" y1="0" x2="665" y2="500"/>
   <line x1="828" y1="0" x2="828" y2="500"/>
-</g>
-<text x="110" y="195" font-family="Arial,Helvetica,sans-serif" font-size="7.5" font-style="italic" font-weight="700" fill="rgba(190,225,255,.32)" text-anchor="middle">PACIFIC OCEAN</text>
-<text x="935" y="142" font-family="Arial,Helvetica,sans-serif" font-size="7.5" font-style="italic" font-weight="700" fill="rgba(190,225,255,.32)" text-anchor="middle">PACIFIC OCEAN</text>
-<text x="462" y="282" font-family="Arial,Helvetica,sans-serif" font-size="7" font-style="italic" font-weight="700" fill="rgba(190,225,255,.28)" text-anchor="middle">ATLANTIC OCEAN</text>
-<text x="700" y="305" font-family="Arial,Helvetica,sans-serif" font-size="7" font-style="italic" font-weight="700" fill="rgba(190,225,255,.28)" text-anchor="middle">INDIAN OCEAN</text>
-<text x="500" y="42" font-family="Arial,Helvetica,sans-serif" font-size="6" font-style="italic" fill="rgba(190,225,255,.22)" text-anchor="middle">ARCTIC OCEAN</text>
-<text x="490" y="467" font-family="Arial,Helvetica,sans-serif" font-size="6" font-style="italic" fill="rgba(190,225,255,.22)" text-anchor="middle">SOUTHERN OCEAN</text>`;
+</g>`;
   /* Layer 0: Decorative islands (countries without NEIGHBORS — shown as gray silhouettes) */
   for(const name of Object.keys(MAP_PATHS)){
     if(NEIGHBORS[name])continue; /* skip playable countries */
@@ -6184,6 +6184,7 @@ function bdrSubmit(){
   }
   if(!isNeighbor){
     bdrShowFb(T.bdrWrong||'✗ Not a neighbor!','bad');
+    try{GeoAudio.playSFX('wrong');}catch(e){}
     inp.value='';inp.focus();
     return;
   }
@@ -6191,6 +6192,7 @@ function bdrSubmit(){
   bdr.visited.push(country);
   bdr.current=country;
   bdrShowFb(T.bdrCorrect||'✓ Correct neighbor!','ok');
+  try{GeoAudio.playSFX('correct');}catch(e){}
   inp.value='';inp.focus();
   bdrUpdateUI();
   /* Smooth zoom to fit all visited countries */

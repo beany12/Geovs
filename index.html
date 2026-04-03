@@ -67,6 +67,7 @@
 <!-- Profile/XP system (must load before profileRender() call in body) -->
 <script src="avatar.js"></script>
 <script src="app-profile.js"></script>
+<script src="audio.js"></script>
 </head>
 <body>
 
@@ -109,6 +110,20 @@
     <div style="background:var(--ink3);border-radius:8px;padding:7px;text-align:center"><div id="pp-total-xp" style="font-family:var(--font-d);font-size:1.1rem;color:var(--lime)">0</div><div style="font-family:var(--font-m);font-size:.48rem;color:var(--muted)">TOTAL XP</div></div>
     <div style="background:var(--ink3);border-radius:8px;padding:7px;text-align:center"><div id="pp-games" style="font-family:var(--font-d);font-size:1.1rem;color:var(--lime)">0</div><div style="font-family:var(--font-m);font-size:.48rem;color:var(--muted)">GAMES</div></div>
     <div style="background:var(--ink3);border-radius:8px;padding:7px;text-align:center"><div id="pp-ach-count" style="font-family:var(--font-d);font-size:1.1rem;color:var(--amber)">0/32</div><div style="font-family:var(--font-m);font-size:.48rem;color:var(--muted)">ACHIEVEMENTS</div></div>
+  </div>
+  <!-- Audio Settings -->
+  <div style="background:var(--ink3);border-radius:10px;padding:10px 12px;display:flex;flex-direction:column;gap:8px">
+    <div style="font-family:var(--font-m);font-size:.55rem;color:var(--muted);letter-spacing:.12em;text-transform:uppercase">AUDIO</div>
+    <div style="display:flex;align-items:center;gap:8px">
+      <span style="font-size:.65rem;color:var(--muted2);min-width:48px">Musik</span>
+      <input type="range" min="0" max="100" value="50" id="audio-music-vol" class="setup-slider" style="accent-color:var(--teal);flex:1" oninput="GeoAudio.setMusicVolume(this.value/100)">
+      <span id="audio-music-icon" style="font-size:.85rem;cursor:pointer;min-width:20px;text-align:center" onclick="GeoAudio.toggleMusic()">🔊</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px">
+      <span style="font-size:.65rem;color:var(--muted2);min-width:48px">Effekte</span>
+      <input type="range" min="0" max="100" value="70" id="audio-sfx-vol" class="setup-slider" style="accent-color:var(--lime);flex:1" oninput="GeoAudio.setSFXVolume(this.value/100)">
+      <span id="audio-sfx-icon" style="font-size:.85rem;cursor:pointer;min-width:20px;text-align:center" onclick="GeoAudio.toggleSFX()">🔊</span>
+    </div>
   </div>
   <div style="display:flex;gap:6px">
     <button onclick="openAchPanel()" style="flex:1;padding:6px;border-radius:8px;background:var(--ink3);border:1px solid rgba(255,184,48,.3);color:var(--amber);font-size:.7rem;cursor:pointer;font-family:inherit;font-weight:700">🏆 Achievements</button>

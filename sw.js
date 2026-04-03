@@ -1,4 +1,4 @@
-const CACHE = 'geovs-v6';
+const CACHE = 'geovs-v7';
 const ASSETS = [
   '/',
   '/index.html',
@@ -6,6 +6,7 @@ const ASSETS = [
   '/app-profile.js',
   '/app.js',
   '/avatar.js',
+  '/audio.js',
   '/earth.jpg',
   '/manifest.json'
 ];
@@ -32,8 +33,8 @@ self.addEventListener('fetch', e => {
       url.pathname.startsWith('/auth') || url.pathname.includes('token') ||
       url.pathname.startsWith('/socket.io')) return;
 
-  // GIFs: cache-first with long TTL
-  if (url.pathname.endsWith('.gif')) {
+  // Audio + GIFs: cache-first with long TTL
+  if (url.pathname.endsWith('.mp3') || url.pathname.endsWith('.ogg') || url.pathname.endsWith('.gif')) {
     e.respondWith(
       caches.match(e.request).then(cached => cached || fetch(e.request).then(res => {
         if (res && res.status === 200) {

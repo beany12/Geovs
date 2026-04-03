@@ -12,6 +12,7 @@
 <script src="/socket.io/socket.io.js"></script>
 <!-- BorderRun world map data -->
 <script src="borderrun-world.js"></script>
+<script src="audio.js"></script>
 <style>
   /* ── Page reset ── */
   *{box-sizing:border-box;margin:0;padding:0}
@@ -104,7 +105,7 @@
   .br-player-path{font-size:.58rem;color:var(--muted);margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
   /* ── World map ── */
-  .br-map-wrap{width:100%;position:relative;border-radius:12px;overflow:hidden;border:1px solid rgba(255,255,255,.06);margin-bottom:10px;cursor:grab;touch-action:none;background:#0b1d35;box-shadow:0 8px 32px rgba(0,0,0,.4)}
+  .br-map-wrap{width:100%;position:relative;border-radius:12px;overflow:hidden;border:1px solid rgba(255,255,255,.06);margin-bottom:10px;cursor:grab;touch-action:none;background:#061525;box-shadow:0 8px 32px rgba(0,0,0,.4)}
   .br-map-wrap:active{cursor:grabbing}
   .br-map-wrap svg{display:block;width:100%;height:auto;aspect-ratio:2/1}
   .br-map-zoom{position:absolute;bottom:6px;right:6px;display:flex;gap:4px}
@@ -649,6 +650,7 @@ function connectSocket() {
   socket.on('br:victory', (state) => {
     renderVictory(state);
     showScreen('victory');
+    try{ GeoAudio.playSFX(state.winner === myPlayerIdx ? 'victory' : 'defeat'); }catch(e){}
   });
 
   socket.on('br:opponent_left', () => showToast(T.oppLeft));
@@ -807,9 +809,9 @@ function _renderMapToSvg(svg, state, showOpponent) {
 
   let html = `<defs>
 <linearGradient id="brOG" gradientUnits="userSpaceOnUse" x1="500" y1="0" x2="500" y2="500">
-  <stop offset="0%" stop-color="#0b1d35"/>
-  <stop offset="50%" stop-color="#1a6fa3"/>
-  <stop offset="100%" stop-color="#0a1b30"/>
+  <stop offset="0%" stop-color="#061525"/>
+  <stop offset="50%" stop-color="#0d3560"/>
+  <stop offset="100%" stop-color="#051220"/>
 </linearGradient>
 </defs>
 <rect width="1000" height="500" fill="url(#brOG)"/>`;
@@ -1068,6 +1070,7 @@ function brShowFb(msg, type) {
   const fb = document.getElementById('g-fb');
   if (!fb) return;
   fb.textContent = msg; fb.className = 'br-fb ' + type;
+  try{ GeoAudio.playSFX(type==='ok'?'correct':'wrong'); }catch(e){}
   setTimeout(() => { fb.textContent = ''; fb.className = 'br-fb'; }, 2000);
 }
 

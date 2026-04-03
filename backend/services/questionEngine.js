@@ -11,7 +11,8 @@ function pickRandom(arr, n) {
 }
 
 function signQuestion(questionId, correctAnswer, expiresAt) {
-  const secret = process.env.SESSION_SECRET || 'dev-secret-change-me';
+  const secret = process.env.SESSION_SECRET;
+  if (!secret) throw new Error('SESSION_SECRET not configured');
   return crypto
     .createHmac('sha256', secret)
     .update(`${questionId}:${correctAnswer}:${expiresAt}`)
