@@ -537,8 +537,13 @@ const GeoAudio = (function() {
     settings.musicVolume = Math.max(0, Math.min(1, v));
     settings.musicEnabled = settings.musicVolume > 0;
     updateMusicVolume();
-    if (settings.musicEnabled && currentTrack && (!musicA || musicA.paused)) playMusic(currentTrack);
-    if (!settings.musicEnabled && musicA && !musicA.paused) { stopMusic(); currentTrack = null; }
+    if (settings.musicEnabled && !synthMusicTimer && (!musicA || musicA.paused)) {
+      playMusic(currentTrack || lastTrack || 'menu');
+    }
+    if (!settings.musicEnabled) {
+      lastTrack = currentTrack || lastTrack;
+      stopMusic();
+    }
     save(); updateSettingsUI();
   }
 
@@ -548,10 +553,15 @@ const GeoAudio = (function() {
     save(); updateSettingsUI();
   }
 
+  let lastTrack = 'menu'; // Remember last track for re-enable
   function toggleMusic() {
     settings.musicEnabled = !settings.musicEnabled;
-    if (!settings.musicEnabled) stopMusic();
-    else if (currentTrack) playMusic(currentTrack);
+    if (!settings.musicEnabled) {
+      lastTrack = currentTrack || lastTrack;
+      stopMusic();
+    } else {
+      playMusic(currentTrack || lastTrack || 'menu');
+    }
     save(); updateSettingsUI();
   }
 

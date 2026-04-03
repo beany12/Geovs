@@ -111,20 +111,6 @@
     <div style="background:var(--ink3);border-radius:8px;padding:7px;text-align:center"><div id="pp-games" style="font-family:var(--font-d);font-size:1.1rem;color:var(--lime)">0</div><div style="font-family:var(--font-m);font-size:.48rem;color:var(--muted)">GAMES</div></div>
     <div style="background:var(--ink3);border-radius:8px;padding:7px;text-align:center"><div id="pp-ach-count" style="font-family:var(--font-d);font-size:1.1rem;color:var(--amber)">0/32</div><div style="font-family:var(--font-m);font-size:.48rem;color:var(--muted)">ACHIEVEMENTS</div></div>
   </div>
-  <!-- Audio Settings -->
-  <div style="background:var(--ink3);border-radius:10px;padding:10px 12px;display:flex;flex-direction:column;gap:8px">
-    <div style="font-family:var(--font-m);font-size:.55rem;color:var(--muted);letter-spacing:.12em;text-transform:uppercase">AUDIO</div>
-    <div style="display:flex;align-items:center;gap:8px">
-      <span style="font-size:.65rem;color:var(--muted2);min-width:48px">Musik</span>
-      <input type="range" min="0" max="100" value="50" id="audio-music-vol" class="setup-slider" style="accent-color:var(--teal);flex:1" oninput="GeoAudio.setMusicVolume(this.value/100)">
-      <span id="audio-music-icon" style="font-size:.85rem;cursor:pointer;min-width:20px;text-align:center" onclick="GeoAudio.toggleMusic()">🔊</span>
-    </div>
-    <div style="display:flex;align-items:center;gap:8px">
-      <span style="font-size:.65rem;color:var(--muted2);min-width:48px">Effekte</span>
-      <input type="range" min="0" max="100" value="70" id="audio-sfx-vol" class="setup-slider" style="accent-color:var(--lime);flex:1" oninput="GeoAudio.setSFXVolume(this.value/100)">
-      <span id="audio-sfx-icon" style="font-size:.85rem;cursor:pointer;min-width:20px;text-align:center" onclick="GeoAudio.toggleSFX()">🔊</span>
-    </div>
-  </div>
   <div style="display:flex;gap:6px">
     <button onclick="openAchPanel()" style="flex:1;padding:6px;border-radius:8px;background:var(--ink3);border:1px solid rgba(255,184,48,.3);color:var(--amber);font-size:.7rem;cursor:pointer;font-family:inherit;font-weight:700">🏆 Achievements</button>
     <button onclick="openRanksPanel()" style="flex:1;padding:6px;border-radius:8px;background:var(--ink3);border:1px solid var(--border);color:var(--lime);font-size:.7rem;cursor:pointer;font-family:inherit">ℹ️ All Levels</button>
@@ -184,52 +170,49 @@
 <!-- ══════════════════════════════════════
      HOME
 ══════════════════════════════════════ -->
-<!-- Audio toggle (top-left, always visible) -->
-<div id="audio-toggle" onclick="GeoAudio.toggleMusic(); GeoAudio.toggleSFX();" style="position:fixed;top:14px;left:14px;z-index:200;width:36px;height:36px;border-radius:10px;background:rgba(14,14,26,.7);border:1px solid rgba(255,255,255,.08);display:flex;align-items:center;justify-content:center;cursor:pointer;backdrop-filter:blur(12px);transition:all .15s;font-size:1rem;user-select:none;-webkit-tap-highlight-color:transparent" title="Sound an/aus">
+<!-- Audio control (top-left, always visible) -->
+<div id="audio-btn" style="position:fixed;top:14px;left:14px;z-index:201;width:36px;height:36px;border-radius:10px;background:rgba(14,14,26,.7);border:1px solid rgba(255,255,255,.08);display:flex;align-items:center;justify-content:center;cursor:pointer;backdrop-filter:blur(12px);transition:all .15s;font-size:1rem;user-select:none;-webkit-tap-highlight-color:transparent" title="Audio">
   <span id="audio-toggle-icon">🔊</span>
 </div>
+<div id="audio-panel" style="position:fixed;top:56px;left:14px;z-index:200;width:220px;background:rgba(14,14,26,.9);border:1px solid rgba(255,255,255,.1);border-radius:14px;padding:14px;backdrop-filter:blur(20px);box-shadow:0 12px 40px rgba(0,0,0,.5);display:none;flex-direction:column;gap:10px">
+  <div style="font-family:var(--font-m);font-size:.55rem;color:var(--muted);letter-spacing:.12em;text-transform:uppercase">AUDIO</div>
+  <div style="display:flex;align-items:center;gap:8px">
+    <span style="font-size:.65rem;color:var(--muted2);min-width:48px">Musik</span>
+    <input type="range" min="0" max="100" value="50" id="audio-music-vol" class="setup-slider" style="accent-color:var(--teal);flex:1" oninput="GeoAudio.setMusicVolume(this.value/100);_audioSyncIcon()">
+    <span id="audio-music-icon" style="font-size:.85rem;cursor:pointer;min-width:20px;text-align:center" onclick="GeoAudio.toggleMusic();_audioSyncIcon()">🔊</span>
+  </div>
+  <div style="display:flex;align-items:center;gap:8px">
+    <span style="font-size:.65rem;color:var(--muted2);min-width:48px">Effekte</span>
+    <input type="range" min="0" max="100" value="70" id="audio-sfx-vol" class="setup-slider" style="accent-color:var(--lime);flex:1" oninput="GeoAudio.setSFXVolume(this.value/100);_audioSyncIcon()">
+    <span id="audio-sfx-icon" style="font-size:.85rem;cursor:pointer;min-width:20px;text-align:center" onclick="GeoAudio.toggleSFX();_audioSyncIcon()">🔊</span>
+  </div>
+</div>
 <script>
-(function(){
-  function syncIcon(){
-    var el=document.getElementById('audio-toggle-icon');
-    if(!el||typeof GeoAudio==='undefined')return;
-    var s=GeoAudio.settings;
-    el.textContent=(s.musicEnabled||s.sfxEnabled)?'🔊':'🔇';
-    var wrap=document.getElementById('audio-toggle');
-    if(wrap) wrap.style.borderColor=(s.musicEnabled||s.sfxEnabled)?'rgba(255,255,255,.08)':'rgba(255,45,94,.3)';
-  }
-  // Override toggles to sync icon
-  var origTM,origTS;
-  function patch(){
-    if(typeof GeoAudio==='undefined')return setTimeout(patch,100);
-    origTM=GeoAudio.toggleMusic;origTS=GeoAudio.toggleSFX;
-    GeoAudio.toggleMusic=function(){origTM.call(GeoAudio);syncIcon();};
-    GeoAudio.toggleSFX=function(){origTS.call(GeoAudio);syncIcon();};
-    // Also patch volume setters
-    var origMV=GeoAudio.setMusicVolume,origSV=GeoAudio.setSFXVolume;
-    GeoAudio.setMusicVolume=function(v){origMV.call(GeoAudio,v);syncIcon();};
-    GeoAudio.setSFXVolume=function(v){origSV.call(GeoAudio,v);syncIcon();};
-    syncIcon();
-  }
-  patch();
-  // Make toggle button smarter: single click mutes/unmutes everything
-  document.getElementById('audio-toggle').onclick=function(){
-    if(typeof GeoAudio==='undefined')return;
-    var s=GeoAudio.settings;
-    var isOn=s.musicEnabled||s.sfxEnabled;
-    if(isOn){
-      // Mute all
-      if(s.musicEnabled)origTM.call(GeoAudio);
-      if(s.sfxEnabled)origTS.call(GeoAudio);
-    } else {
-      // Unmute all
-      if(!s.musicEnabled)origTM.call(GeoAudio);
-      if(!s.sfxEnabled)origTS.call(GeoAudio);
-    }
-    syncIcon();
-    GeoAudio.updateSettingsUI();
-  };
-})();
+var _audioPanelOpen=false;
+function _audioSyncIcon(){
+  var el=document.getElementById('audio-toggle-icon');
+  if(!el||typeof GeoAudio==='undefined')return;
+  var s=GeoAudio.settings;
+  var on=s.musicEnabled||s.sfxEnabled;
+  el.textContent=on?'🔊':'🔇';
+  document.getElementById('audio-btn').style.borderColor=on?'rgba(255,255,255,.08)':'rgba(255,45,94,.3)';
+}
+document.getElementById('audio-btn').onclick=function(e){
+  e.stopPropagation();
+  _audioPanelOpen=!_audioPanelOpen;
+  document.getElementById('audio-panel').style.display=_audioPanelOpen?'flex':'none';
+  if(typeof GeoAudio!=='undefined') GeoAudio.updateSettingsUI();
+  _audioSyncIcon();
+};
+// Close panel when clicking outside
+document.addEventListener('click',function(e){
+  if(!_audioPanelOpen)return;
+  if(e.target.closest('#audio-panel')||e.target.closest('#audio-btn'))return;
+  _audioPanelOpen=false;
+  document.getElementById('audio-panel').style.display='none';
+});
+// Sync icon on load
+(function p(){if(typeof GeoAudio==='undefined')return setTimeout(p,100);_audioSyncIcon();GeoAudio.updateSettingsUI();})();
 </script>
 
 <div class="screen active" id="sh">
